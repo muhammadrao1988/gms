@@ -1,0 +1,261 @@
+/* apply a natural box layout model to all elements */
+*, *:before, *:after {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+html, body {
+    min-height: 100%;
+}
+
+body {
+    background: url("../img/body-bg.png") #030e0e repeat-x;
+    font-family: 'Myriad Pro';
+    color: #ffffff;
+}
+
+.container{
+    width: 1000px;
+}
+
+.main-bg {
+    background: url("../img/background.png") no-repeat;
+}
+
+/*------------------ Top Header -----------------------*/
+.top-header {
+    margin: 15px 0 10px 0;
+}
+
+
+.call-number {
+    text-align: right;
+    font-size: 18px;
+    line-height: 25px;
+    color: #000;
+}
+
+.call-number a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 25px;
+}
+
+/*------------------ Navigation -----------------------*/
+.navbar-inner {
+    padding-left: 0;
+    padding-right: 0;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    border-radius: 0;
+}
+
+.navbar .nav li {
+    background: url("../img/nav-bg.png");
+    width: 165px;
+    height: 45px;
+    line-height: 27px;
+    text-align: center;
+    font-size: 19px;
+}
+
+.navbar .nav li.active > a, .navbar .nav li a:hover {
+    background: url("../img/nav-hover.png");
+    color: #88c425;
+}
+
+.navbar .nav > .active > a, .navbar .nav > .active > a:hover, .navbar .nav > .active > a:focus {
+    background-color: transparent;
+    box-shadow: none;
+    background: url("../img/nav-hover.png");
+    color: #88c425;
+}
+
+/*------------------ Banner -----------------------*/
+.banner {
+    color: #ffffff;
+    height: 340px;
+    padding: 55px 0;
+}
+
+.heading {
+    text-transform: uppercase;
+    color: #88c425;
+    font-size: 24px;
+    line-height: 42px;
+    font-weight: lighter;
+    margin: 5px 10px;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+.colored {
+    color: #88c425;
+}
+
+.pt-34 {
+    font-size: 34px;
+}
+
+.pt-18 {
+    font-size: 17px;
+}
+
+.pt-30 {
+    font-size: 30px;
+}
+
+.pt-24 {
+    font-size: 24px;
+    line-height: 34px;
+}
+
+.pt-22 {
+    font-size: 22px;
+    line-height: 100px;
+    color: #c4c4c4;
+}
+
+
+
+hr {
+    background-color: #081f1f;
+    border: 0 none;
+    height: 1px;
+    padding: 0;
+    margin: 0;
+}
+
+hr.gray {
+    background-color: #dce8e8;
+    height: 1px;
+}
+
+/*------------------- network-box --------------------*/
+.network-box {
+
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    background: url("../img/network-box-bg.png") repeat-x;
+}
+
+.network-list {
+    margin: 0;
+    padding: 3px;
+    list-style: none;
+}
+
+.network-list li > a {
+    background: url("../img/choosenetwork-btn-bg-normal.png") no-repeat;
+    width: 130px;
+    height: 83px;
+    float: left;
+    margin: 6px;
+    text-align: center;
+}
+
+.network-list li > a:hover {
+    background: url("../img/choosenetwork-btn-bg-hovr.png") no-repeat;
+}
+
+/*---------------------- Content-area ---------------------------*/
+.content-area {
+    padding: 5px;
+    color: #ffffff;
+    border-radius: 2px;
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    background: url("../img/heading-bar.png") repeat-x #154f50;
+}
+
+.page-content {
+    padding: 20px 15px;
+}
+
+/*---------------------- Footer ---------------------------*/
+.footer-desc {
+    height: 128px;
+    font-size: 12px;
+    color: #dce8e8;
+    padding: 30px 0;
+    text-align: center;
+}
+
+footer, footer a {
+    color: #ffffff;
+}
+
+footer a:hover {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.form-actions {
+    background-color: transparent;
+    border-top: none;
+}
+
+.control-label {
+    color: #c4c4c4;
+}
+
+input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], .uneditable-input {
+    height: 42px;
+    line-height: 42px;
+    width: 284px;
+    border: 3px solid #b7c2c2;
+}
+
+textarea {
+    border: 3px solid #b7c2c2;
+    width: auto;
+}
+select {
+    border: 3px solid #b7c2c2;
+    height: 45px;
+    width: 284px;
+}
+
+.wrong {
+    border: 3px solid #ef8319 !important;
+}
+
+.right {
+    border: 3px solid #88c425 !important;
+}
+
+.right-points li {
+    list-style-image: url("../img/right-points.png");
+}
+
+.btn-ssc {
+    background: #88c425;
+    color: #ffff4a;
+    font-size: 16px;
+    padding: 10px 35px;
+}
+
+.btn-ssc:hover {
+    background: #88c425;
+}
+
+.network-carousel span {
+    background: url("../img/network-slider.png") no-repeat;
+    width: 130px;
+    height: 83px;
+    float: left;
+    margin: 6px;
+    text-align: center;
+}
+.ui-slider-handle{
+    border-radius: 10px !important;
+    -moz-border-radius: 10px !important;
+}
+div.checker, div.checker span, div.checker input{
+    height: 50px !important;
+}
