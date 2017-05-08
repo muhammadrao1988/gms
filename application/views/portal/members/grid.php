@@ -4,11 +4,6 @@ include dirname(__FILE__) . "/../includes/header.php";
 include dirname(__FILE__) . "/../includes/left_side_bar.php";
 ?>
 <link rel="stylesheet" href="<?php echo base_url('assets/css/style_new.css') ; ?>">
-<style>
-    .table-overflow{
-        width: 97%;
-    }
-</style>
 <section id="main-content" class="inner-main-pages">
     <section class="wrapper">
         <!--mini statistics start-->

@@ -14,8 +14,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                 <!--breadcrumbs start -->
                 <ul class="breadcrumb">
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">Admin</a></li>
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">Users</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">Members</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">All <?php echo $title ; ?></a></li>
                     <li class="active"><?php echo(!empty($row->acc_id) ? 'Edit' : 'Add'); ?></li>
                 </ul>
                 <!--breadcrumbs end -->
@@ -31,7 +31,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 class="fa fa-chevron-left"></i> Back
                     </button>
                     <span class="vert-sep"></span>
-                    <button class="btn btn-white active" type="button">Users</button>
+                    <button class="btn btn-white active" type="button">All <?php echo $title ; ?></button>
                     <span class="vert-sep"></span>
                 </div>
             </div>
@@ -77,7 +77,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 <div class="form-group">
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Date of Birth: </label>
                                     <div class="col-lg-6">
-                                        <input type="text" id="date_of_birth" name="date_of_birth" value="<?= $row->date_of_birth; ?>"
+                                        <input type="text" id="date_of_birth" name="date_of_birth" value="<?=(($row->date_of_birth!='' and $row->date_of_birth!='0000-00-00')?date('d/m/Y',strtotime($row->date_of_birth)):'') ; ?>"
                                                placeholder="DD-MM-YYYY"
                                                class="form-control validate[required] datepicker-default">
                                     </div>
@@ -86,10 +86,10 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Gender: </label>
                                     <div class="col-lg-6">
                                         <label>
-                                            <input type="radio" name="gender" value="male"> Male
+                                            <input type="radio" name="gender" value="male" <?php echo (($row->gender == 'male')?'checked':'') ; ?>> Male
                                         </label>
                                         <label>
-                                            <input type="radio" name="gender" value="female"> Female
+                                            <input type="radio" name="gender" value="female" <?php echo (($row->gender == 'female')?'checked':'') ; ?>> Female
                                         </label>
                                     </div>
                                 </div>
