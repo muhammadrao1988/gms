@@ -31,6 +31,15 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                            type="text">
                 </div>
                 <div class="form-group">
+                    <label class="sr-only" for="attendance">Check Type</label>
+                    <label for="style" class="styled_select">
+                        <select name="check_type" id="check_type">
+                            <option value="I">IN</option>
+                            <option value="O">OUT</option>
+                        </select>
+                    </label>
+                </div>
+                <div class="form-group">
                     <label class="sr-only" for="attendance">Date</label>
                     <input class="form-control datetime-picker" id="datetime" name="datetime" value="<?php echo $pk_date_time; ?>" type="text">
                 </div>

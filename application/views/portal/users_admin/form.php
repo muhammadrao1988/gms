@@ -176,6 +176,24 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="machine_serial" class="col-lg-3 col-sm-3 control-label">Machine Serial Number:</label>
+                                    <div class="col-lg-6">
+                                        <input type="text" id="machine_serial" name="machine_serial" value="<?= $row->machine_serial; ?>"
+                                               placeholder="Machine Serial Number" class="form-control validate[required,custom[integer]]">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="branch_id" class="col-lg-3 col-sm-3 control-label">Branch:</label>
+                                    <div class="col-lg-6">
+                                        <label class="styled_select">
+                                            <select name="branch_id" id="branch_id" class="styled validate[required]">
+                                                <option value=""> - Select -</option>
+                                                <?= selectBox("SELECT id,branch_name FROM `branches`", $row->branch_id); ?>
+                                            </select>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label class="control-label col-md-3">&nbsp;</label>
                                     <div class="col-md-8">
                                         <button type="reset" class="btn btn-black " onclick="window.history.back()">

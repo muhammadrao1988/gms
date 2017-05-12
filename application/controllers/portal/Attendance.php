@@ -41,20 +41,26 @@ class Attendance extends CI_Controller
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
         $data['pk_date_time'] = $this->pk_date_time;
-
+        if($this->session->userdata('user_info')->u_type != '1'){
+            $where .= ' AND ac.branch_id = "'.getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"').'"';
+        }
         $data['query'] = "SELECT 
-                          att.account_id ,
+                          /*att.account_id as user_id,*/
+                          ac.machine_member_id as machine_id,
                           ac.acc_name ,
-                          act.`Name` ,
-                          att.`datetime`
+                          act.`Name` ,                      
+                          IF(check_type='I','Checked In','Checked Out') as check_type,
+                          att.`datetime`                          
                         FROM
                           attendance AS att
                           INNER JOIN accounts AS ac 
                             ON (
-                              ac.`acc_id` = att.`account_id`
+                              ac.`machine_user_id` = att.`account_id`
                             ) 
                           INNER JOIN acc_types AS act
-                            ON  (act.`acc_type_ID` = ac.`acc_types`) ".$where;
+                            ON  (act.`acc_type_ID` = ac.`acc_types`)
+                             INNER JOIN users as usr 
+                             ON ( usr.user_id = ac.acc_manager ) where 1 and att.status = 1 ".$where;
 
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
@@ -75,6 +81,10 @@ class Attendance extends CI_Controller
                 $DBdata['datetime'] = $this->pk_date_time;
             }
             $DBdata['datetime'] = date('Y-m-d H:i:s',strtotime($DBdata['datetime']));
+            $DBdata['datetime'] = date('Y-m-d H:i:s',strtotime($DBdata['datetime']));
+
+            $DBdata['account_id'] = getVal('accounts','machine_user_id',' where acc_id = "'.getVar('account_id').'"');
+            $DBdata['sensored_id'] = 1;
             $DBdata['status'] = 1;
             $id = save($this->table, $DBdata);
 
@@ -87,7 +97,7 @@ class Attendance extends CI_Controller
         if ($str > 0)
         {
             if(getVal('accounts','acc_id',' where acc_id = "'.$str.'"') > 0) {
-                if(getVal('attendance','id',' where account_id = "'.$str.'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'"')){
+                if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
                     $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
                     return FALSE;
                 }

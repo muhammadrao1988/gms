@@ -26,6 +26,20 @@ class M_members extends CI_Model
             return true;
         }
     }
+    function getMachineUserId($id){
+        $dbName = urldecode(ACCESS_DATABASE);
+
+        if (!file_exists($dbName)) {
+
+            echo 'file not exist';
+        }
+        $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+        //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');
+        $result = $dbh->query("select USERINFO.USERID from USERINFO where Badgenumber = '".$id."'");
+
+        $USERID = $result->fetch(PDO::FETCH_ASSOC);
+        return $USERID['USERID'];
+    }
 }
 
 /* End of file m_events.php */

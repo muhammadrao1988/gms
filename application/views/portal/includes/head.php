@@ -40,6 +40,7 @@
     <!-- Date picker css -->
     <link rel="stylesheet" href="<?php echo base_url('assets/js/datapicker/base.css') ; ?>" />
     <link rel="stylesheet" href="<?php echo base_url('assets/js/datapicker/clean.css') ; ?>" />
+    <link rel="stylesheet" href="<?php echo base_url('assets/js/gritter/css/gritter.css') ; ?>" />
     <link rel="shortcut icon" type="image/png" href="<?php echo base_url('assets/images/favicon.ico') ; ?>"/>
     <!-- Custom styles for this template -->
     <link href="<?php echo base_url('assets/css/style.css') ; ?>" rel="stylesheet">

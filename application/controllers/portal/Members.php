@@ -72,8 +72,13 @@ class Members extends CI_Controller
           LEFT JOIN account_status ac_s
             ON (users.login_status = ac_s.id)
         WHERE 1 ". $where;*/
+        if($this->session->userdata('user_info')->u_type != '1'){
+            $branch_id = ' AND acc.branch_id = "'.getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"').'"';
+        }
+
         $data['query'] = "SELECT 
                               acc.acc_id,
+                              acc.machine_member_id as machine_id,
                               acc.acc_name,
                               acc.acc_tel,
                               acc.email,
@@ -86,8 +91,7 @@ class Members extends CI_Controller
                                 ON (br.`id` = acc.`branch_id`)
                                 INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = acc.`subscriptin_id`)
-                               WHERE acc.`status` = 1";
-
+                               WHERE acc.`status` = 1 ".$branch_id." ".$where;
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
@@ -146,7 +150,11 @@ class Members extends CI_Controller
             $DbArray = getDbArray($this->table);
 
             $DBdata = $DbArray['dbdata'];
-            $DBdata['date_of_birth'] = date('Y-m-d',strtotime(getVar('date_of_birth')));
+            $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
+            $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
+            $DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));;
+            $DBdata['branch_id']        = getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
+            $DBdata['serial_number']    = getVal('users','machine_serial',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
 
             $id = save($this->table, $DBdata);
 
@@ -166,10 +174,14 @@ class Members extends CI_Controller
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {
-
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
-            $DBdata['date_of_birth'] = date('Y-m-d',strtotime(getVar('date_of_birth')));
+            $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
+            $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
+            $DBdata['machine_user_id']  = $this->module->getMachineUserId($_REQUEST['machine_member_id']);;
+            $DBdata['branch_id']        = getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
+            $DBdata['serial_number']    = getVal('users','machine_serial',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
+
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
 

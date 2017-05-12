@@ -12,6 +12,9 @@ class M_dashboard extends CI_Model
             $this->table = getUri(2);
         }
     }
+    function existMembersAttendance(){
+        return $this->db->query("SELECT *,CONCAT(account_id,'_',check_type) as account_check FROM attendance WHERE `datetime` >= '".date('Y-m-d')." 00:00:00' and status = 1")->result();
+    }
 
 }
 

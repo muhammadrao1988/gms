@@ -1,4 +1,5 @@
 <?php
+
 include dirname(__FILE__) . "/../includes/head.php";
 include dirname(__FILE__) . "/../includes/header.php";
 include dirname(__FILE__) . "/../includes/left_side_bar.php";
@@ -127,6 +128,14 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Machine Member ID: </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" id="machine_member_id" name="machine_member_id"
+                                               value="<?= $row->machine_member_id; ?>" placeholder="Machine Member ID"
+                                               class="form-control validate[required,custom[integer]]">
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Member Type: </label>
                                     <div class="col-lg-6">
                                         <label class="styled_select">
@@ -178,6 +187,7 @@ include dirname(__FILE__) . "/../includes/footer.php";
 <script type="text/javascript">
     (function ($) {
         $(document).ready(function () {
+
             $('#subscriptin_id').on('change', function () {
                 var id = $(this).val();
                 if(id !='') {
@@ -194,6 +204,7 @@ include dirname(__FILE__) . "/../includes/footer.php";
                     $('#subscriptin_id').closest('.styled_select').find('.help-block').html('');
                 }
             });
+            $('#subscriptin_id').trigger('change');
         });
     })(jQuery)
 </script>

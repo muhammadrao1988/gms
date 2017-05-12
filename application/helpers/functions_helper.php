@@ -800,3 +800,22 @@ function emailFooter(){
 
     return $email_footer;
 }
+
+function getAttendenceMachine()
+{
+    $dbName = urldecode(ACCESS_DATABASE);
+
+    if (!file_exists($dbName)) {
+
+        echo 'file not exist';
+    } else {
+
+        $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+        //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');
+        $result = $dbh->query("select CHECKINOUT.* from CHECKINOUT where 1 AND CHECKTIME>#".date('Y-m-d')."# ORDER BY CHECKINOUT.CHECKTIME DESC");
+
+        return $result->fetchAll(PDO::FETCH_ASSOC);
+
+    }
+
+}

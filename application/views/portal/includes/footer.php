@@ -19,9 +19,9 @@
 <script src="<?php echo base_url('assets/assets/jQuery-slimScroll-1.3.0/jquery.slimscroll.js') ; ?>"></script>
 <script src="<?php echo base_url('assets/assets/skycons/skycons.js') ; ?>"></script>
 <script src="<?php echo base_url('assets/assets/jquery.scrollTo/jquery.scrollTo.js') ; ?>"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>-->
 <script src="<?php echo base_url('assets/assets/calendar/clndr.js') ; ?>"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>-->
 <script src="<?php echo base_url('assets/assets/calendar/moment-2.2.1.js') ; ?>"></script>
 <script src="<?php echo base_url('assets/js/calendar/evnt.calendar.init.js') ; ?>"></script>
 <script src="<?php echo base_url('assets/assets/jvector-map/jquery-jvectormap-1.2.2.min.js') ; ?>"></script>
@@ -65,6 +65,7 @@
 <script type="text/javascript" src="<?php echo  base_url('assets/assets/fuelux/js/spinner.min.js'); ?>"></script>
 <script type="text/javascript" src="<?php echo  base_url('assets/js/plugins/forms/jquery.validation.js'); ?>"></script>
 <script type="text/javascript" src="<?php echo  base_url('assets/js/plugins/forms/jquery.validationEngine-en.js'); ?>"></script>
+<script type="text/javascript" src="<?php echo  base_url('assets/js/gritter/gritter.js'); ?>"></script>
 <script src="<?php echo base_url('assets/assets/nestable/jquery.nestable.js') ; ?>"></script>
 
 
@@ -83,6 +84,35 @@
 <script type="text/javascript" src="<?php echo  base_url('assets/tiny_mce/tiny_mce_setting.js'); ?>"></script>
 
 <script type="text/javascript" src="<?php echo base_url('assets/js/my_plugins.js');?>"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        setInterval(function () {
+            $.ajax({
+                type: "POST",
+                dataType: "JSON",
+                url: "<?= site_url(ADMIN_DIR. '/dashboard/checkNewData'); ?>",
+                data: {id: 1},
+                complete: function (data) {
+                    var json = $.parseJSON(data.responseText);
+                    if(json.length > 0 ) {
+                        $.each(json, function (key, value) {
+                            //console.log(key+"=>>>>>"+value.account_id);
+                            $.gritter.add({
+                                // (string | mandatory) the heading of the notification
+                                title: 'Member '+value.account_id+' '+((value.check_type=="I")?"Checked In":"Checked Out"),
+                                // (string | mandatory) the text inside the notification
+                                text: 'Member id = '+value.account_id +' has checked at date time '+value.datetime,
+                                class_name: ((value.check_type=="I")?"gritter-in":"gritter-out"),
+                                sticky: false
+                            });
+                        });
+                    }
+                }
+                });
+        },6000);
+
+    });
+</script>
 </body>
 </html>
 

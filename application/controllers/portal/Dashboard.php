@@ -1,5 +1,10 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+/**
+ * Class Banned_users
+ * @property M_dashboard $module
+ * @property M_cpanel $m_cpanel
+ */
 class Dashboard extends CI_Controller
 {
 
@@ -37,119 +42,196 @@ class Dashboard extends CI_Controller
         $this->id_field = $this->module->id_field;
 
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
-
     }
 
 
     public function index()
     {
 
-
-
-        $this->load->view(ADMIN_DIR . 'dashboard/dashboard',"");
+        $this->load->view(ADMIN_DIR . 'dashboard/dashboard', "");
     }
-    public function returnAccount(){
+
+    public function checkNewData()
+    {
+        $json = array();
+        /*Get Attendance by Machine*/
+        $today_attendance = getAttendenceMachine();
+
+        if (count($today_attendance > 0)) {
+            /*Exist Attendance by DB*/
+            $exist_attendance = $this->module->existMembersAttendance();
+            $new_attendance = array();
+            //$today_data = array_unique(array_column($today_attendance, 'USERID'));
+            $exist_data = array_unique(array_column($exist_attendance, 'account_check'));
+            //$today_type = array_unique(array_column($today_attendance, 'CHECKTYPE'));
+            //$exist_type = array_unique(array_column($exist_attendance, 'check_type'));
+            $i = 0;
+            foreach ($today_attendance as $key=>$row){
+                $account_check = $row['USERID']."_".$row['CHECKTYPE'];
+                if(in_array($account_check,$exist_data)){
+                    $exist_data[] = $account_check;
+                    continue;
+                }else{
+                    $new_attendance['account_id'] = $row['USERID'];
+                    $new_attendance['datetime'] = $row['CHECKTIME'];
+                    $new_attendance['check_type'] = $row['CHECKTYPE'];
+                    $new_attendance['machine_serial'] = $row['sn'];
+                    $new_attendance['sensored_id'] = $row['SENSORID'];
+                    $new_attendance['status'] = 1;
+                    save('attendance',$new_attendance);
+                    $json[$i]['account_id'] = $row['USERID'];
+                    $json[$i]['datetime'] = $row['CHECKTIME'];
+                    $json[$i]['check_type'] = $row['CHECKTYPE'];
+                    $exist_data[] = $account_check;
+                    $i++;
+                }
+            }
+            /*foreach ($today_attendance as $key => $row) {
+                if (!in_array($row['USERID'], $exist_data)) {
+
+                    $new_attendance['account_id'] = $row['USERID'];
+                    $new_attendance['datetime'] = $row['CHECKTIME'];
+                    $new_attendance['check_type'] = $row['CHECKTYPE'];
+                    $new_attendance['machine_serial'] = $row['sn'];
+                    $new_attendance['sensored_id'] = $row['SENSORID'];
+                    $new_attendance['status'] = 1;
+                    $exist_attendance[] = $new_attendance;
+                    $exist_data[] = $new_attendance['account_id'];
+                    //save('attendance',$new_attendance);
+                    $json[$i]['account_id'] = $row['USERID'];
+                    $json[$i]['datetime'] = $row['CHECKTIME'];
+                    $json[$i]['check_type'] = $row['CHECKTYPE'];
+                    $i++;
+                } else {
+                    foreach ($exist_attendance as $key2 => $row2) {
+                        if ($row2->account_id == $row['USERID'] and $row2->check_type != $row['CHECKTYPE']) {
+                            $new_attendance['account_id'] = $row['USERID'];
+                            $new_attendance['datetime'] = $row['CHECKTIME'];
+                            $new_attendance['check_type'] = $row['CHECKTYPE'];
+                            $new_attendance['machine_serial'] = $row['sn'];
+                            $new_attendance['sensored_id'] = $row['SENSORID'];
+                            $new_attendance['status'] = 1;
+                            $exist_attendance[] = $new_attendance;
+                            $exist_data[] = $new_attendance['account_id'];
+                            //save('attendance',$new_attendance);
+                            $json[$i]['account_id'] = $row['USERID'];
+                            $json[$i]['datetime'] = $row['CHECKTIME'];
+                            $json[$i]['check_type'] = $row['CHECKTYPE'];
+                            $i++;
+                            echo "=======".$i."<br>";
+                        }
+                    }
+                }
+            }*/
+            echo json_encode($json);
+        }
+    }
+
+    public function returnAccount()
+    {
 
         $id = $this->session->userdata['switch_customer'];
 
-                $chekcAccount = "SELECT parent_child FROM users WHERE user_id='" . $id . "'";
-                $userResult  = $this->db->query($chekcAccount)->num_rows();
+        $chekcAccount = "SELECT parent_child FROM users WHERE user_id='" . $id . "'";
+        $userResult = $this->db->query($chekcAccount)->num_rows();
 
-                if ($userResult > 0) {
-                    $SQL = "SELECT users.*
+        if ($userResult > 0) {
+            $SQL = "SELECT users.*
                           		FROM users
                           		JOIN accounts ON (users.parent_child = accounts.acc_id )
-                          		WHERE users.`user_id`='".$id."' AND users.`status`=1
+                          		WHERE users.`user_id`='" . $id . "' AND users.`status`=1
                           		ORDER BY user_type DESC LIMIT 1 ";
 
-                    $result = $this->db->query($SQL)->row();
-                    if (count($result) > 0 && is_object($result)) {
-                        $currentUser = $this->session->userdata['tgm_user_id'];
-                        $switchCustomer = $this->session->userdata['switch_customer'];
-                        $this->session->unset_userdata(array(
-                            'logged_in' => '',
-                            'tgm_user_id' => '',
-                            'user_id' => '',
-                            'temp_user_id' => '',
-                            'username' => '',
-                            'password_attempts' => '',
-                            'email' => '',
-                            'user_type' => '',
-                            'u_type' => '',
-                            'user_info' => '',
-                            'advice_user_id' => '',
-                            'advice_firstname' => '',
-                            'advice_lastname' => '',
-                            'advice_login' => '',
-                            'advice_email' => '',
-                            'advice_plan' => '',
-                            'switch_customer' => ''
+            $result = $this->db->query($SQL)->row();
+            if (count($result) > 0 && is_object($result)) {
+                $currentUser = $this->session->userdata['tgm_user_id'];
+                $switchCustomer = $this->session->userdata['switch_customer'];
+                $this->session->unset_userdata(array(
+                    'logged_in' => '',
+                    'tgm_user_id' => '',
+                    'user_id' => '',
+                    'temp_user_id' => '',
+                    'username' => '',
+                    'password_attempts' => '',
+                    'email' => '',
+                    'user_type' => '',
+                    'u_type' => '',
+                    'user_info' => '',
+                    'advice_user_id' => '',
+                    'advice_firstname' => '',
+                    'advice_lastname' => '',
+                    'advice_login' => '',
+                    'advice_email' => '',
+                    'advice_plan' => '',
+                    'switch_customer' => ''
 
 
-                        ));
+                ));
 
-                            $this->session->set_userdata(array(
-                                'tgm_user_id' => $result->user_id,
-                                'login_status' => $result->login_status,
-                                'password_attempts' => '0',
-                                'user_id' => $result->user_id,
-                                'username' => $result->username,
-                                'email' => $result->email,
-                                'user_type' => $result->user_type,
-                                'u_type' => $result->u_type,
-                                'user_template_id' => $result->user_template_id,
-                                'parent_id' => $result->parent,
-                                'user_info' => $result,
+                $this->session->set_userdata(array(
+                    'tgm_user_id' => $result->user_id,
+                    'login_status' => $result->login_status,
+                    'password_attempts' => '0',
+                    'user_id' => $result->user_id,
+                    'username' => $result->username,
+                    'email' => $result->email,
+                    'user_type' => $result->user_type,
+                    'u_type' => $result->u_type,
+                    'user_template_id' => $result->user_template_id,
+                    'parent_id' => $result->parent,
+                    'user_info' => $result,
 
 
-                            ));
-                        $this->session->set_userdata('logged_in', 1);
-                        die('Call');
-                        redirect(ADMIN_DIR . 'dashboard');
+                ));
+                $this->session->set_userdata('logged_in', 1);
+                die('Call');
+                redirect(ADMIN_DIR . 'dashboard');
 
-                    } else {
-                        redirect(ADMIN_DIR . $this->module_name . '/?error=Sorry, you can not return to your own account. This user has blocked.');
-                    }
-                } else {
-                    redirect(ADMIN_DIR . $this->module_name . '/?error=Sorry, Invalid user id');
-                }
+            } else {
+                redirect(ADMIN_DIR . $this->module_name . '/?error=Sorry, you can not return to your own account. This user has blocked.');
+            }
+        } else {
+            redirect(ADMIN_DIR . $this->module_name . '/?error=Sorry, Invalid user id');
+        }
 
     }
 
-    public function save_dashboard_configuration(){
+    public function save_dashboard_configuration()
+    {
         $owner_id = $this->session->userdata['user_info']->parent_child;
-        if(getVar('save_dashboard_config')==1 && $owner_id!=""){
+        if (getVar('save_dashboard_config') == 1 && $owner_id != "") {
 
-            $report_array = array("today","yesterday","this_week","current_month");
-            $graph_array = array("call","min","acd","mcall");
+            $report_array = array("today", "yesterday", "this_week", "current_month");
+            $graph_array = array("call", "min", "acd", "mcall");
 
             $selected_graph_value = getVar('selected_graph_value');
             $selected_report_value = getVar('selected_report_value');
 
 
-            if(in_array($selected_graph_value,$graph_array) && in_array($selected_report_value,$report_array)){
+            if (in_array($selected_graph_value, $graph_array) && in_array($selected_report_value, $report_array)) {
 
                 $configuration = array(
                     'report_summary' => array(
-                        'date_frame'=>$selected_report_value,
-                        'selected_graph'=>$selected_graph_value
+                        'date_frame' => $selected_report_value,
+                        'selected_graph' => $selected_graph_value
                     )
                 );
-                $json_encode_configuration =  json_encode($configuration);
+                $json_encode_configuration = json_encode($configuration);
                 $dbdata['configuration'] = $json_encode_configuration;
-                $where =  "acc_id ='" . $owner_id . "'";
+                $where = "acc_id ='" . $owner_id . "'";
                 save("accounts", $dbdata, $where);
-                $result_array = array('result'=>200);
+                $result_array = array('result' => 200);
                 echo json_encode($result_array);
-            }else{
-                $result_array = array('result'=>400);
+            } else {
+                $result_array = array('result' => 400);
                 echo json_encode($result_array);
             }
 
         }
     }
 
-    public function viewSearchResult(){
+    public function viewSearchResult()
+    {
 
         if (getVar('number') != '') {
             $data = array();
@@ -171,10 +253,7 @@ class Dashboard extends CI_Controller
             $where .= ' AND numbers.full_number LIKE "%' . $full_number . '"';
 
 
-
-
-
-             $queryAll = "SELECT COUNT(id) as num_row FROM numbers" . $where;
+            $queryAll = "SELECT COUNT(id) as num_row FROM numbers" . $where;
             $total_row = $this->db->query($queryAll)->row();
             $data['total_record'] = $total_row->num_row;
 
@@ -187,7 +266,7 @@ class Dashboard extends CI_Controller
                 } else {
                     $pagination_sql = " LIMIT 0 , $resultsPerPage";
                 }
-                 $queryResult = "SELECT id,full_number,num_name FROM numbers" . $where . $pagination_sql;
+                $queryResult = "SELECT id,full_number,num_name FROM numbers" . $where . $pagination_sql;
 
 
                 $data['num_rows'] = $num_rows = $this->db->query($queryResult)->num_rows();
@@ -220,14 +299,13 @@ class Dashboard extends CI_Controller
             } else {
                 echo '<div class="alert alert-info ">No Record found.</div>';
             }
-        }else{
+        } else {
             echo '<div class="alert alert-info ">Invalid number found. Please try again</div>';
         }
 
-           // echo $this->load->view(ADMIN_DIR . 'dashboard/dashboard_search_modal', $data, true);
+        // echo $this->load->view(ADMIN_DIR . 'dashboard/dashboard_search_modal', $data, true);
 
     }
-
 
 
 }
