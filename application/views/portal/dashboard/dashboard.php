@@ -7,6 +7,8 @@ echo '<div class="loader-dashboard"></div>';
 	}*/
 
 include dirname(__FILE__) . "/../includes/left_side_bar.php";
+$month_member = $this->db->query("SELECT COUNT(acc_id) AS month_member FROM accounts WHERE MONTH(accounts.`acc_date`) = MONTH(CURRENT_DATE()) and `status` = 1")->row()->month_member;
+$total_member= $this->db->query("SELECT COUNT(acc_id) AS total_member FROM accounts WHERE `status` = 1")->row()->total_member;
 ?>
 <section id="main-content" class="dashboard-main-content">
     <section class="wrapper dashboard-main-wrapper">
@@ -28,7 +30,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 <div class="mini-stat clearfix">
                     <span class="mini-stat-icon orange"><i class="fa fa-group"></i></span>
                     <div class="mini-stat-info">
-                        <span>320</span>
+                        <span><?php echo number_format($total_member) ; ?></span>
                         Total Members
                     </div>
                 </div>
@@ -37,7 +39,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 <div class="mini-stat clearfix">
                     <span class="mini-stat-icon tar"><i class="fa fa-user"></i></span>
                     <div class="mini-stat-info">
-                        <span>22,450</span>
+                        <span><?php echo number_format($month_member) ; ?></span>
                         Members Register This Month
                     </div>
                 </div>

@@ -119,7 +119,7 @@ class Members extends CI_Controller
             $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "'";
             $data['row'] = $this->db->query($SQL)->row();
         }
-        $data['buttons'] = array();
+        /*$data['buttons'] = array('add');*/
         $data['title'] = $this->module_title;
         $this->load->view(ADMIN_DIR . '/includes/record_view', $data);
     }
