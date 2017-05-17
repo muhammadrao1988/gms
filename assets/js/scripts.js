@@ -217,6 +217,7 @@
   
 	 $('.datepicker2').datepicker();
 	 $('.datepicker-default').datepicker({ dateFormat: 'dd/mm/yy' });
+	 $('.datepicker-format').datepicker({ dateFormat: 'dd-mm-yy' });
 
  $('#checkRow').click(function(event) {  //on click 
         if(this.checked) { // check select status

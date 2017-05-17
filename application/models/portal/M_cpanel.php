@@ -126,7 +126,7 @@ class M_cpanel extends CI_Model
 					$this->email->subject("Unauthorised Access Detected");
 					$html_unauth = '<html">
 							<head>
-							<title>Telebox - Unauthorised Access Detected</title>
+							<title> Unauthorised Access Detected</title>
 							</head>
 							
 							<body>

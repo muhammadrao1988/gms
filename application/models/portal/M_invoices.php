@@ -15,8 +15,10 @@ class M_invoices extends CI_Model
 
     function validate()
     {
-        $this->form_validation->set_rules('branch_name', 'Branch Name', 'required');
-        $this->form_validation->set_rules('branch_user', 'Branch User', 'required');
+        $this->form_validation->set_rules('acc_id', 'Account Name', 'required');
+        $this->form_validation->set_rules('type[]', 'Fees Type', 'required');
+        $this->form_validation->set_rules('amount[]', 'Amount', 'required');
+        $this->form_validation->set_rules('fees_month', 'Fees Month', 'required');
 
         if ($this->form_validation->run() == FALSE) {
             return false;

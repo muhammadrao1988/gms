@@ -37,24 +37,85 @@ class Invoices extends CI_Controller
         $data['title'] = $this->module_title;
         //$data['query'] = "Select * from ".$this->table." where 1".$where;
         $data['query'] = "SELECT 
-                              ic.id,
-                              ac.acc_name AS member_name,
+                              ic.`id`,
                               ic.amount,
-                              ic.fees_month AS last_paid,
-                              30-DATEDIFF(CURRENT_DATE(),ic.fees_month) AS day_left,
-                              IF(30-DATEDIFF(CURRENT_DATE(),ic.fees_month)<5,CONCAT('Unpaid ','<button class=\"btn btn-primary btn-sm\" type=\"button\" data-toggle=\"modal\" href=\"#payment_pop\" data-invoice=\"',ic.id,'\">Pay</button>'),'<span class=\"green\"><b>Paid</b></span>') as payment_status,
-                              CASE ic.`type`
-                              WHEN '1' THEN 'Monthly Fees'
-                              WHEN '2' THEN 'Member Type'
-                              WHEN '3' THEN 'Subscription'
-                              WHEN '4' THEN 'Special Days'
-                              ELSE 'Other'
-                           END AS payment_type
+                              ic.acc_id,
+                              ac.acc_name as member_name,
+                              date(ic.fees_datetime) as paid_date,
+                              MONTHNAME(ic.fees_month) as last_paid_month,
+                              ic.`type` as invoice_for                              
+                            FROM
+                              invoices AS ic 
+                               INNER JOIN accounts AS ac 
+                                ON (ac.acc_id = ic.acc_id) 
+                           ".$where;
+        $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
+    }
+    public function monthlyInvoice(){
+        $where = '';
+        $where .= getFindQuery();
+        $data['title'] = $this->module_title;
+        //$data['query'] = "Select * from ".$this->table." where 1".$where;
+        $data['query'] = "SELECT
+                              id,
+                              ac.acc_name AS member_name,
+                              ac.acc_id,
+                              MAX(ic.fees_month) AS fees_month,                              
+                              ic.amount,
+                              DATE(ic.fees_datetime) AS last_paid,
+                              MONTHNAME(ic.fees_month) as last_paid_month,
+                              IF(
+                                (30 - DATEDIFF(
+                                  CURRENT_DATE(),
+                                  CONCAT(
+                                    DATE_FORMAT(ic.`fees_month`, '%Y-%m-'),
+                                    DAY(ac.acc_date)
+                                  )
+                                )) < 4 
+                                AND it.id = 1,
+                                CONCAT(
+                                  IF(
+                                    (30- DATEDIFF(CURRENT_DATE(), CONCAT(
+                                    DATE_FORMAT(ic.`fees_month`, '%Y-%m-'),
+                                    DAY(ac.acc_date)
+                                  ))) > 0,
+                                    CONCAT(
+                                      (30 - DATEDIFF(CURRENT_DATE(), CONCAT(
+                                    DATE_FORMAT(ic.`fees_month`, '%Y-%m-'),
+                                    DAY(ac.acc_date)
+                                  ))),
+                                      ' Days Left '
+                                    ),
+                                    'Unpiad '
+                                  ),
+                                  '<button class=\"btn btn-primary btn-sm payment_pop\" type=\"button\" href=\"javascript:void(0);\" data-invoice=\"',
+                                  ic.id,
+                                  '\"><i class=\"fa fa-money\"></i> Pay</button>'
+                                ),
+                                '<!--<span class=\"green\"><b>Paid</b></span>-->'
+                              ) AS payment_status,
+                              it.name AS invoice_for
                             FROM
                               invoices AS ic 
                               INNER JOIN accounts AS ac 
-                                ON (ic.`acc_id` = ac.`acc_id`)
-                            WHERE ic.`status` = 1 AND ac.`status` = 1".$where;
+                                ON (ic.`acc_id` = ac.`acc_id`) 
+                              INNER JOIN invoice_types AS `it` 
+                                ON (ic.`type` = `it`.`id`) 
+                            WHERE 1 
+                              AND ac.`status` = 1 and ic.type = 1 
+                            GROUP BY ic.acc_id ".$where;
+        echo htmlentities($data['query']);
+        die('Call');
+        $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
+    }
+    public function allInvoices(){
+        $where = '';
+        $where .= getFindQuery();
+        $data['title'] = $this->module_title;
+        //$data['query'] = "Select * from ".$this->table." where 1".$where;
+        $data['query'] = "select ic.acc_id,ac.acc_name from invoices as ic inner join account as ac on(ac.acc_id = ic.acc_id) inner join inovice_types as it on (it.id=ic.type) ".$where;
+        /*echo htmlentities($data['query']);
+        die('Call');*/
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -93,10 +154,15 @@ class Invoices extends CI_Controller
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {
-
             $DbArray = getDbArray($this->table);
-
             $DBdata = $DbArray['dbdata'];
+            $DBdata['fees_month'] = date('Y-m-d',strtotime(getVar('fees_month')));
+            $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
+            $DBdata['amount'] = array_sum(getVar('amount'));
+            $DBdata['type'] = implode(',',getVar('type'));
+            $amount_details[] =   array_filter(getVar('type'));
+            $amount_details[] =   array_filter(getVar('amount'));
+            $DBdata['amount_details'] = json_encode($amount_details);
 
             $id = save($this->table, $DBdata);
             /*------------------------------------------------------------------------------------------*/
@@ -114,6 +180,13 @@ class Invoices extends CI_Controller
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
 
+            $DBdata['fees_month'] = date('Y-m-d',strtotime(getVar('fees_month')));
+            $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
+            $DBdata['amount'] = array_sum(getVar('amount'));
+            $DBdata['type'] = implode(',',getVar('type'));
+            $amount_details[] =   array_filter(getVar('type'));
+            $amount_details[] =   array_filter(getVar('amount'));
+            $DBdata['amount_details'] = json_encode($amount_details);
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
@@ -151,8 +224,6 @@ class Invoices extends CI_Controller
         }else{
             $id = getVar('del-all');
         }
-
-
         $SQL = "DELETE FROM " . $this->table . " WHERE `" . $this->id_field . "` IN(" . $id . ")";
         $this->db->query($SQL);
         $JSON['notification'] = '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>Record has been deleted..</div>';
@@ -160,6 +231,12 @@ class Invoices extends CI_Controller
         $JSON['redirect_url'] =  $redirct_url;
         echo json_encode($JSON);
 
+
+    }
+    public function payPayment()
+    {
+        echo '<pre>';print_r($_REQUEST );echo '</pre>';
+        die('Call');
 
     }
 }

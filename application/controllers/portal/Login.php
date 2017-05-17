@@ -290,7 +290,7 @@ class Login extends CI_Controller
                     $email_data = getEmailTemplate( $result, 'Locked Account Attempted to Login');
 
                     $this->email->from(get_option('email_admin_noreply'), get_option('email_admin_from'));
-                    $this->email->to('noc@telebox.co.uk');
+                    $this->email->to('rameezbscs@hotmail.com');
                     $this->email->subject($email_data->subject);
                     $this->email->message($email_data->email_content);
                     $this->email->set_mailtype('html');

@@ -195,8 +195,6 @@ class grid
             $this->DB = $default;
 
         }
-
-
         return $this->query;
     }
 

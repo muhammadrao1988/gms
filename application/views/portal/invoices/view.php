@@ -92,29 +92,14 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 <div class="row">
                                     <div class="col-md-4 col-sm-5 inv-label">Invoice Type #</div>
                                     <div class="col-md-8 col-sm-7"><?php
-                                        switch ($row->type){
-                                            case 1:
-                                                echo "Monthly Fees";
-                                            break;
-                                            case 2:
-                                               echo  'Subscription Fees';
-                                                break;
-                                            case 3:
-                                                echo  'Member Type';
-                                                break;
-                                            case 4:
-                                                echo  'Special Days Fees';
-                                                break;
-                                            default:
-                                                echo  'Other';
-                                                break;
-                                        }
+                                        $type[0] = $row->type;
+                                        echo $invoice_types =  invoice_for($type);
                                         ?></div>
                                 </div>
                                 <br>
                                 <div class="row">
                                     <div class="col-md-4 col-sm-5 inv-label">Date #</div>
-                                    <div class="col-md-8 col-sm-7"><?=date('d M y') ; ?></div>
+                                    <div class="col-md-8 col-sm-7"><?=date('d M Y') ; ?></div>
                                 </div>
                                 <br>
                                 <!--<div class="row">
@@ -129,33 +114,71 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                             </div>
                         </div>
-                        <table class="table table-invoice">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Fees Description</th>
-                                <th class="text-center">Amount</th>
-                                <th class="text-center">Month</th>
-                                <th class="text-center">Total</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <?php
-
+                        <?php
+                        if($row->type != '1') {
                             ?>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <h4>Monthly Fees</h4>
-                                    <p>Monthly Charges Paid by member.</p>
-                                </td>
-                                <td class="text-center">300</td>
-                                <td class="text-center">1</td>
-                                <td class="text-center">Rs. 300</td>
-                            </tr>
-                            <?php ?>
-                            </tbody>
-                        </table>
+                            <table class="table table-invoice">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fees Description</th>
+                                    <th class="text-center">Amount</th>
+                                    <th class="text-center">Fees Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <?php
+                                $i = 1;
+                                $grand_total = '';
+                                $amount_details = json_decode($row->amount_details);
+                                foreach ($amount_details[0] as $key=>$val) { ?>
+                                    <tr>
+                                        <td><?php echo $i; ?></td>
+                                        <td>
+                                            <h4><?=invoice_for($type[0] =$val); ?></h4>
+                                            <!--<p>Monthly Charges Paid by member.</p>-->
+                                        </td>
+                                        <td class="text-center"><?=$amount_details[1][$key] ; ?></td>
+                                        <td class="text-center"><?=date('F',strtotime($row->fees_month)) ; ?></td>
+                                        <!--<td class="text-center">Rs. 300</td>-->
+                                    </tr>
+                                    <?php $i++;
+                                    $grand_total +=$amount_details[1][$key];
+                                } ?>
+                                </tbody>
+                            </table>
+                            <?php
+                        }else{ ?>
+                            <table class="table table-invoice">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fees Description</th>
+                                    <th class="text-center">Amount</th>
+                                    <th class="text-center">Month</th>
+                                    <th class="text-center">Total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <?php
+                                $i = 1;
+                                foreach (explode(',', $invoice_types) as $val) { ?>
+                                    <tr>
+                                        <td><?php echo $i; ?></td>
+                                        <td>
+                                            <h4><?= $val; ?></h4>
+                                            <!--<p>Monthly Charges Paid by member.</p>-->
+                                        </td>
+                                        <td class="text-center"></td>
+                                        <td class="text-center">1</td>
+                                        <!--<td class="text-center">Rs. 300</td>-->
+                                    </tr>
+                                    <?php $i++;
+                                } ?>
+                                </tbody>
+                            </table>
+                        <?php }
+                            ?>
                         <div class="row">
                             <div class="col-md-8 col-xs-7 payment-method">
                                 <!--<h4>Payment Method</h4>
@@ -165,18 +188,18 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 <br>-->
                                 <h3 class="inv-label itatic">Thank you for the payment.</h3>
                             </div>
-                            <div class="col-md-4 col-xs-5 invoice-block pull-right">
+                            <div class="col-md-2 col-xs-5 invoice-block pull-right">
                                 <ul class="unstyled amounts">
                                     <!--<li>Sub - Total amount : $3820</li>
                                     <li>Discount : 10% </li>
                                     <li>TAX (15%) ----- </li>-->
-                                    <li class="grand-total">Total : Rs. 300</li>
+                                    <li class="grand-total text-center">Total : <?=$grand_total ; ?></li>
                                 </ul>
                             </div>
                         </div>
 
                         <div class="text-center invoice-btn">
-                            <a class="btn btn-success btn-lg"><i class="fa fa-check"></i> Submit Invoice </a>
+                            <!--<a class="btn btn-success btn-lg"><i class="fa fa-check"></i> Submit Invoice </a>-->
                             <a href="invoice_print.html" target="_blank" class="btn btn-primary btn-lg"><i class="fa fa-print"></i> Print </a>
                         </div>
 

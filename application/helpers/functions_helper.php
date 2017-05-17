@@ -4,6 +4,7 @@
  * @param string $selected
  * @return string
  */
+
 function selectBox($query, $selected = '')
 {
     $CI = & get_instance();
@@ -817,5 +818,21 @@ function getAttendenceMachine()
         return $result->fetchAll(PDO::FETCH_ASSOC);
 
     }
+
+}
+function getTotalfeesAmount($values)
+{
+    $acc_details = getVal('accounts','acc_date',' where acc_id = "'.$values[1]['acc_id'].'"');
+    $now = time(); // or your date as well
+    $your_date = strtotime(date('Y-m',strtotime($values[1]['fees_month'])).'-'.date('d',strtotime($acc_details)));
+    $datediff = $now - $your_date;
+    return  300*floor($datediff / (60 * 60 * 24 * 30));
+
+}
+function invoice_for($val){
+    $CI = & get_instance();
+    $sql = "SELECT GROUP_CONCAT(`name`) as types FROM invoice_types WHERE id IN (".(($val[0]=='')?0:$val[0]).")";
+    return $CI->db->query($sql)->row()->types;
+     //getVal('invoice_types','group_concat(name)',' where id in ('.(($val[0]=='')?0:$val[0]).')');
 
 }
