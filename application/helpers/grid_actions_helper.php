@@ -30,19 +30,18 @@ if (!function_exists('get_grid_actions')) {
 				 }
 			}else */
            // if($CI->session->userdata['u_type']==4 || $CI->session->userdata['u_type']==3){
-				 $user_template_table = $CI->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$CI->session->userdata['user_info']->parent_child."'")->num_rows();
+				 $user_template_table = $CI->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$CI->session->userdata['user_info']->acc_id."'")->num_rows();
 				 if($user_template_table==0){
 				   $table_temp	= 'user_type_module_rel';
 
 
                    //$user_template_id	= intval(sessionVar('user_template_id'));
-                   $user_template_id = $CI->db->query("SELECT user_template_id FROM users WHERE user_id = '" . $CI->session->userdata['user_info']->user_id . "'")->row();
+                   $user_template_id = $CI->db->query("SELECT user_template_id FROM accounts WHERE acc_id = '" . $CI->session->userdata['user_info']->acc_id . "'")->row();
                    $user_template_id = $user_template_id->user_template_id;
                  }else{
 				   $table_temp	= 'user_template_methods';
-                   $get_user_account_id = $CI->db->query("SELECT parent_child FROM users WHERE user_id = '".$CI->session->userdata['user_info']->user_id."'")->row();
-				   $and_condition = ' AND um.acc_id = "'.$CI->session->userdata['user_info']->parent_child.'"';
-				   $user_template_id	= $CI->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$get_user_account_id->parent_child."'")->row();
+				   $and_condition = ' AND um.acc_id = "'.$CI->session->userdata['user_info']->acc_id.'"';
+				   $user_template_id	= $CI->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$CI->session->userdata['user_info']->acc_id."'")->row();
 				   $user_template_id	= $user_template_id->user_type_id;
 				 }
 			/*}else{
@@ -52,7 +51,7 @@ if (!function_exists('get_grid_actions')) {
 
         //todo:: _users
          // $user_actions = $CI->db->query("SELECT um.actions FROM users AS u INNER JOIN user_type_module_rel AS um ON (u.user_type = um.user_type_id) INNER JOIN modules AS m ON (m.id = um.module_id) WHERE um.user_type_id = '" . intval($CI->session->userdata('user_type')) . "' AND m.`module`='" . addslashes($module) . "'")->row()->actions;
-		$user_actions = $CI->db->query("SELECT um.actions FROM users AS u INNER JOIN ".$table_temp." AS um ON (u.user_template_id = um.user_type_id) INNER JOIN modules AS m ON (m.id = um.module_id) WHERE um.user_type_id = '" . intval($user_template_id) . "' ".$and_condition." AND m.`module`='" . addslashes($module) . "'")->row()->actions;
+		$user_actions = $CI->db->query("SELECT um.actions FROM accounts AS u INNER JOIN ".$table_temp." AS um ON (u.user_template_id = um.user_type_id) INNER JOIN modules AS m ON (m.id = um.module_id) WHERE um.user_type_id = '" . intval($user_template_id) . "' ".$and_condition." AND m.`module`='" . addslashes($module) . "'")->row()->actions;
        //todo::remove
         $user_actions .='|view_number_manager|edit_numbers|view_attendance';
         $user_actions = array_unique(explode('|', str_replace(array('update'), array('edit'), $user_actions))); //$user_actions[$module]

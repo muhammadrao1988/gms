@@ -62,6 +62,7 @@ class Invoices extends CI_Controller
                               ac.acc_id,
                               MAX(ic.fees_month) AS fees_month,                              
                               ic.amount,
+<<<<<<< HEAD
                               DATE(ic.fees_datetime) AS last_paid,
                               MONTHNAME(ic.fees_month) as last_paid_month,
                               IF(
@@ -116,6 +117,23 @@ class Invoices extends CI_Controller
         $data['query'] = "select ic.acc_id,ac.acc_name from invoices as ic inner join account as ac on(ac.acc_id = ic.acc_id) inner join inovice_types as it on (it.id=ic.type) ".$where;
         /*echo htmlentities($data['query']);
         die('Call');*/
+=======
+                              ic.fees_month AS last_paid,
+                              30-DATEDIFF(CURRENT_DATE(),ic.fees_month) AS day_left,
+                              IF(30-DATEDIFF(CURRENT_DATE(),ic.fees_month)=16,CONCAT('Unpaid ','<button class=\"btn btn-primary btn-sm payment_pop\" type=\"button\" href=\"javascript:void(0);\"  data-invoice=\"',ic.id,'\"><i class=\"fa fa-money\"></i> Pay</button>'),'<span class=\"green\"><b>Paid</b></span>') as payment_status,
+                              CASE ic.`type`
+                              WHEN '1' THEN 'Monthly Fees'
+                              WHEN '2' THEN 'Member Type'
+                              WHEN '3' THEN 'Subscription'
+                              WHEN '4' THEN 'Special Days'
+                              ELSE 'Other'
+                           END AS payment_type
+                            FROM
+                              invoices AS ic 
+                              INNER JOIN accounts AS ac 
+                                ON (ic.`acc_id` = ac.`acc_id`)
+                            WHERE 1 AND ac.`status` = 1".$where;
+>>>>>>> 383d1dc8d03b8d6a6d00611ecebf7fad21a95452
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -233,11 +251,16 @@ class Invoices extends CI_Controller
 
 
     }
+<<<<<<< HEAD
     public function payPayment()
     {
         echo '<pre>';print_r($_REQUEST );echo '</pre>';
         die('Call');
 
+=======
+    public function payPayment(){
+        echo "fuck";
+>>>>>>> 383d1dc8d03b8d6a6d00611ecebf7fad21a95452
     }
 }
 
