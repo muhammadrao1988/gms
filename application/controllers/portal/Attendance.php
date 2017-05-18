@@ -42,7 +42,7 @@ class Attendance extends CI_Controller
         $data['title'] = $this->module_title;
         $data['pk_date_time'] = $this->pk_date_time;
         if($this->session->userdata('user_info')->u_type != '1'){
-            $where .= ' AND ac.branch_id = "'.getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"').'"';
+            $where .= ' AND ac.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
         }
         $data['query'] = "SELECT 
                           /*att.account_id as user_id,*/
@@ -59,8 +59,7 @@ class Attendance extends CI_Controller
                             ) 
                           INNER JOIN acc_types AS act
                             ON  (act.`acc_type_ID` = ac.`acc_types`)
-                             INNER JOIN users as usr 
-                             ON ( usr.user_id = ac.acc_manager ) where 1 and att.status = 1 ".$where;
+                              where 1 and att.status = 1 ".$where;
 
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
@@ -153,7 +152,7 @@ class Attendance extends CI_Controller
 
     public function add()
     {
-        $email_exists = getVal('users', 'email', 'WHERE `email`="' . getVar('email') . '"');
+        $email_exists = getVal('accounts', 'email', 'WHERE `email`="' . getVar('email') . '"');
         if (!empty($email_exists)) {
             $errors[] = $_POST['error'] = 'E-Mail address already registered.';
         }
@@ -187,7 +186,7 @@ class Attendance extends CI_Controller
 
     public function update()
     {
-        $email_exists = getVal('users', 'email', 'WHERE `email`="' . getVar('email') . '" AND user_id !="' . getVar('user_id') . '"');
+        $email_exists = getVal('accounts', 'email', 'WHERE `email`="' . getVar('email') . '" AND acc_id !="' . getVar('user_id') . '"');
         if ($email_exists != '') {
 
             $errors[] = $_POST['error'] = 'E-Mail address already registered.';
@@ -234,7 +233,7 @@ class Attendance extends CI_Controller
     {
         $JSON = array();
         $id = getVar('status-id');
-        $login_status_val = getVal('users', 'status', 'WHERE user_id ="' . $id . '"');
+        $login_status_val = getVal('accounts', 'status', 'WHERE acc_id ="' . $id . '"');
         if($login_status_val==0 ||  $login_status_val==2 || $login_status_val==3 ){
             $status=1;
         }else if($login_status_val==1){

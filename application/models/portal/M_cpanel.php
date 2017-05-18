@@ -20,24 +20,24 @@ class M_cpanel extends CI_Model
         }
     }
 
-	function checkModulePermission($module){
+    function checkModulePermission($module){
 
 
 
 
         //if($this->session->userdata['u_type']==4 || $this->session->userdata['u_type']==3){
-        $user_template_table = $this->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->parent_child."'")->num_rows();
+        $user_template_table = $this->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->num_rows();
         if($user_template_table==0){
             $table			= 'user_type_module_rel';
 
             //$user_template_id	= intval(sessionVar('user_template_id'));
-            $user_template_id = $this->db->query("SELECT user_template_id FROM users WHERE user_id = '".$this->session->userdata['user_info']->user_id."'")->row();
+            $user_template_id = $this->db->query("SELECT user_template_id FROM accounts WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->row();
             $user_template_id = $user_template_id->user_template_id;
         }else{
-            $get_user_account_id = $this->db->query("SELECT parent_child FROM users WHERE user_id = '".$this->session->userdata['user_info']->user_id."'")->row();
+
             $table	= 'user_template_methods';
-            $and_condition = ' AND acc_id = "'.$get_user_account_id->parent_child.'" ';
-            $user_template_id	= $this->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$get_user_account_id->parent_child."'")->row();
+            $and_condition = ' AND um.acc_id = "'.$this->session->userdata['user_info']->acc_id.'" ';
+            $user_template_id	= $this->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->row();
             $user_template_id	= $user_template_id->user_type_id;
         }
 
@@ -48,7 +48,7 @@ class M_cpanel extends CI_Model
                        um.actions AS actions
                        
                    FROM
-                       users AS u
+                       accounts AS u
                        INNER JOIN ".$table." AS um
                            ON (u.u_type = um.user_type_id)
                        INNER JOIN modules AS m
@@ -66,11 +66,11 @@ class M_cpanel extends CI_Model
 
     function checkModule()
     {
-		
+
         $module = $this->router->fetch_class();
         $action = $this->router->fetch_method();
         $user_type = intval($this->session->userdata['u_type']);
-		
+
 
         $mod_rs = $this->checkModulePermission($module);
 
@@ -103,7 +103,7 @@ class M_cpanel extends CI_Model
         $replace = array('update|form','update|form','export');
 
 
-        $account_id 	= getVal('users', 'parent_child', 'WHERE `user_id`="' .$this->session->userdata['user_id'].'"');
+        $account_id 	= $this->session->userdata['user_id'];
         $account_name 	= getVal('accounts', 'acc_name', 'WHERE `acc_id`="'.$account_id.'"');
 
         if(count($actions) > 0) {
@@ -118,13 +118,13 @@ class M_cpanel extends CI_Model
 
 
             if (!in_array($action, $user_actions) && in_array($action, $module_actions)) {
-				
-				 $protocol = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
-    			/*** return the full address ***/
-   			 	 $protocol 		=	$protocol.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
-					$this->email->subject("Unauthorised Access Detected");
-					$html_unauth = '<html">
+                $protocol = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
+                /*** return the full address ***/
+                $protocol 		=	$protocol.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+
+                $this->email->subject("Unauthorised Access Detected");
+                $html_unauth = '<html">
 							<head>
 							<title>Telebox - Unauthorised Access Detected</title>
 							</head>
@@ -160,16 +160,16 @@ class M_cpanel extends CI_Model
 							</table>
 							</body>
 							</html>';
-                    $this->email->message($html_unauth);
+                $this->email->message($html_unauth);
 
-                    $this->email->from(get_option('email_admin'), get_option('email_admin_from'));
-                    $this->email->to('muhammadrao1988@gmail.com');
+                $this->email->from(get_option('email_admin'), get_option('email_admin_from'));
+                $this->email->to('muhammadrao1988@gmail.com');
 
-                    $this->email->set_mailtype('html');
-                    $this->email->send();
+                $this->email->set_mailtype('html');
+                $this->email->send();
 
 
-                    redirect(ADMIN_DIR .'dashboard?error=Sorry, you do not have access to this feature.');
+                redirect(ADMIN_DIR .'dashboard?error=Sorry, you do not have access to this feature.');
 
 
                 exit;
@@ -178,19 +178,19 @@ class M_cpanel extends CI_Model
 
 
 
-                return TRUE;
+            return TRUE;
 
 
         } elseif (count($mod_rs) == 0) {
-                return TRUE;
+            return TRUE;
 
 
         } else {
-				$protocol = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
-    			/*** return the full address ***/
-   			 	 $protocol 		=	$protocol.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-				 	$this->email->subject("Unauthorised Access Detected");
-					$html_unauth = '<html">
+            $protocol = $_SERVER['HTTPS'] == 'on' ? 'https' : 'http';
+            /*** return the full address ***/
+            $protocol 		=	$protocol.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+            $this->email->subject("Unauthorised Access Detected");
+            $html_unauth = '<html">
 							<head>
 							<title>Unauthorised Access Detected</title>
 							</head>
@@ -226,15 +226,15 @@ class M_cpanel extends CI_Model
 							</table>
 							</body>
 							</html>';
-                    $this->email->message($html_unauth);
+            $this->email->message($html_unauth);
 
-                    $this->email->from(get_option('email_admin'), get_option('email_admin_from'));
-                    $this->email->to('muhammadrao1988@gmail.com');
+            $this->email->from(get_option('email_admin'), get_option('email_admin_from'));
+            $this->email->to('muhammadrao1988@gmail.com');
 
-                    $this->email->set_mailtype('html');
-                    $this->email->send();
+            $this->email->set_mailtype('html');
+            $this->email->send();
 
-              redirect(ADMIN_DIR .'dashboard?error=Sorry, you do not have access to this feature.');
+            redirect(ADMIN_DIR .'dashboard?error=Sorry, you do not have access to this feature.');
 
 
 
@@ -244,13 +244,13 @@ class M_cpanel extends CI_Model
     }
 
     function parent_submenu($parent_id){
-        $user_parent_child = $this->db->query("SELECT parent_child FROM users WHERE user_id = '".$this->session->userdata['user_id']."'")->row();
 
 
-             $sql = "SELECT modules.* from modules
+
+        $sql = "SELECT modules.* from modules
                     LEFT JOIN user_template_methods ON(modules.id= user_template_methods.module_id)
-                    WHERE modules.parent_id='".$parent_id."' AND user_template_methods.acc_id='".$user_parent_child->parent_child."' AND modules.status='active' GROUP BY modules.id";
-           return $this->db->query($sql)->result();
+                    WHERE modules.parent_id='".$parent_id."' AND user_template_methods.acc_id='".$this->session->userdata['user_id']."' AND modules.status='active' GROUP BY modules.id";
+        return $this->db->query($sql)->result();
 
     }
 

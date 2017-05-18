@@ -112,7 +112,13 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
-
 ?>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.payment_pop').click( function () {
+            
+        });
+    });
+</script>
 <!-- Content -->
   

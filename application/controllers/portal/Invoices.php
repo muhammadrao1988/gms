@@ -42,7 +42,7 @@ class Invoices extends CI_Controller
                               ic.amount,
                               ic.fees_month AS last_paid,
                               30-DATEDIFF(CURRENT_DATE(),ic.fees_month) AS day_left,
-                              IF(30-DATEDIFF(CURRENT_DATE(),ic.fees_month)<5,CONCAT('Unpaid ','<button class=\"btn btn-primary btn-sm\" type=\"button\" data-toggle=\"modal\" href=\"#payment_pop\" data-invoice=\"',ic.id,'\">Pay</button>'),'<span class=\"green\"><b>Paid</b></span>') as payment_status,
+                              IF(30-DATEDIFF(CURRENT_DATE(),ic.fees_month)=16,CONCAT('Unpaid ','<button class=\"btn btn-primary btn-sm payment_pop\" type=\"button\" href=\"javascript:void(0);\"  data-invoice=\"',ic.id,'\"><i class=\"fa fa-money\"></i> Pay</button>'),'<span class=\"green\"><b>Paid</b></span>') as payment_status,
                               CASE ic.`type`
                               WHEN '1' THEN 'Monthly Fees'
                               WHEN '2' THEN 'Member Type'
@@ -54,7 +54,7 @@ class Invoices extends CI_Controller
                               invoices AS ic 
                               INNER JOIN accounts AS ac 
                                 ON (ic.`acc_id` = ac.`acc_id`)
-                            WHERE ic.`status` = 1 AND ac.`status` = 1".$where;
+                            WHERE 1 AND ac.`status` = 1".$where;
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -161,6 +161,9 @@ class Invoices extends CI_Controller
         echo json_encode($JSON);
 
 
+    }
+    public function payPayment(){
+        echo "fuck";
     }
 }
 
