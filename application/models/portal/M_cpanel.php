@@ -26,18 +26,18 @@ class M_cpanel extends CI_Model
 
 
         //if($this->session->userdata['u_type']==4 || $this->session->userdata['u_type']==3){
-        $user_template_table = $this->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->num_rows();
+        $user_template_table = $this->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->user_id."'")->num_rows();
         if($user_template_table==0){
             $table			= 'user_type_module_rel';
 
             //$user_template_id	= intval(sessionVar('user_template_id'));
-            $user_template_id = $this->db->query("SELECT user_template_id FROM accounts WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->row();
+            $user_template_id = $this->db->query("SELECT user_template_id FROM users WHERE user_id = '".$this->session->userdata['user_info']->user_id."'")->row();
             $user_template_id = $user_template_id->user_template_id;
         }else{
 
             $table	= 'user_template_methods';
-            $and_condition = ' AND um.acc_id = "'.$this->session->userdata['user_info']->acc_id.'" ';
-            $user_template_id	= $this->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->row();
+            $and_condition = ' AND um.acc_id = "'.$this->session->userdata['user_info']->user_id.'" ';
+            $user_template_id	= $this->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->user_id."'")->row();
             $user_template_id	= $user_template_id->user_type_id;
         }
 
@@ -48,7 +48,7 @@ class M_cpanel extends CI_Model
                        um.actions AS actions
                        
                    FROM
-                       accounts AS u
+                       users AS u
                        INNER JOIN ".$table." AS um
                            ON (u.u_type = um.user_type_id)
                        INNER JOIN modules AS m
@@ -66,6 +66,7 @@ class M_cpanel extends CI_Model
 
     function checkModule()
     {
+
 
         $module = $this->router->fetch_class();
         $action = $this->router->fetch_method();
@@ -104,7 +105,8 @@ class M_cpanel extends CI_Model
 
 
         $account_id 	= $this->session->userdata['user_id'];
-        $account_name 	= getVal('accounts', 'acc_name', 'WHERE `acc_id`="'.$account_id.'"');
+        $account_name 	= getVal('users', 'first_name', 'WHERE `user_id`="'.$account_id.'"');
+
 
         if(count($actions) > 0) {
             $user_actions = array_unique(explode('|', str_replace($search, $replace, $user_actions[$module])));
@@ -241,6 +243,7 @@ class M_cpanel extends CI_Model
             exit;
             //die('This module has no access allowed');
         }
+
     }
 
     function parent_submenu($parent_id){
@@ -249,7 +252,7 @@ class M_cpanel extends CI_Model
 
         $sql = "SELECT modules.* from modules
                     LEFT JOIN user_template_methods ON(modules.id= user_template_methods.module_id)
-                    WHERE modules.parent_id='".$parent_id."' AND user_template_methods.acc_id='".$this->session->userdata['user_id']."' AND modules.status='active' GROUP BY modules.id";
+                    WHERE modules.parent_id='".$parent_id."' AND user_template_methods.acc_id='".$this->session->userdata['user_info']->user_id."' AND modules.status='active' GROUP BY modules.id";
         return $this->db->query($sql)->result();
 
     }

@@ -2,6 +2,7 @@
 include dirname(__FILE__) . "/../includes/head.php";
 include dirname(__FILE__) . "/../includes/header.php";
 include dirname(__FILE__) . "/../includes/left_side_bar.php";
+
 ?>
 <link rel="stylesheet" href="<?php echo base_url('assets/css/style_new.css') ; ?>">
 <section id="main-content" class="inner-main-pages">
@@ -44,6 +45,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
             $grid = new grid();
             $grid->query = $query;
+
             //$grid->title = $this->module_title .' - List';
             $grid->limit = 25;
             $grid->search_box = TRUE;

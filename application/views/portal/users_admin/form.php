@@ -39,11 +39,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 type="button">Change Password
                         </button>
                         <span class="vert-sep"></span>
-                        <button class="btn btn-white"
-                                data-action="<?= site_url(ADMIN_DIR . "users_admin/account_access/" . $row->user_id); ?>"
-                                type="button">Account Access
-                        </button>
-                        <span class="vert-sep"></span>
+                        
                     <?php } ?>
                 </div>
             </div>
@@ -52,7 +48,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
         <div class="row page-middle-btn">
             <div class="col-sm-12">
                 <section class="panel">
-                    <div class="panel-body panel-breadcrumb-action"> <?php echo show_validation_errors(); ?>
+                    <div class="panel-body panel-breadcrumb-action">
                         <div class="period-text"></div>
                     </div>
                 </section>
@@ -60,6 +56,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
         </div>
         <div class="clearfix">&nbsp;</div>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <?php echo '<pre>';print_r($_REQUEST );echo '</pre>';
+            echo show_validation_errors(); ?>
             <section class="panel">
                 <header class="panel-heading theme-panel-heading"><strong>Users - Form</strong></header>
                 <div class="panel-body">
@@ -73,57 +71,27 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">User
                                         Template</label>
                                     <div class="col-lg-6">
-                                        <label class="styled_select">
+
                                             <select name="user_template_id" id="user_template_id"
-                                                    class="styled validate[required]">
+                                                    class="select validate[required]">
                                                 <option value=""> - Select -</option>
                                                 <?= selectBox("SELECT id, `user_type` FROM `user_types_template`", $row->user_template_id); ?>
                                             </select>
-                                        </label>
+
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">User Type</label>
                                     <div class="col-lg-6">
-                                        <label class="styled_select">
-                                            <select name="user_type" id="user_type" class="styled validate[required]">
-                                                <option value=""> - Select -</option>
-                                                <?= selectBox("SELECT LOWER(`user_type`) as user_type, `user_type` as show_u_type FROM `user_types`", $row->user_type); ?>
-                                            </select>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Reseller</label>
-                                    <div class="col-lg-6">
-                                        <label class="styled_select">
-                                            <select name="reseller" id="reseller" class="styled">
-                                                <option value=""> - Select -</option>
-                                                <?= selectBox("SELECT acc_id,acc_name FROM accounts WHERE acc_types IN (" . RESELLER_IDS . ")", $row->parent); ?>
-                                            </select>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Company</label>
-                                    <div class="col-lg-6">
-                                        <label class="styled_select">
-                                            <select name="company" id="company"
-                                                    class="styled" <?= ($row->company_id == '') ? 'disabled' : ''; ?>>
-                                                <option value=""> - Select -</option>
-                                                <?php
-                                                if ($row->parent != "") {
-                                                    $get_company = "SELECT acc_id, acc_name FROM accounts where acc_types IN (" . COMPANY_IDS . ")";
-                                                } else {
-                                                    $get_company = "SELECT acc_id, acc_name FROM accounts where acc_types IN (" . COMPANY_IDS . ")";
-                                                }
 
-                                                echo selectBox($get_company, $row->parent_child);
-                                                ?>
+                                            <select name="user_type" id="user_type" class="select validate[required]">
+                                                <option value=""> - Select -</option>
+                                                <?= selectBox("SELECT id , `user_type` as show_u_type FROM `user_types`", $row->user_type); ?>
                                             </select>
-                                        </label>
+
                                     </div>
                                 </div>
+
                                 <div class="form-group">
                                     <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">First
                                         Name</label>
@@ -148,16 +116,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                class="form-control validate[required,custom[email]]">
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Phone
-                                        Number</label>
-                                    <div class="col-lg-6">
-                                        <input type="text" id="office_phone" name="office_phone"
-                                               value="<?= $row->office_phone; ?>"
-                                               class="form-control validate[required,custom[phone]]"
-                                               placeholder="Phone Number:">
-                                    </div>
-                                </div>
+
                                 <div class="form-group">
                                     <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Mobile
                                         Number:</label>
@@ -167,14 +126,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                class="form-control validate[required,custom[phone]]">
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Fax
-                                        Number:</label>
-                                    <div class="col-lg-6">
-                                        <input type="text" id="fax" name="fax" value="<?= $row->fax; ?>"
-                                               placeholder="Fax Number" class="form-control validate[custom[number]]">
-                                    </div>
-                                </div>
+
                                 <div class="form-group">
                                     <label for="machine_serial" class="col-lg-3 col-sm-3 control-label">Machine Serial Number:</label>
                                     <div class="col-lg-6">
@@ -185,14 +137,28 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 <div class="form-group">
                                     <label for="branch_id" class="col-lg-3 col-sm-3 control-label">Branch:</label>
                                     <div class="col-lg-6">
-                                        <label class="styled_select">
-                                            <select name="branch_id" id="branch_id" class="styled validate[required]">
+
+                                            <select name="branch_id" id="branch_id" class="select validate[required]">
                                                 <option value=""> - Select -</option>
                                                 <?= selectBox("SELECT id,branch_name FROM `branches`", $row->branch_id); ?>
                                             </select>
-                                        </label>
+
                                     </div>
                                 </div>
+                                <?php if($row->user_id==""){?>
+                                <div class="form-group">
+                                    <label for="inputEmail1" class="col-lg-3 control-label">New Password:</label>
+                                    <div class="col-lg-4">
+                                        <input type="password" id="password" name="password" value="" class="form-control validate[required,custom[my_password]]">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail1" class="col-lg-3 control-label">Re-Type New Password:</label>
+                                    <div class="col-lg-4">
+                                        <input type="password" id="retype_new_pwd" name="retype_new_pwd" value="" class="form-control validate[required,equals[password]]">
+                                    </div>
+                                </div>
+                                <?php }?>
                                 <div class="form-group">
                                     <label class="control-label col-md-3">&nbsp;</label>
                                     <div class="col-md-8">
@@ -218,56 +184,3 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 include dirname(__FILE__) . "/../includes/footer.php";
 
 ?>
-
-<script type="text/javascript">
-    (function ($) {
-        $(document).ready(function () {
-            $('#reseller').on('change', function () {
-                var user_type = $('#user_type').val();
-                var reseller = $(this).val();
-                if (user_type == "customer") {
-                    $.ajax({
-                        type: 'POST',
-                        dataType: 'JSON',
-                        url: '<?= site_url(ADMIN_DIR . $this->module_name . '/AJAX/reseller_companies'); ?>',
-                        data: 'reseller_id=' + reseller,
-                        success: function (JSON) {
-                            $('#company').removeAttr('disabled').html(JSON.data);
-                            $('#uniform-company').removeClass('disabled');
-                        }
-                    });
-                }
-            });
-            /*-------------------------------------------------------------------------*/
-            $('#user_type').on('change', function () {
-                var user_type = $(this).val();
-
-                switch (user_type) {
-                    case 'customer':
-                        $('#reseller,#company').addClass('validate[required]');
-                        $('#reseller,#first_name,#surname,#email,#office_phone,#mob_phone,#fax').removeAttr('disabled');
-                        $('#uniform-company').removeClass('disabled');
-                        $('#company').removeAttr('disabled');
-                        break;
-                    case 'reseller':
-                        $('#company').attr("disabled", "disabled").removeClass('validate[required]');
-                        $('#reseller').removeAttr('disabled');
-                        $('#reseller').addClass('validate[required]');
-                        $('#first_name,#surname,#email,#office_phone,#mob_phone,#fax').removeAttr('disabled');
-
-                        break;
-                    case 'administrator':
-                    case 'super admin':
-                        $('#reseller, #company').attr("disabled", "disabled").removeClass('validate[required]');
-                        $('#first_name,#surname,#email,#office_phone,#mob_phone,#fax').removeAttr('disabled');
-                        break;
-                    default :
-                        $('#reseller,#company,#first_name,#surname,#email,#office_phone,#mob_phone,#fax').attr('disabled', 'disabled');
-                        break;
-                }
-            });
-
-            $('#user_type').trigger('change');
-        });
-    })(jQuery)
-</script>

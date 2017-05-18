@@ -25,7 +25,7 @@ class M_login extends CI_Model
 
     function checkUser($where)
         {
-            $q = "SELECT * FROM `accounts` LEFT JOIN `security_q` ON (`users`.`security_id` = `security_q`.`sec_id`) WHERE 1 " . $where;
+            $q = "SELECT * FROM `users` LEFT JOIN `security_q` ON (`users`.`security_id` = `security_q`.`sec_id`) WHERE 1 " . $where;
             $query = $this->db->query($q);
 
             if ($query->num_rows > 0) {
@@ -51,14 +51,14 @@ class M_login extends CI_Model
     function updateResetKey($id)
     {
         $reset_key = md5(rand() * 545);
-        $this->db->where('acc_id', $id);
-        $this->db->update('accounts',array('reset_key' => $reset_key,'modified_date' => date('Y-m-d H:i:s')));
+        $this->db->where('user_id', $id);
+        $this->db->update('users',array('reset_key' => $reset_key,'modified_date' => date('Y-m-d H:i:s')));
         return $reset_key;
     }
 
     function resetPasswordFromKey($key, $reset_pass)
     {
-        $this->db->query("UPDATE `accounts` SET `password` = '".md5($reset_pass)."', `reset_key` = '' WHERE reset_key=".$this->db->escape($key)."");
+        $this->db->query("UPDATE `users` SET `password` = '".md5($reset_pass)."', `reset_key` = '' WHERE reset_key=".$this->db->escape($key)."");
         if($this->db->affected_rows()){
             return $reset_pass;
         }else{
@@ -67,7 +67,7 @@ class M_login extends CI_Model
     }
 
 	function getUserQuestion($user_id){
-		$query = "SELECT security_q.sec_question FROM accounts INNER JOIN security_q ON (accounts.security_id = security_q.sec_id AND accounts.acc_id='".$user_id."')";
+		$query = "SELECT security_q.sec_question FROM users INNER JOIN security_q ON (users.security_id = security_q.sec_id AND users.user_id='".$user_id."')";
 		$query = $this->db->query($query);
 		if ($query->num_rows > 0) {
             return $query->row();
@@ -78,9 +78,9 @@ class M_login extends CI_Model
 
     function chklogin($username, $password){
         //todo:: _users
-        $SQL = "SELECT accounts.*
-		FROM accounts 
-		WHERE username='" . ($username) . "' AND accounts.status = 1 ";
+        $SQL = "SELECT users.*
+		FROM users 
+		WHERE username='" . ($username) . "' AND users.status = 1 ";
 
         $result = $this->db->query($SQL);
 

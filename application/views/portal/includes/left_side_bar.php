@@ -2,7 +2,7 @@
 <?php
 $this->load->database('default', TRUE);
 
-$user_info_left = $this->db->query("SELECT t1.first_name, t1.surname, t1.acc_name FROM accounts t1 WHERE t1.acc_id = '".$this->session->userdata['user_id']."'")->result();
+$user_info_left = $this->db->query("SELECT t1.first_name, t1.surname FROM users t1 WHERE t1.user_id = '".$this->session->userdata['user_info']->user_id."'")->result();
 
 ?>
 <aside>
@@ -42,17 +42,17 @@ $user_info_left = $this->db->query("SELECT t1.first_name, t1.surname, t1.acc_nam
 				 }
 			}else */
 			//if($this->session->userdata['u_type']==4 || $this->session->userdata['u_type']==3){
-				 $user_template_table = $this->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->num_rows();
+				 $user_template_table = $this->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->user_id."'")->num_rows();
 				 if($user_template_table==0){
 				   $table			= 'user_type_module_rel';	 
 				   //$user_template_id	= intval(sessionVar('user_template_id'));
-                   $user_template_id = $this->db->query("SELECT user_template_id FROM accounts WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->row();
+                   $user_template_id = $this->db->query("SELECT user_template_id FROM users WHERE user_id = '".$this->session->userdata['user_info']->user_id."'")->row();
 				   $user_template_id = $user_template_id->user_template_id;
 				 }else{
 				   $table	= 'user_template_methods';
 
-				   $and_condition = ' AND user_template_methods.acc_id = "'.$this->session->userdata['user_info']->acc_id.'" ';
-				   $user_template_id	= $this->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->acc_id."'")->row();
+				   $and_condition = ' AND user_template_methods.acc_id = "'.$this->session->userdata['user_info']->user_id.'" ';
+				   $user_template_id	= $this->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->user_id."'")->row();
 				   $user_template_id	= $user_template_id->user_type_id;
 				 }
 
