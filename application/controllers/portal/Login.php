@@ -85,18 +85,14 @@ class Login extends CI_Controller
 			
 			if($result->status==2){
 			
-			$company = $this->m_login->account_name($result->acc_id);
-			$reseller = $this->m_login->account_name($result->parent);
+
             $this->email->subject('Warning Admin Locked Account Attempting to login');
 			$message = 'Hi,<br><br>
 						The following admin locked account is attempting to unlock their account
 						<br/>
 						<br/>
 						Username: '.$result->username.'
-						<br/>
-						Account Name: '.$company->acc_name.'
-						<br/>
-						Parent: '.$reseller->acc_name.'
+						
 						<br/>
 						<br/>
 						Thanks,<br>
@@ -133,7 +129,7 @@ class Login extends CI_Controller
 					
 					$user_log_array = array(
 						'date'			=> date('Y-m-d H:i:s'),
-						'user_id'		=> $result->acc_id,
+						'user_id'		=> $result->user_id,
 						'owner'			=> $owner,
 						'type_id'		=> 13,
 						'display_state'	=> 2,
@@ -192,13 +188,11 @@ class Login extends CI_Controller
         $result = $this->m_login->checkUser(" AND email='" . getVar('email') . "'");
         if ($result) {
             /*-------- Email sending ------*/
-            $reset_key = $this->m_login->updateResetKey($result->acc_id);
+            $reset_key = $this->m_login->updateResetKey($result->user_id);
             $result->reset_key = $reset_key;
 			
 			if($result->status==2){
-			$company = $this->m_login->account_name($result->acc_id);
-			$reseller = $this->m_login->account_name($result->parent);
-			
+
             $this->email->subject('Warning Admin Locked Account Attempting to login');
 			$message = 'Hi,<br><br>
 						The following admin locked account is attempting to unlock their account
@@ -206,10 +200,7 @@ class Login extends CI_Controller
 						<br/>
 						Username: '.$result->username.'
 						<br/>
-						Account Name: '.$company->acc_name.'
-						<br/>
-						Parent: '.$reseller->acc_name.'
-						<br/>
+				
 						<br/>
 						Thanks,<br>
 						Mintbrains';
@@ -242,7 +233,7 @@ class Login extends CI_Controller
 					
 					$user_log_array = array(
 						'date'			=> date('Y-m-d H:i:s'),
-						'user_id'		=> $result->acc_id,
+						'user_id'		=> $result->user_id,
 						'owner'			=> $result->parent,
 						'type_id'		=> 14,
 						'display_state'	=> 2,
@@ -324,10 +315,10 @@ class Login extends CI_Controller
 			}else if (count($result) > 0 && is_object($result)) {
 
                 $this->session->set_userdata(array(
-                    'tgm_user_id' => $result->acc_id,
+                    'tgm_user_id' => $result->user_id,
                     'login_status' => $result->login_status,
                     'password_attempts' => '0',
-                    'user_id' => $result->acc_id,
+                    'user_id' => $result->user_id,
                     'username' => $result->username,
                     'email' => $result->email,
                     'user_type' => $result->user_type,
@@ -345,7 +336,7 @@ class Login extends CI_Controller
 					
 					$user_log_array = array(
 						'date'			=> date('Y-m-d H:i:s'),
-						'user_id'		=> $result->acc_id,
+						'user_id'		=> $result->user_id,
 						'owner'			=> $result->parent,
 						'type_id'		=> 8,
 						'display_state'	=> 2,
@@ -366,7 +357,7 @@ class Login extends CI_Controller
                     }
 
                     if($result->login_status==2){
-                        $this->db->query("UPDATE accounts SET `login_status` = '1' WHERE 1  AND acc_id='".$result->acc_id."' LIMIT 1");
+                        $this->db->query("UPDATE users SET `login_status` = '1' WHERE 1  AND user_id='".$result->user_id."' LIMIT 1");
                     }
 
                     /*if( $_SERVER['HTTP_HOST']!="localhost" && ROOT_DIR!="beta"){
@@ -384,8 +375,8 @@ class Login extends CI_Controller
                 }
 
             } else {
-                $users_info = getValues('accounts', 'acc_id,first_name,email,parent,u_type', "WHERE username='" . $username . "'");
-                $user_id = $users_info->acc_id;
+                $users_info = getValues('users', 'user_id,first_name,email,parent,u_type', "WHERE username='" . $username . "'");
+                $user_id = $users_info->user_id;
 
                 if ($user_id != "") {
                     $password_attempts = $this->session->userdata("password_attempts");
@@ -398,8 +389,8 @@ class Login extends CI_Controller
                     $password_attempts = $this->session->userdata("password_attempts");
                     if ($password_attempts >= 3) {
 
-                        $where = "AND acc_id='" . $user_id . "'";
-                        $this->db->query("UPDATE accounts SET `status` = '3' WHERE 1 " . $where);
+                        $where = "AND user_id='" . $user_id . "'";
+                        $this->db->query("UPDATE users SET `status` = '3' WHERE 1 " . $where);
 
                         //$reset_key = $this->m_login->updateResetKey($users_info->user_id);
                         $users_info->reset_key = $reset_key;
@@ -423,7 +414,7 @@ class Login extends CI_Controller
 						
 						$user_log_array = array(
 							'date'			=> date('Y-m-d H:i:s'),
-							'user_id'		=> $users_info->acc_id,
+							'user_id'		=> $users_info->user_id,
 							'owner'			=> $owner,
 							'type_id'		=> 12,
 							'display_state'	=> 2,
@@ -456,7 +447,7 @@ class Login extends CI_Controller
                 $data['page'] = "step1";
                 $this->load->view(ADMIN_DIR . 'login',$data);
             } else {
-                save('accounts', array('security_id' => getVar('select_question'), 'security_ans' => getVar('answer')), "acc_id = '" . dbEscape($user_id) . "'");
+                save('users', array('security_id' => getVar('select_question'), 'security_ans' => getVar('answer')), "user_id = '" . dbEscape($user_id) . "'");
                 $data['page'] = "step2";
                 $this->load->view(ADMIN_DIR . 'login', $data);
             }
@@ -469,7 +460,7 @@ class Login extends CI_Controller
                 $password = getVar('password');
                 $encryptPassword = encryptPassword($password);
                 $login_status = 1;
-                save('accounts', array('password' => $encryptPassword, 'login_status' => $login_status), "acc_id = '" . dbEscape($user_id) . "'");
+                save('users', array('password' => $encryptPassword, 'login_status' => $login_status), "user_id = '" . dbEscape($user_id) . "'");
                 $this->session->set_userdata(array('login_status' => $login_status));
                 redirect(ADMIN_DIR);
             }
@@ -542,7 +533,7 @@ class Login extends CI_Controller
                 if(substr($mob_phone,0,2)==4){
                     $mob_phone = "0".substr($mob_phone,2);
                 }
-                $user_id = getVal('accounts', 'acc_id', " WHERE email='" . getVar('email') . "' AND REPLACE(mob_phone,' ','')='".$mob_phone."' AND mob_phone!=''");
+                $user_id = getVal('users', 'user_id', " WHERE email='" . getVar('email') . "' AND REPLACE(mob_phone,' ','')='".$mob_phone."' AND mob_phone!=''");
                 sessionVar('temp_user_id', $user_id);
                 if ($user_id == "") {
                     $msg = "Sorry, we can not find your details.";
@@ -557,10 +548,10 @@ class Login extends CI_Controller
                     $this->db->insert('audit_log',$user_log_array);
                     redirect(ADMIN_DIR . 'login/forget_pass/?error=' . $msg);
                 } else {
-					$status = getVal('accounts', 'status', " WHERE email='" . getVar('email') . "'  AND REPLACE(mob_phone,' ','')='".$mob_phone."' AND mob_phone!=''");
-                    $parent 		= getVal('accounts', 'parent', "WHERE acc_id='" . $user_id . "'");
+					$status = getVal('users', 'status', " WHERE email='" . getVar('email') . "'  AND REPLACE(mob_phone,' ','')='".$mob_phone."' AND mob_phone!=''");
+                    $parent 		= getVal('users', 'parent', "WHERE user_id='" . $user_id . "'");
                     $parent_child   =  $user_id ;
-                    $username   = getVal('accounts', 'username', "WHERE acc_id='" . $user_id . "'");
+                    $username   = getVal('users', 'username', "WHERE user_id='" . $user_id . "'");
                     if($status==2){
 
 					$this->email->subject('Warning Admin Locked Account Attempting to login');
@@ -622,7 +613,7 @@ class Login extends CI_Controller
                             'acc_sms_id_charged' => '',
                         );
                         //$this->db->insert('mcdr_outbound', $mcdr_outbound);
-                        $this->db->query("UPDATE accounts SET reset_code = '" . $random_code . "' WHERE 1  AND acc_id='" . $user_id . "'");
+                        $this->db->query("UPDATE users SET reset_code = '" . $random_code . "' WHERE 1  AND user_id='" . $user_id . "'");
                         redirect(ADMIN_DIR . 'login/forget_pass/?step=step2');
                     }
                 }
@@ -632,7 +623,7 @@ class Login extends CI_Controller
 
             $data['user_id'] = sessionVar('temp_user_id');
             $data['answer'] = getVar('reset_code');
-            $answer_status = getVal('accounts', 'acc_id', "WHERE reset_code='" . getVar('reset_code') . "' AND acc_id='" . $data['user_id'] . "' ");
+            $answer_status = getVal('users', 'user_id', "WHERE reset_code='" . getVar('reset_code') . "' AND user_id='" . $data['user_id'] . "' ");
             if ($answer_status == "") {
                 $error = "Sorry, the code you entered was incorrect, please try resetting your password again.";
                 $incorrect_code = (sessionVar('temp_incorrect_code')=="" ? 0 : sessionVar('temp_incorrect_code'));
@@ -642,10 +633,10 @@ class Login extends CI_Controller
                 if( sessionVar('temp_incorrect_code') >= 4){
 
 
-                    $user_info_data = "SELECT accounts.first_name,accounts.surname,accounts.acc_name,accounts.acc_id,accounts.username,CONCAT('') as ip_address
-                                    FROM accounts
+                    $user_info_data = "SELECT users.first_name,users.surname,users.acc_name,users.user_id,users.username,CONCAT('') as ip_address
+                                    FROM users
                           
-                                    WHERE accounts.acc_id='".sessionVar('temp_user_id')."'";
+                                    WHERE users.user_id='".sessionVar('temp_user_id')."'";
                     $users_info = $this->db->query($user_info_data)->row();
                     $users_info->ip_address = user_ip();
                     $user_log_array = array(
@@ -691,7 +682,7 @@ class Login extends CI_Controller
                 exit;
             }
             $value = encryptPassword($password);
-            $where = " acc_id = " . $user_id . "";
+            $where = " user_id = " . $user_id . "";
             $dbData = array(
                 'password' => $value,
                 'reset_key' => '',
@@ -700,10 +691,10 @@ class Login extends CI_Controller
 
             );
 
-            save('accounts', $dbData, $where);
-            $user_info_data = "SELECT accounts.first_name,accounts.username,accounts.password,accounts.acc_id,accounts.email
-                                    FROM accounts
-                                    WHERE accounts.acc_id='".sessionVar('temp_user_id')."'";
+            save('users', $dbData, $where);
+            $user_info_data = "SELECT users.first_name,users.username,users.password,users.user_id,users.email
+                                    FROM users
+                                    WHERE users.user_id='".sessionVar('temp_user_id')."'";
             $users_info = $this->db->query($user_info_data)->row();
 
 
@@ -778,10 +769,10 @@ class Login extends CI_Controller
         $old_password = encryptPassword(getVar('old_password',TRUE, FALSE));
         $password = encryptPassword(getVar('password',TRUE, FALSE));
         //todo:: _users
-        $sql = "SELECT * FROM accounts WHERE acc_id={$user_id} AND `password`='{$old_password}'";
+        $sql = "SELECT * FROM users WHERE user_id={$user_id} AND `password`='{$old_password}'";
         $rs = $this->db->query($sql);
         if ($rs->num_rows() > 0) {
-            $update_sql = "UPDATE accounts SET `password` = '{$password}' WHERE acc_id = '{$user_id}'";
+            $update_sql = "UPDATE users SET `password` = '{$password}' WHERE user_id = '{$user_id}'";
             $this->db->query($update_sql);
             echo 'Successfully Changed New Password';
         } else {

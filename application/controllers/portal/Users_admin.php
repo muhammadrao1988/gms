@@ -51,44 +51,24 @@ class Users_admin extends CI_Controller
     public function index()
     {
 
+
         $where = '';
 
         $data['title'] = $this->module_title;
-        /*$data['query'] = "SELECT
-          users.user_id,
-          users.username,
-          users.email,
-          CONCAT(users.first_name,' ', users.surname) as full_name,
-          ac_r.acc_name AS reseller,
-          ac_c.acc_name AS company,
-          ac_s.short_desc AS user_login_status
-        FROM
-          users
-          LEFT JOIN accounts ac_c
-            ON (users.parent = ac_c.acc_id AND ac_c.acc_type IN (" . COMPANY_IDS . ") )
-          LEFT JOIN accounts ac_r
-            ON ( users.parent = ac_c.acc_id AND ac_r.acc_type IN (" . RESELLER_IDS . ") AND ac_c.parent = ac_r.acc_id )
-          LEFT JOIN account_status ac_s
-            ON (users.login_status = ac_s.id)
-        WHERE 1 ". $where;*/
+
 		 $data['query'] = "SELECT
           users.user_id,
           users.username,
           users.email,
           CONCAT(users.first_name,' ', users.surname) as full_name,
-          ac_c.acc_name AS company,
-		  ac_r.acc_name AS reseller,
-          
-          ac_s.short_desc AS user_login_status
+          branches.branch_name
         FROM
           users
-          LEFT JOIN accounts ac_c
-            ON (users.parent_child = ac_c.acc_id AND ac_c.acc_types IN (" . COMPANY_IDS . ") )
-          LEFT JOIN accounts ac_r
-            ON ( users.parent = ac_r.acc_id AND ac_r.acc_types IN (" . RESELLER_IDS . ")  )
-          LEFT JOIN account_status ac_s
-            ON (users.status = ac_s.id)
-        WHERE 1 ". str_replace("reseller =","ac_r.`acc_id` =",str_replace("company =","ac_c.`acc_id` =",$where));
+           JOIN branches 
+            ON (branches.id = users.branch_id)
+         
+        WHERE 1 ". $where;
+
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -100,15 +80,8 @@ class Users_admin extends CI_Controller
         if ($id > 0) {
             $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "'";
             $data['row'] = $this->db->query($SQL)->row();
-            $data['row']->user_type = strtolower(getVal('user_types', 'user_type', "WHERE id='" . $data['row']->u_type . "'"));
-            if ($data['row']->u_type == RESELLER_TYPE_ID) {
-                $data['row']->reseller_id = $data['row']->parent;
-            }
 
-        } else if (getVar('reseller_id') > 0) {
-            $data['row'] = new stdClass();
-            $data['row']->reseller_id = getVar('reseller_id');
-            $data['row']->user_type = 'reseller';
+
         }
 
         $data['title'] = $this->module_title;
@@ -135,53 +108,28 @@ class Users_admin extends CI_Controller
         if (!empty($email_exists)) {
             $errors[] = $_POST['error'] = 'E-Mail address already registered.';
         }
+
+        if($this->input->post('password')!=$this->input->post('retype_new_pwd')){
+            $errors[] = $_POST['error'] = 'Password and Repeat password should be same.';
+        }
         if (!$this->module->validate() || count($errors) > 0) {
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {
             /*-----------------------------------------$_POST-------------------------------------------------*/
             $username = $this->module->check_username(strtolower(str_replace(' ', '', getVar('first_name') . getVar('surname'))));
-            $password = random_string('alnum', 8);
+            $password = getVar('password');
 
             $_POST['username'] = $username;
             $_POST['password'] = encryptPassword($password);
-
-
-            $_POST['u_type'] = getVal('user_types', 'id', "WHERE LOWER(user_type)='" . getVar('user_type') . "'");
-            if (getVar('user_type') == 'customer') {
-                $_POST['user_type'] 		= '7';
-                $_POST['parent'] 			= getVar('reseller', TRUE, FALSE);
-				$_POST['parent_child'] 		= getVar('company', TRUE, FALSE);
-				$owner 				   		= getVar('company', TRUE, FALSE);	
-                $email_name 				= 'New User Created';
-				
-            } else if (getVar('user_type') == 'reseller') {
-                $_POST['user_type'] 		= '6';
-                $_POST['parent_child'] 		= getVar('reseller', TRUE, FALSE);
-				$reseller					= getVar('reseller', TRUE, FALSE);	
-				$_POST['parent'] 			= getVal('accounts', 'parent', "WHERE acc_id='" . $reseller . "'");
-				$owner 						= getVar('reseller', TRUE, FALSE);	
-                $email_name 				= 'New Reseller User Created';
-				
-            } else if (getVar('user_type') == 'administrator') {
-                $_POST['user_type'] 		= '5';
-                $_POST['parent'] 			= '50000';
-				$_POST['parent_child'] 		= '50000';
-				$owner 						= 50000;
-                $email_name 				= 'New Admin User Created';
-				
-            }else if(getVar('user_type') == 'super admin') {
-				$_POST['user_type'] 		= '1';
-				$_POST['parent'] 			= '50000';
-				$_POST['parent_child'] 		= '50000';
-				$owner 						= 50000;
-			}
-			#for log
+            $_POST['parent'] = 50000;
+            $_POST['status'] = 1;
+            $_POST['login_status'] = 1;
 
 			$user_log_array = array(
 				'date'			=> date('Y-m-d H:i:s'),
 				'user_id'		=> sessionVar('user_id'),
-				'owner'			=> $owner,
+				'owner'			=> 50000,
 				'type_id'		=> 15,
 				'display_state'	=> 2,
 				'ip_addr'		=> user_ip()
@@ -197,24 +145,9 @@ class Users_admin extends CI_Controller
 
             /*--------------------------------------EmailTemplate--------------------------------------*/
             $_POST['password'] = $password;
-             if(getVar('user_type')!="1")
-             {
-                    $email_data = getEmailTemplate($_POST, $email_name);
-                    $this->email->subject($email_data->subject);
-                    $this->email->message($email_data->email_content);
 
-                    $this->email->from(get_option('email_admin'), get_option('email_admin_from'));
-                    $this->email->to(getVar('email'));
-
-                    $this->email->set_mailtype('html');
-                    if ($this->email->send()) {
-                        $emailMsg = '&info=A new Telebox user has been added and an email sent';
-                    } else {
-                        $emailMsg = '&error=Email sending failed...';
-                    }
-             }
             /*------------------------------------------------------------------------------------------*/
-            redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been inserted..' . $emailMsg);
+            redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been inserted..' );
         }
     }
 
@@ -231,24 +164,7 @@ class Users_admin extends CI_Controller
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {
             /*-----------------------------------------$_POST-------------------------------------------------*/
-            $_POST['u_type'] = getVal('user_types', 'id', "WHERE LOWER(user_type)='" . getVar('user_type') . "'");
-            if (getVar('user_type') == 'customer') {
-                $_POST['user_type'] 		= '7';
-                $_POST['parent'] 			= getVar('reseller', TRUE, FALSE);
-				$_POST['parent_child'] 		= getVar('company', TRUE, FALSE);
-            
-			} elseif (getVar('user_type') == 'reseller') {
-                $_POST['user_type'] 		= '6';
-                $_POST['parent_child'] 		= getVar('reseller', TRUE, FALSE);
-				$reseller					= getVar('reseller', TRUE, FALSE);	
-				$_POST['parent'] 			= getVal('accounts', 'parent', "WHERE acc_id='" . $reseller . "'");
-            } elseif (getVar('user_type') == 'administrator') {
-                $_POST['user_type'] = '5';
-                //$_POST['parent'] = '0';
-            } elseif (getVar('user_type') == 'super admin') {
-                $_POST['user_type'] = '1';
-                //$_POST['parent'] = '0';
-            }
+
             /*------------------------------------------------------------------------------------------*/
 
             $DbArray = getDbArray($this->table);
@@ -257,6 +173,7 @@ class Users_admin extends CI_Controller
 			
 
             $where = $DbArray['where'];
+
             save($this->table, $DBdata, $where);
 
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
@@ -316,8 +233,9 @@ class Users_admin extends CI_Controller
         $data["id"]=$id;
 
 
-        if (($this->input->post('submit') !== false)&&($this->input->post('password')==$this->input->post('retype_new_pwd')))
+        if (($this->input->post('submit') != "")&&($this->input->post('password')==$this->input->post('retype_new_pwd')))
         {
+
             $password = $this->input->post('password');
             $user_id = $this->input->post('user_id');
 
@@ -380,120 +298,8 @@ class Users_admin extends CI_Controller
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/send_password',$data);
     }
-	
-	 function account_access()
-     {
-
-        $id = intval(getUri(4));
-        $data["id"]=$id;
 
 
-        if (($this->input->post('submit') !== false))
-        {
-            $access_account = $this->input->post('access_account');
-            $user_id = $this->input->post('user_id');
-
-
-            /*updating new password*/
-            $where = "user_id='" . $user_id . "' ";
-            save($this->table, array('password' => encryptPassword($password)), $where);
-			
-			if($_POST['access_account']==2){
-			$where = "user_id='" . $user_id . "' ";
-			$password = random_string('alnum', 8);
-            save($this->table, array('reset_key' => '','login_status'=>1,'password'=>encryptPassword($password)), $where);	
-			 if(empty($_POST['send_email'])){
-			/*selecting user info*/
-            $p=getValues('users',"*", "WHERE user_id='" . $user_id . "'");
-            $email_name="Telebox Account Unlock";
-			$msg = '<html>
-					<head>
-					<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-					<title>Account Unlock</title>
-					</head>
-					<body style="background: #fff; margin: 0px auto; font-family: Calibri;">
-					<div style="width: 620px;  background: #ffffff; margin:0 auto;">
-					  <div style="background:#275d90; height:65px;"><img src="http://www.telebox.co.uk/assets/images/small_logo.png" style="padding-left:15px; padding-top:15px;" /></div>
-					  <div style="padding:15px; ">
-						<p style="font-size: 21px; font-weight:bold;">Hi '.$p->first_name.',</p>
-						<p style="font-size: 16px;">Your account has unlocked.</p>
-						<p style="font-size: 16px;">Your Telebox login details have recently been updated :</p>
-						<p style="font-size: 16px; padding-top:5px; font-weight:bold"> Username: '.$p->username.'<br>
-						  Password: '.$password.' </p>
-						<p style="font-size: 16px; padding-top:5px;"> To access your account please visit <br/>
-						  <a href="http://www.telebox.co.uk/portal" style="color:#ee7b2a; font-weight:bold;">http://www.telebox.co.uk/portal</a> 
-						  
-						  </p>
-						<p style="font-size: 16px;padding-top:5px;"> Thanks,<br>
-						  The Telebox Team </p>
-					  </div>
-					  <div style="background:#393939;">
-						<div style="font-size: 15px; color:#949494; padding:15px;">This email was sent to you as a register user of <a href="www.telebox.co.uk/portal" style="color:#949494">www.telebox.co.uk</a><br />
-						  If you need any assistance please contact your account manager, or email <a href="mailto:help@telebox.co.uk" style="color:#949494">help@telebox.co.uk</a></div>
-					  </div>
-					  <div style="background:#393939; border-top:1px solid #949494">
-						<div style="font-size: 15px; color:#fff; padding:15px;">Copyright &copy; '.date('Y').' <a href="www.telebox.co.uk/portal" style="color:#fff; text-decoration:none;">telebox.co.uk</a> All rights reserved</div>
-					  </div>
-					</div>
-					</div>
-					</body>
-					</html>';
-
-           
-
-            //$email_data = getEmailTemplate($_POST, $email_name);
-
-            $this->email->subject($email_name);
-            $this->email->message($msg);
-
-            $this->email->from(get_option('email_admin'), get_option('email_admin_from'));
-            $this->email->to($p->email);
-
-            $this->email->set_mailtype('html');
-            if ($this->email->send()) {
-                $emailMsg = '?msg=The password has been changed and email sent.';
-            } else {
-                $emailMsg = '?error=Email sending failed...';
-            }
-			}else{
-			$emailMsg = '?msg=Account unlock successfully';	
-			}
-				
-			}
-			
-			if($_POST['access_account']==1){
-			$where = "user_id='" . $user_id . "' ";
-            save($this->table, array('status'=>2), $where);	
-				
-			}
-			
-			
-			
-
-           
-
-            redirect(ADMIN_DIR . $this->module_name . '/'.$emailMsg);
-        }
-
-
-        $this->load->view(ADMIN_DIR . $this->module_name . '/account_access',$data);
-    }
-
-
-    function AJAX()
-    {
-        $action = getUri(4);
-        $JSON['data'] = '';
-        switch ($action) {
-            case 'reseller_companies':
-
-                $JSON['data'] .= '<option value=""> - Select -</option>';
-                $JSON['data'] .= selectBox("SELECT acc_id, acc_name FROM accounts where acc_types IN(" . COMPANY_IDS . ") and parent = '" . getVar('reseller_id') . "' ");
-                break;
-        }
-
-        echo json_encode($JSON);
-    }
 	
 
 

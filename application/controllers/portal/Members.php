@@ -73,7 +73,7 @@ class Members extends CI_Controller
             ON (users.login_status = ac_s.id)
         WHERE 1 ". $where;*/
         if($this->session->userdata('user_info')->u_type != '1'){
-            $branch_id = ' AND acc.branch_id = "'.getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"').'"';
+            $branch_id = ' AND acc.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
         }
 
         $data['query'] = "SELECT 
@@ -127,7 +127,7 @@ class Members extends CI_Controller
 
     public function add()
     {
-        $email_exists = getVal('users', 'email', 'WHERE `email`="' . getVar('email') . '"');
+        $email_exists = getVal('accounts', 'email', 'WHERE `email`="' . getVar('email') . '"');
         if (!empty($email_exists)) {
             $errors[] = $_POST['error'] = 'E-Mail address already registered.';
         }
@@ -139,7 +139,7 @@ class Members extends CI_Controller
             #for log
             $user_log_array = array(
                 'date'			=> date('Y-m-d H:i:s'),
-                'user_id'		=> sessionVar('user_id'),
+                'user_id'		=> $this->session->userdata('user_info')->acc_id,
                 'type_id'		=> 15,
                 'display_state'	=> 2,
                 'ip_addr'		=> user_ip()
@@ -151,10 +151,10 @@ class Members extends CI_Controller
 
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
-            $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
+            $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
             $DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));;
-            $DBdata['branch_id']        = getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
-            $DBdata['serial_number']    = getVal('users','machine_serial',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
+            $DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
+            $DBdata['serial_number']    = getVal('accounts','serial_number',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
 
             $id = save($this->table, $DBdata);
 
@@ -166,7 +166,7 @@ class Members extends CI_Controller
 
     public function update()
     {
-        $email_exists = getVal('users', 'email', 'WHERE `email`="' . getVar('email') . '" AND user_id !="' . getVar('user_id') . '"');
+        $email_exists = getVal('accounts', 'email', 'WHERE `email`="' . getVar('email') . '" AND acc_id !="' . getVar('user_id') . '"');
         if ($email_exists != '') {
             $errors[] = $_POST['error'] = 'E-Mail address already registered.';
         }
@@ -177,10 +177,10 @@ class Members extends CI_Controller
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
-            $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
+            $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
             $DBdata['machine_user_id']  = $this->module->getMachineUserId($_REQUEST['machine_member_id']);;
-            $DBdata['branch_id']        = getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
-            $DBdata['serial_number']    = getVal('users','machine_serial',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
+            $DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
+            $DBdata['serial_number']    = getVal('accounts','serial_number',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
 
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
@@ -194,7 +194,7 @@ class Members extends CI_Controller
     {
         $JSON = array();
         $id = getVar('status-id');
-        $login_status_val = getVal('users', 'status', 'WHERE user_id ="' . $id . '"');
+        $login_status_val = getVal('accounts', 'status', 'WHERE acc_id ="' . $id . '"');
         if($login_status_val==0 ||  $login_status_val==2 || $login_status_val==3 ){
             $status=1;
         }else if($login_status_val==1){

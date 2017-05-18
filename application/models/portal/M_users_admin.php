@@ -19,9 +19,10 @@ class M_users_admin extends CI_Model
         $this->form_validation->set_rules('first_name', 'First name', 'required');
         $this->form_validation->set_rules('surname', 'Surname', 'required');
         $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
-        $this->form_validation->set_rules('office_phone', 'Phone number', 'required');
         $this->form_validation->set_rules('mob_phone', 'Mobile number', 'required');
         $this->form_validation->set_rules('machine_serial', 'Machine Serial Number', 'required');
+       /* $this->form_validation->set_rules('password', 'Password', 'required');
+        $this->form_validation->set_rules('retype_new_pwd', 'Retype Password', 'required');*/
 
         if ($this->form_validation->run() == FALSE) {
             return false;
@@ -33,7 +34,7 @@ class M_users_admin extends CI_Model
 
     function get_username($username)
     {
-        $result = $this->db->query("SELECT user_id FROM users WHERE username='" . $username . "'")->row();
+        $result = $this->db->query("SELECT acc_id FROM accounts WHERE username='" . $username . "'")->row();
         if ($result->user_id != "") {
             return '0';
         } else {

@@ -89,7 +89,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                   </div>
                 </div>
                 <?php
-                $login_status = getVal("users","status", " WHERE user_id='".$id."'");
+                $login_status = getVal("accounts","status", " WHERE acc_id='".$id."'");
                 if($login_status==3){
                 ?>
                 <div class="form-group">
