@@ -55,8 +55,7 @@ class Invoices extends CI_Controller
         $where = '';
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
-        //$data['query'] = "Select * from ".$this->table." where 1".$where;
-        $data['query'] = "SELECT
+        /*$data['query'] = "SELECT
                               id,
                               ac.acc_name AS member_name,
                               ac.acc_id,
@@ -103,20 +102,24 @@ class Invoices extends CI_Controller
                                 ON (ic.`type` = `it`.`id`) 
                             WHERE 1 
                               AND ac.`status` = 1 and ic.type = 1 
-                            GROUP BY ic.acc_id ".$where;
-        echo htmlentities($data['query']);
-        die('Call');
-        $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
-    }
-    public function allInvoices(){
-        $where = '';
-        $where .= getFindQuery();
-        $data['title'] = $this->module_title;
-        //$data['query'] = "Select * from ".$this->table." where 1".$where;
-        $data['query'] = "select ic.acc_id,ac.acc_name from invoices as ic inner join account as ac on(ac.acc_id = ic.acc_id) inner join inovice_types as it on (it.id=ic.type) ".$where;
-        /*echo htmlentities($data['query']);
-        die('Call');*/
-        $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
+                            GROUP BY ic.acc_id ".$where;*/
+        $data['query'] = "SELECT 
+                              iv.`id` AS id,
+                              iv.`acc_id`,
+                              ac.`acc_name`,
+                              ac.`acc_date`,
+                              iv.`amount` AS amount,
+                              iv.`fees_month`,
+                              DATE_FORMAT(iv.`fees_month`,'%M %Y') AS last_paid_month,
+                              DATE(iv.`fees_datetime`) as paid_date,
+                              iv.`fees_month` as payment_status,
+                              iv.status
+                            FROM
+                              invoices AS iv 
+                              INNER JOIN accounts AS ac 
+                                ON (ac.`acc_id` = iv.`acc_id`) 
+                            WHERE ac.`status` = 1 AND FIND_IN_SET('1', iv.`type`) " .$where;
+        $this->load->view(ADMIN_DIR . $this->module_name . '/grid_monthly', $data);
     }
 
     public function form()
@@ -235,8 +238,26 @@ class Invoices extends CI_Controller
     }
     public function payPayment()
     {
-        echo '<pre>';print_r($_REQUEST );echo '</pre>';
-        die('Call');
+        if (!$this->module->validate_payment()) {
+            $this->session->set_flashdata('errors', show_validation_errors());
+            redirect(ADMIN_DIR . $this->module_name . '/monthlyInvoice/?error=Fill all required fields.');
+        } else {
+            $DBdata['amount'] = getVar('fees');
+            $DBdata['description'] = getVar('description');
+            $DBdata['fees_month'] = date('Y-m-d', strtotime(getVar('fees_month')));
+            $invoices_details = getValues('invoices', '*', ' where id = "' . getVar('invoice_id') . '"');
+            $DBdata['acc_id'] = $invoices_details->acc_id;
+            $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
+            $DBdata['type'] = 1;
+            $DBdata['status'] = 1;
+            $amount_details[] = array((string)$DBdata['type']);
+            $amount_details[] = array($DBdata['amount']);
+            $DBdata['amount_details'] = json_encode($amount_details);
+            $id = save($this->table, $DBdata);
+            $id = save($this->table, array('status'=>2),' id = "'.getVar('invoice_id').'"');
+            /*------------------------------------------------------------------------------------------*/
+            redirect(ADMIN_DIR . $this->module_name . '/monthlyInvoice/?msg=Record has been inserted..');
+        }
 
     }
 }

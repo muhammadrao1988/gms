@@ -40,6 +40,8 @@ define('ACCESS_DATABASE' , urldecode("C:\Users\Muhammad Rao\Desktop\ddd\abc.mdb"
 
 $config['base_url'] = DOMAIN_URL;
 
+define("MONTHLY_FEES",300);
+
 
 /*
 |--------------------------------------------------------------------------

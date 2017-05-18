@@ -36,7 +36,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 $grid->form_buttons = array('new', 'delete');
                 $grid->url = '?' . $_SERVER['QUERY_STRING'];
                 //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');
-                $grid->grid_buttons = array('edit', 'delete', 'view_attendance');
+                $grid->grid_buttons = array( 'view_attendance','edit', 'delete');
                 echo $grid->showGrid();
                 ?>
             <!--</div>-->
