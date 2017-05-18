@@ -106,13 +106,10 @@ include dirname(__FILE__) . "/../status.php";
 <script type="text/javascript">
     $(document).ready(function () {
         $('.payment_pop').click( function () {
-<<<<<<< HEAD
             var invoice_id = $(this).attr('data-invoice');
             $('#invoice_id').val(invoice_id);
             $('#payment_pop_modal').modal('show');
-=======
-            
->>>>>>> 383d1dc8d03b8d6a6d00611ecebf7fad21a95452
+
         });
     });
 </script>
