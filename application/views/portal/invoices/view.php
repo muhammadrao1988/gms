@@ -115,7 +115,12 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                             </div>
                         </div>
                         <?php
-                        if($row->type != '1') {
+                        $now = time();
+                        $fees_date = $val[0];
+                        $your_date = strtotime(date('Y-m',strtotime($row->fees_month)).'-'.date('d',strtotime($row2->acc_date)));
+                        $datediff = $now - $your_date;
+                        $month = floor($datediff / (60 * 60 * 24 * 30));
+                        if($month =='0' || $row->status == '2') {
                             ?>
                             <table class="table table-invoice">
                                 <thead>
@@ -156,28 +161,26 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <th>Fees Description</th>
                                     <th class="text-center">Amount</th>
                                     <th class="text-center">Month</th>
-                                    <th class="text-center">Total</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <?php
-                                $i = 1;
-                                foreach (explode(',', $invoice_types) as $val) { ?>
+
                                     <tr>
-                                        <td><?php echo $i; ?></td>
+                                        <td>1</td>
                                         <td>
-                                            <h4><?= $val; ?></h4>
+                                            <h4>Montly Fees</h4>
                                             <!--<p>Monthly Charges Paid by member.</p>-->
                                         </td>
-                                        <td class="text-center"></td>
-                                        <td class="text-center">1</td>
+                                        <td class="text-center"><?php echo MONTHLY_FEES; ?></td>
+                                        <td class="text-center"><?php echo $month ; ?></td>
                                         <!--<td class="text-center">Rs. 300</td>-->
                                     </tr>
-                                    <?php $i++;
-                                } ?>
+
                                 </tbody>
                             </table>
-                        <?php }
+                        <?php
+                        $grand_total = $month*MONTHLY_FEES;
+                        }
                             ?>
                         <div class="row">
                             <div class="col-md-8 col-xs-7 payment-method">

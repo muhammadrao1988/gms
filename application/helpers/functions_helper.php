@@ -848,7 +848,12 @@ function getTotalfeesAmount($values)
     $now = time(); // or your date as well
     $your_date = strtotime(date('Y-m',strtotime($values[1]['fees_month'])).'-'.date('d',strtotime($acc_details)));
     $datediff = $now - $your_date;
-    return  300*floor($datediff / (60 * 60 * 24 * 30));
+    $total_month = floor($datediff / (60 * 60 * 24 * 30));
+    if($total_month !='0' and $values[1]['status'] == '1'){
+        return MONTHLY_FEES * floor($datediff / (60 * 60 * 24 * 30));
+    }else{
+        return $values[1]['amount'];
+    }
 
 }
 function invoice_for($val){
@@ -856,5 +861,18 @@ function invoice_for($val){
     $sql = "SELECT GROUP_CONCAT(`name`) as types FROM invoice_types WHERE id IN (".(($val[0]=='')?0:$val[0]).")";
     return $CI->db->query($sql)->row()->types;
      //getVal('invoice_types','group_concat(name)',' where id in ('.(($val[0]=='')?0:$val[0]).')');
+}
 
+function getPaymemntStatus($val){
+    $now = time();
+    $fees_date = $val[0];
+    $your_date = strtotime(date('Y-m',strtotime($fees_date)).'-'.date('d',strtotime($val[1]['acc_date'])));
+    $datediff = $now - $your_date;
+    $month = floor($datediff / (60 * 60 * 24 * 30));
+    if($month !='0' and $val[1]['status'] == '1'){
+        $paybutton = '<span class="red"><b>Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['id'].'"><i class="fa fa-money"></i> Pay</button>';
+        return $paybutton;
+    }else{
+        return '<span class="green"><b>PAID</b></span>';
+    }
 }

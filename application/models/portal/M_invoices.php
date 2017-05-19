@@ -26,6 +26,16 @@ class M_invoices extends CI_Model
             return true;
         }
     }
+    function validate_payment(){
+        $this->form_validation->set_rules('invoice_id', 'Invoice Id', 'required');
+        $this->form_validation->set_rules('fees', 'Invoice Amount', 'required');
+        $this->form_validation->set_rules('fees_month', 'Fees Month', 'required');
+        if ($this->form_validation->run() == FALSE) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
 
 /* End of file m_events.php */
