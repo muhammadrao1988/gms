@@ -24,6 +24,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             
             
             <div class="row page-table">
+
             
                          <div class="clearfix"></div>
 			<?php
@@ -31,13 +32,16 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 $grid->query 				= $query;
                 //$grid->title 				= $this->module_title . ' - List';
                 $grid->limit 				= 25;
-                $grid->search_box 			= TRUE;
+                $grid->search_box 			= true;
+                $grid->selectAllCheckbox    = false;
 				$grid->url 				 	='?'.$_SERVER['QUERY_STRING'];
                 $grid->hide_fields 			= array('id');
 				$grid->custom_func 		 	= array('in_use' => 'in_use_template');
                 $grid->center_fields 		= array('ordering');
-                $grid->form_buttons 		= array('new', 'delete');
+                $grid->form_buttons 		= array('new');
                 $grid->grid_buttons 		= array('edit', 'delete');
+                $grid->order_column         = "id";
+                $grid->order                = "ASC";
                 echo $grid->showGrid();
                 ?>
                 <!--</div>-->

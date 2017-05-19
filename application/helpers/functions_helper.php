@@ -264,8 +264,7 @@ function getFindQuery($key = 'search')
                 } elseif (count($search_arr) == 1) {
                     $s_coulum = $search_arr[0];
                 }
-
-                $search_v = (is_string($search_v)) ? " LIKE '%" . $CI->db->escape_like_str($search_v) . "%' " : " = '" . dbEscape($search_v) . "'";
+                $search_v = (!is_numeric($search_v)) ? " LIKE '%" . $CI->db->escape_like_str($search_v) . "%' " : " = '" . dbEscape($search_v) . "'";
                 //$search_v = (strtoupper($operator) == 'LIKE') ? "%$search_v%" : $search_v;
                 $search_q .= " AND " . $s_coulum . $search_v;
             }
@@ -370,13 +369,36 @@ function array2url($array, $keyName)
 
 function show_validation_errors()
 {
-    if (validation_errors() != '') {
-        $html = '<div class="alert alert-danger" style="margin-top: 16px;">
-        	    <button type="button" class="close" data-dismiss="alert">×</button>';
-        $html .= validation_errors();
-        return $html .= '</div>';
+    $error = getVar('error');
+    $msg = getVar('msg');
+    $success = getVar('success');
+    $alert = getVar('alert');
+    $info = getVar('info');
+
+    $html = '';
+    if (validation_errors() != '' || !(count($error) == 0 || $error == '')) {
+        $errors = validation_errors() . (is_array($error) ? join('<br>', $error) : $error);
+        $html .= '<div class="alert alert-block alert-danger fade in"><button data-dismiss="alert" class="close close-sm" type="button"><i class="fa fa-times"></i></button>';
+        $html .= $errors . '</div>';
     }
-    return '';
+    if (!(count($msg) == 0 || $msg == '')) {
+        $html .= '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>';
+        $html .= (is_array($msg) ? join('<br>', $msg) : $msg) . '</div>';
+    }
+    if (!(count($success) == 0 || $success == '')) {
+        $html .= '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>';
+        $html .= (is_array($success) ? join('<br>', $success) : $success) . '</div>';
+    }
+    if (!(count($alert) == 0 || getVar('alert') == '')) {
+        $html .= '<div class="alert alert-danger "><button type="button" class="close" data-dismiss="alert">×</button>';
+        $html .= (is_array($alert) ? join('<br>', $alert) : $alert) . '</div>';
+    }
+    if (!(count($info) == 0 || $info == '')) {
+        $html .= '<div class="alert alert-info "><button type="button" class="close" data-dismiss="alert">×</button>';
+        $html .= (is_array($info) ? join('<br>', $info) : $info) . '</div>';
+
+    }
+    return $html;
 }
 
 
@@ -854,6 +876,7 @@ function getPaymemntStatus($val){
         return '<span class="green"><b>PAID</b></span>';
     }
 }
+
 function getSubscriptionStatus($val){
     $now = time();
     $expire_date    = strtotime(date('Y-m-d',strtotime($val[1]['acc_date'].'+ '.$val[0])));
@@ -865,4 +888,34 @@ function getSubscriptionStatus($val){
         return '<span class="green"><b>'.$days_left. ' Days Left</b></span>';
     }
 
+}
+function date_manual()
+{
+    if (getVar('date_frame') == 'Custom Dates' && getVar('range_type') == 'day') {
+        $_GET['date_range'] = getVar('custom_date');
+        $_GET['date_range2'] = getVar('custom_date');
+    }
+    if (getVar('date_frame') == 'Custom Dates' && getVar('range_type') == 'week') {
+        if (getVar('week_picker') == '') {
+            $_GET['date_range'] = getVar('custom_date');
+            $date_second = DateTime::createFromFormat('d/m/Y', getVar('custom_date'));
+            $_GET['date_range2'] = date('d/m/Y', strtotime($date_second->format('m/d/Y') . "+6 days"));
+        } else {
+            $range = explode(' to ', getVar('week_picker'));
+            $_GET['date_range'] = $range[0];
+            $_GET['date_range2'] = $range[1];
+        }
+    }
+    if (getVar('date_frame') == 'Custom Dates' && getVar('range_type') == 'month') {
+        if (getVar('month_picker') == '') {
+            $_GET['date_range'] = getVar('custom_date');
+            $range2 = DateTime::createFromFormat('d/m/Y', getVar('custom_date'));
+            $_GET['date_range2'] = date('t/m/Y', strtotime($range2->format('m/d/Y')));
+        } else {
+            $month = explode(' ', getVar('month_picker'));
+            $date = $month[0] . ' 1 ' . $month[1];
+            $_GET['date_range'] = date('d/m/Y', strtotime($date));
+            $_GET['date_range2'] = date('t/m/Y', strtotime($date));
+        }
+    }
 }

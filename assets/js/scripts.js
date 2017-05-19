@@ -197,20 +197,20 @@
     //date picker
 	 
 	 $("#date_range").datepicker({
-       dateFormat: 'dd/mm/yy',
+       dateFormat: 'yy/mm/dd',
         onSelect: function(selected) {
           $("#date_range2").datepicker("option","minDate", selected)
         }
     });
     $("#date_range2").datepicker({ 
-        dateFormat: 'dd/mm/yy',
+        dateFormat: 'yy/mm/dd',
         onSelect: function(selected) {
            $("#date_range").datepicker("option","maxDate", selected)
         }
     });  
 
 	 
-	 $('.datepicker').datepicker({ dateFormat: 'dd/mm/yy' }).val();
+	 $('.datepicker').datepicker({ dateFormat: 'yy/mm/dd' }).val();
 	$( ".datepicker" ).datepicker( "option", "maxDate", '+0m +0w' );//calendar end date restrict to today
 	
 	 

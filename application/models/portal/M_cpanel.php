@@ -23,25 +23,10 @@ class M_cpanel extends CI_Model
     function checkModulePermission($module){
 
 
-
-
-        //if($this->session->userdata['u_type']==4 || $this->session->userdata['u_type']==3){
-        $user_template_table = $this->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->user_id."'")->num_rows();
-        if($user_template_table==0){
-            $table			= 'user_type_module_rel';
-
-            //$user_template_id	= intval(sessionVar('user_template_id'));
-            $user_template_id = $this->db->query("SELECT user_template_id FROM users WHERE user_id = '".$this->session->userdata['user_info']->user_id."'")->row();
-            $user_template_id = $user_template_id->user_template_id;
-        }else{
-
-            $table	= 'user_template_methods';
-            $and_condition = ' AND um.acc_id = "'.$this->session->userdata['user_info']->user_id.'" ';
-            $user_template_id	= $this->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$this->session->userdata['user_info']->user_id."'")->row();
-            $user_template_id	= $user_template_id->user_type_id;
-        }
-
-
+        $user_template_id = $this->db->query("SELECT user_template_id FROM users WHERE user_id = '".$this->session->userdata['user_info']->user_id."'")->row();
+        $user_template_id = $user_template_id->user_template_id;
+        $table = "user_type_module_rel";
+        $and_condition = "";
         $mod_sql = "SELECT
                        um.module_id AS module_id,
                        m.module AS module,
@@ -50,7 +35,7 @@ class M_cpanel extends CI_Model
                    FROM
                        users AS u
                        INNER JOIN ".$table." AS um
-                           ON (u.u_type = um.user_type_id)
+                           ON (u.user_template_id = um.user_type_id)
                        INNER JOIN modules AS m
                            ON (m.id = um.module_id)
                       WHERE um.user_type_id='" . intval($user_template_id) . "' ".$and_condition."

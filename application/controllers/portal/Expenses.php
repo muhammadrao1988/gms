@@ -54,10 +54,14 @@ class Expenses extends CI_Controller
     public function index()
     {
 
+
         $where = '';
         $where .= getFindQuery();
         $search_array = getVar('search');
         $data['search'] = $search_array;
+        if(getVar('date_range')){
+
+        }
 
 
         $data['query'] = "SELECT 
@@ -70,10 +74,30 @@ class Expenses extends CI_Controller
                                WHEN 3 THEN 'UnPaid' 
                                ELSE 'N/A'
                                END as 'status',
+                               
                                expense_date
                             FROM
                               expenses 
-                               WHERE branch_id = ' ".$this->branch_id."' ".$where;
+                               WHERE branch_id = ' ".$this->branch_id."' ".$where. "";
+        $currentMonth = " AND expense_date BETWEEN '".date('Y-m-01 00:00:00')."' AND '".date('Y-m-d H:i:s')."' ";
+         $chart = "SELECT 
+                              expense_date,
+                              SUM(total_amount) as total_amount
+                            FROM
+                              expenses 
+                               WHERE branch_id = ' ".$this->branch_id."'  "  .$where.$currentMonth." GROUP BY expense_date";
+
+
+        $data['chart_total'] = $this->db->query($chart)->result();
+        foreach ($data['chart_total'] as $ct) {
+
+
+            $total_amount[] = ($ct->total_amount=="" ? 0 : $ct->total_amount);
+            $report_days[] = date('dM y', strtotime($ct->expense_date));
+
+        }
+        $data['total_amount'] = $total_amount;
+        $data['report_days'] = $report_days;
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
@@ -114,16 +138,45 @@ class Expenses extends CI_Controller
         } else {
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
-            $DBdata['expense_date'] = date('Y-m-d',strtotime(getVar('expense_date')));
+            $expense_date = date('Y-m-d H:i:s',strtotime(getVar('expense_date')));
+            $total_amount = array_sum(getVar('amount'));
+            $DBdata['expense_date'] = $expense_date;
             $DBdata['created_date'] = date('Y-m-d H:i:s');
             $DBdata['created_by'] = $this->current_user;
-            $DBdata['total_amount'] = array_sum(getVar('amount'));
+            $DBdata['total_amount'] = $total_amount;
             $DBdata['branch_id'] = $this->branch_id;
             $expense_details[] =   array_filter(getVar('label'));
             $expense_details[] =   array_filter(getVar('amount'));
             $DBdata['expense_entry'] = json_encode($expense_details);
 
             $id = save($this->table, $DBdata);
+            //audit log entry
+            if($DBdata['expense_status']==1){
+                $status_expense = "Paid";
+                $type_id = 5;
+            }else if($DBdata['expense_status']==2){
+                $status_expense = "Part Paid";
+                $type_id = 6;
+            }else if($DBdata['expense_status']==3){
+                $status_expense = "UnPaid";
+                $type_id = 7;
+            }
+
+            $note = $this->current_user." generated expense invoice with the status of ".$status_expense;
+
+            $audit_log = array(
+                            'date'=> $expense_date,
+                            'user_id'=> $this->current_user,
+                            'type_id'=> $type_id,
+                            'note'=> $note,
+                            'amount'=> $total_amount,
+                            'reference_id'=> $id,
+                            'reference_table'=> $this->table,
+                            'ip_addr'=> $this->input->ip_address(),
+                            'branch_id'=> $this->branch_id
+                            );
+
+            save("audit_log",$audit_log);
             /*------------------------------------------------------------------------------------------*/
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been inserted..');
         }
@@ -137,17 +190,56 @@ class Expenses extends CI_Controller
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {
             $DbArray = getDbArray($this->table);
+            $expense_date = date('Y-m-d H:i:s',strtotime(getVar('expense_date')));
+            $total_amount = array_sum(getVar('amount'));
             $DBdata = $DbArray['dbdata'];
-            $DBdata['expense_date'] = date('Y-m-d',strtotime(getVar('expense_date')));
+            $DBdata['expense_date'] = $expense_date;
             $DBdata['created_date'] = date('Y-m-d H:i:s');
             $DBdata['created_by'] = $this->current_user;
-            $DBdata['total_amount'] = array_sum(getVar('amount'));
+            $DBdata['total_amount'] = $total_amount;
             $DBdata['branch_id'] = $this->branch_id;
             $expense_details[] =   array_filter(getVar('label'));
             $expense_details[] =   array_filter(getVar('amount'));
             $DBdata['expense_entry'] = json_encode($expense_details);
             $where = $DbArray['where'];
+
             save($this->table, $DBdata, $where);
+
+            if($DBdata['expense_status']==1){
+                $status_expense = "Paid";
+                $type_id = 5;
+            }else if($DBdata['expense_status']==2){
+                $status_expense = "Part Paid";
+                $type_id = 6;
+            }else if($DBdata['expense_status']==3){
+                $status_expense = "UnPaid";
+                $type_id = 7;
+            }
+
+            if(getVar('old_status')==1){
+                $old_type_id = 5;
+            }else if(getVar('old_status')==2){
+                $old_type_id = 6;
+            }else if(getVar('old_status')==3){
+                $old_type_id = 7;
+            }
+
+            $note = $this->current_user." generated expense invoice with the status of ".$status_expense;
+
+            $audit_log = array(
+                'date'=> $expense_date,
+                'user_id'=> $this->current_user,
+                'type_id'=> $type_id,
+                'note'=> $note,
+                'amount'=> $total_amount,
+                'reference_id'=> getVar('id'),
+                'reference_table'=> $this->table,
+                'ip_addr'=> $this->input->ip_address(),
+                'branch_id'=> $this->branch_id
+            );
+             $audit_log_where = " `reference_id` = '".getVar('id')."' AND `type_id` = '".$old_type_id."'";
+            save("audit_log",$audit_log,$audit_log_where);
+
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
         }
     }

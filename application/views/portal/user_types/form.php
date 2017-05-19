@@ -80,27 +80,18 @@ background:#f2f2f2 !important;
                     </div>
                   </div>
                 </div>
-                <div class="form-group">
-                <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">User Type</label>
-                <div class="col-lg-8">
-                  <label class="styled_select" >
-                    <select name="user_type_id" id="user_type_id" style="width:35%;" class="validate[required]" >
-                                            <?=selectBox("SELECT id, user_type FROM user_types", $row->user_type_id);?>
-                                        </select>
-                  </label>
-                </div>
-              </div>
+
                 <div class="form-group">
                   <label class="control-label col-md-3">Status:</label>
                   <div class="col-md-8">
                     <div class="input-large">
-                    <label class="styled_select">
-                        <select class="styled" name="user_status" id="user_status" style="width:35%;">
+
+                        <select class="select" name="user_status" id="user_status" style="width:35%;">
                          
                           <option value="1" <?php echo ($row->user_status==1 ? 'selected' : '');?>>Active</option>
                           <option value="0" <?php echo ($row->user_status==0 ? 'selected' : '');?>>Inactive</option>
                                             </select>
-                      </label>
+
                     </div>
                   </div>
                 </div>
@@ -304,7 +295,7 @@ background:#f2f2f2 !important;
                   <div class="col-md-8">
                        <button type="reset" class="btn btn-black " onclick="window.history.back()"> Cancel</button>
                     <button type="submit" class="btn btn-green "> Save </button>
-                      <button type="submit" name="update_all_account" value="1" class="btn btn-green "> Save and update all accounts </button>
+
                
                   </div>
                 </div>

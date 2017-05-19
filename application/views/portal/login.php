@@ -43,9 +43,13 @@ include dirname(__FILE__) . "/includes/header.php";
                 </div>
                 <label class="checkbox">
                     <input type="checkbox" id="remember1" class="check styled" checked="checked">
-                    Remember me <span class="pull-right"> <a href="<?= site_url(ADMIN_DIR . 'login/forget_pass'); ?>"> Forgotten
+                    Remember me
+                   <!-- <span class="pull-right">
+                        <a href="<?/*= site_url(ADMIN_DIR . 'login/forget_pass'); */?>"> Forgotten
                             Password?</a> <br/>
-                            <a href="<?= site_url(ADMIN_DIR . 'login/forget_user'); ?>"> Forgotten Username?</a> </span> </label>
+                            <a href="<?/*= site_url(ADMIN_DIR . 'login/forget_user'); */?>"> Forgotten Username?</a>
+                    </span> -->
+                </label>
                 <button class="btn btn-lg btn-login btn-block" type="submit">Sign in</button>
             </div>
         </form>

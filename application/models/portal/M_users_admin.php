@@ -34,7 +34,7 @@ class M_users_admin extends CI_Model
 
     function get_username($username)
     {
-        $result = $this->db->query("SELECT acc_id FROM accounts WHERE username='" . $username . "'")->row();
+        $result = $this->db->query("SELECT user_id FROM users WHERE username='" . $username . "'")->row();
         if ($result->user_id != "") {
             return '0';
         } else {

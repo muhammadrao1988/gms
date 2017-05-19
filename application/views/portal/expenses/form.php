@@ -62,6 +62,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                           action="<?= site_url(ADMIN_DIR . $this->module_name . (!empty($row->id) ? '/update' : '/add')); ?>"
                           method="post" enctype="multipart/form-data">
                         <input type="hidden" name="id" id="id" value="<?= $row->id; ?>"/>
+                        <input type="hidden" name="old_status" id="old_status" value="<?= $row->expense_status; ?>"/>
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
@@ -114,11 +115,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 <div class="form-group">
                                     <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Date *</label>
                                     <div class="col-lg-6">
-                                        <input type="text" id="fees_month" placeholder="DD/MM/YYYY"
+                                        <input type="text" id="fees_month" placeholder=""
                                                style="padding: 0 10px;"
-                                               class="form-control datepicker-format validate[required]"
+                                               class="form-control datepicker-custom validate[required]"
                                                name="expense_date"
-                                               value="<?= (($row->expense_date != '') ? date('d-m-Y', strtotime($row->expense_date)) : ''); ?>">
+                                               value="<?= (($row->expense_date != '') ? date('Y-m-d', strtotime($row->expense_date)) : ''); ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -228,6 +229,7 @@ include dirname(__FILE__) . "/../includes/footer.php";
 ?>
 <script type="text/javascript">
     $(document).ready(function () {
+        $('.datepicker-custom').datepicker({ dateFormat: 'yy-mm-dd' });
         $('#add-more-btn').click(function (e) {
             $('#invoice_entries > div:last').after($('.add_more_entries').html());
             $('#invoice_entries > div.append_row:last').find('.select-more').select2();
