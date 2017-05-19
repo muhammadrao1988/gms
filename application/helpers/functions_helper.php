@@ -876,3 +876,33 @@ function getPaymemntStatus($val){
         return '<span class="green"><b>PAID</b></span>';
     }
 }
+function date_manual()
+{
+    if (getVar('date_frame') == 'Custom Dates' && getVar('range_type') == 'day') {
+        $_GET['date_range'] = getVar('custom_date');
+        $_GET['date_range2'] = getVar('custom_date');
+    }
+    if (getVar('date_frame') == 'Custom Dates' && getVar('range_type') == 'week') {
+        if (getVar('week_picker') == '') {
+            $_GET['date_range'] = getVar('custom_date');
+            $date_second = DateTime::createFromFormat('d/m/Y', getVar('custom_date'));
+            $_GET['date_range2'] = date('d/m/Y', strtotime($date_second->format('m/d/Y') . "+6 days"));
+        } else {
+            $range = explode(' to ', getVar('week_picker'));
+            $_GET['date_range'] = $range[0];
+            $_GET['date_range2'] = $range[1];
+        }
+    }
+    if (getVar('date_frame') == 'Custom Dates' && getVar('range_type') == 'month') {
+        if (getVar('month_picker') == '') {
+            $_GET['date_range'] = getVar('custom_date');
+            $range2 = DateTime::createFromFormat('d/m/Y', getVar('custom_date'));
+            $_GET['date_range2'] = date('t/m/Y', strtotime($range2->format('m/d/Y')));
+        } else {
+            $month = explode(' ', getVar('month_picker'));
+            $date = $month[0] . ' 1 ' . $month[1];
+            $_GET['date_range'] = date('d/m/Y', strtotime($date));
+            $_GET['date_range2'] = date('t/m/Y', strtotime($date));
+        }
+    }
+}
