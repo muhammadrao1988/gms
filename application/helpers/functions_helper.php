@@ -264,8 +264,7 @@ function getFindQuery($key = 'search')
                 } elseif (count($search_arr) == 1) {
                     $s_coulum = $search_arr[0];
                 }
-
-                $search_v = (is_string($search_v)) ? " LIKE '%" . $CI->db->escape_like_str($search_v) . "%' " : " = '" . dbEscape($search_v) . "'";
+                $search_v = (!is_numeric($search_v)) ? " LIKE '%" . $CI->db->escape_like_str($search_v) . "%' " : " = '" . dbEscape($search_v) . "'";
                 //$search_v = (strtoupper($operator) == 'LIKE') ? "%$search_v%" : $search_v;
                 $search_q .= " AND " . $s_coulum . $search_v;
             }
@@ -370,13 +369,36 @@ function array2url($array, $keyName)
 
 function show_validation_errors()
 {
-    if (validation_errors() != '') {
-        $html = '<div class="alert alert-danger" style="margin-top: 16px;">
-        	    <button type="button" class="close" data-dismiss="alert">×</button>';
-        $html .= validation_errors();
-        return $html .= '</div>';
+    $error = getVar('error');
+    $msg = getVar('msg');
+    $success = getVar('success');
+    $alert = getVar('alert');
+    $info = getVar('info');
+
+    $html = '';
+    if (validation_errors() != '' || !(count($error) == 0 || $error == '')) {
+        $errors = validation_errors() . (is_array($error) ? join('<br>', $error) : $error);
+        $html .= '<div class="alert alert-block alert-danger fade in"><button data-dismiss="alert" class="close close-sm" type="button"><i class="fa fa-times"></i></button>';
+        $html .= $errors . '</div>';
     }
-    return '';
+    if (!(count($msg) == 0 || $msg == '')) {
+        $html .= '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>';
+        $html .= (is_array($msg) ? join('<br>', $msg) : $msg) . '</div>';
+    }
+    if (!(count($success) == 0 || $success == '')) {
+        $html .= '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>';
+        $html .= (is_array($success) ? join('<br>', $success) : $success) . '</div>';
+    }
+    if (!(count($alert) == 0 || getVar('alert') == '')) {
+        $html .= '<div class="alert alert-danger "><button type="button" class="close" data-dismiss="alert">×</button>';
+        $html .= (is_array($alert) ? join('<br>', $alert) : $alert) . '</div>';
+    }
+    if (!(count($info) == 0 || $info == '')) {
+        $html .= '<div class="alert alert-info "><button type="button" class="close" data-dismiss="alert">×</button>';
+        $html .= (is_array($info) ? join('<br>', $info) : $info) . '</div>';
+
+    }
+    return $html;
 }
 
 

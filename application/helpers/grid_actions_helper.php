@@ -17,37 +17,10 @@ if (!function_exists('get_grid_actions')) {
         $controller_method = $CI->router->fetch_method();
         $module  = $controller;
 
-		/*if($CI->session->userdata['u_type']==3){
-				 $user_template_table = $CI->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$CI->session->userdata['parent_id']."'")->num_rows();
-				 if($user_template_table==0){
-				   $table_temp	= 'user_type_module_rel';
-				   $user_template_id	= $CI->session->userdata('user_template_id');
-				 }else{
-				   $table_temp	= 'user_template_methods';
-				   $and_condition = ' AND um.acc_id = "'.$CI->session->userdata['parent_id'].'"';
-				   $user_template_id	= $CI->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$CI->session->userdata['parent_id']."'")->row();
-				   $user_template_id	= $user_template_id->user_type_id;
-				 }
-			}else */
-           // if($CI->session->userdata['u_type']==4 || $CI->session->userdata['u_type']==3){
-				 $user_template_table = $CI->db->query("SELECT module_id FROM user_template_methods WHERE acc_id = '".$CI->session->userdata['user_info']->user_id."'")->num_rows();
-				 if($user_template_table==0){
-				   $table_temp	= 'user_type_module_rel';
-
-
-                   //$user_template_id	= intval(sessionVar('user_template_id'));
-                   $user_template_id = $CI->db->query("SELECT user_template_id FROM users WHERE user_id = '" . $CI->session->userdata['user_info']->user_id . "'")->row();
-                   $user_template_id = $user_template_id->user_template_id;
-                 }else{
-				   $table_temp	= 'user_template_methods';
-				   $and_condition = ' AND um.acc_id = "'.$CI->session->userdata['user_info']->user_id.'"';
-				   $user_template_id	= $CI->db->query("SELECT user_type_id FROM user_template_methods WHERE acc_id = '".$CI->session->userdata['user_info']->user_id."'")->row();
-				   $user_template_id	= $user_template_id->user_type_id;
-				 }
-			/*}else{
-				 	$table_temp	= 'user_type_module_rel';
-					$user_template_id	= intval($CI->session->userdata('user_template_id'));
-			}*/
+        $user_template_id = $CI->db->query("SELECT user_template_id FROM users WHERE user_id = '" . $CI->session->userdata['user_info']->user_id . "'")->row();
+        $user_template_id = $user_template_id->user_template_id;
+        $table_temp	= 'user_type_module_rel';
+        $and_condition = "";
 
         //todo:: _users
          // $user_actions = $CI->db->query("SELECT um.actions FROM users AS u INNER JOIN user_type_module_rel AS um ON (u.user_type = um.user_type_id) INNER JOIN modules AS m ON (m.id = um.module_id) WHERE um.user_type_id = '" . intval($CI->session->userdata('user_type')) . "' AND m.`module`='" . addslashes($module) . "'")->row()->actions;

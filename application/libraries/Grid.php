@@ -293,7 +293,14 @@ class grid
                 }
             }
 
-            echo '<th align="left"><input type="submit" class="btn btn-green"  value="Search"></th>';
+            echo '<th align="left">
+                <input type="submit" class="btn btn-green"  value="Search">';
+            $search_ar = getVar('search');
+
+            if(count($search_ar) > 1) {
+                echo '  <a href="'.site_url(ADMIN_DIR.$this->currentController."/".$this->currentMethod).'" class="btn btn-black" >Reset</a>';
+            }
+              echo '   </th>';
         }
 
         if ($this->show_title_td) {

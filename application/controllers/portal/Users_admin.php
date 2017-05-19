@@ -53,6 +53,7 @@ class Users_admin extends CI_Controller
 
 
         $where = '';
+        $where .= getFindQuery();
 
         $data['title'] = $this->module_title;
 
@@ -61,11 +62,14 @@ class Users_admin extends CI_Controller
           users.username,
           users.email,
           CONCAT(users.first_name,' ', users.surname) as full_name,
-          branches.branch_name
+          branches.branch_name,
+          user_types_template.user_type 
         FROM
           users
            JOIN branches 
             ON (branches.id = users.branch_id)
+            JOIN user_types_template
+            ON (user_types_template.id = users.user_template_id)
          
         WHERE 1 ". $where;
 

@@ -39,7 +39,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 type="button">Change Password
                         </button>
                         <span class="vert-sep"></span>
-                        
+
                     <?php } ?>
                 </div>
             </div>
@@ -56,8 +56,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
         </div>
         <div class="clearfix">&nbsp;</div>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-            <?php echo '<pre>';print_r($_REQUEST );echo '</pre>';
-            echo show_validation_errors(); ?>
+            <?php echo show_validation_errors(); ?>
             <section class="panel">
                 <header class="panel-heading theme-panel-heading"><strong>Users - Form</strong></header>
                 <div class="panel-body">
@@ -98,7 +97,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <div class="col-lg-6">
                                         <input type="text" id="first_name" name="first_name"
                                                value="<?= $row->first_name; ?>" placeholder="First Name"
-                                               class="form-control">
+                                               class="form-control validate[required]">
                                     </div>
                                 </div>
                                 <div class="form-group">

@@ -47,9 +47,9 @@ class User_types extends CI_Controller
         $where .= getFindQuery();
 
         $data['title'] = $this->module_title;
-        $data['query'] = "SELECT ".$this->table.".id, ".$this->table.".user_type as template_name, user_types.user_type,  IF(".$this->table.".user_status=1,'Yes','No') AS active, ".$this->table.".id as in_use, ".$this->table.".last_edited, CONCAT(users.first_name,' ',users.surname) AS edited_by  
+        $data['query'] = "SELECT ".$this->table.".id, ".$this->table.".user_type as template_name,   IF(".$this->table.".user_status=1,'Yes','No') AS active,  ".$this->table.".last_edited, CONCAT(users.first_name,' ',users.surname) AS edited_by  
 		FROM " . $this->table . "
-		LEFT JOIN user_types ON(".$this->table.".user_type_id = user_types.id) 
+		
 		LEFT JOIN users ON (".$this->table.".edited_by = users.user_id)
 		WHERE 1 " . $where;
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
@@ -153,17 +153,6 @@ class User_types extends CI_Controller
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
 
-            $get_module_id = "SELECT module_id FROM user_type_module_rel WHERE user_type_id='".$id."'";
-            $prev_modules_id = $this->db->query($get_module_id)->result();
-            $previous_modules = array();
-            $module_delete_id = array();
-            foreach($prev_modules_id as $mid){
-                $previous_modules[] = $mid->module_id;
-                if(!in_array($mid->module_id,getVar('modules'))){
-                    $module_delete_id[] = $mid->module_id;
-                }
-            }
-
             $this->db->delete('user_type_module_rel', "`user_type_id` ='" . $id."'");
 
             foreach (getVar('modules') as $module_id) {
@@ -176,48 +165,9 @@ class User_types extends CI_Controller
                 save('user_type_module_rel', $data);
             }
 
-            if(getVar('update_all_account')==1) {
-                // get all account templates modules according to user_type_id
-                $get_all_account_templates = "SELECT acc_id FROM user_template_methods WHERE user_type_id='" . $id . "' GROUP BY acc_id";
-                $account_array = $this->db->query($get_all_account_templates)->result();
-
-                $update_account_ids = array();
-                foreach ($account_array as $account) {
-
-                    $check_account_moudle = "SELECT user_type_module_rel.`module_id`, user_type_module_rel.`actions`  FROM user_type_module_rel WHERE user_type_module_rel.`user_type_id`='" . $id . "' AND user_type_module_rel.`module_id`
-                                        NOT IN
-                                        (SELECT user_template_methods.`module_id` FROM user_template_methods WHERE user_template_methods.`user_type_id`='" . $id . "' AND user_template_methods.`acc_id`='" . $account->acc_id . "')";
-                    $account_module_update = $this->db->query($check_account_moudle)->result();
-
-                    $count_module = count($account_module_update);
-                    if ($count_module > 0) {
-                        foreach ($account_module_update as $amu) {
-                            $data = array(
-                                'user_type_id' => $id,
-                                'acc_id' => $account->acc_id,
-                                'module_id' => $amu->module_id,
-                                'actions' => $amu->actions,
-                                'datetime' => date('Y-m-d H:i:s'),
-                            );
-                            save('user_template_methods', $data);
-                        }
-                        $update_account_ids[$account->acc_id] = $account->acc_id;
-                    }
-
-                    //for delete module
-                    if(count($module_delete_id) > 0){
-                        $implode_module_id = implode(',',$module_delete_id);
-                        $this->db->delete('user_template_methods', "`module_id` IN(".$implode_module_id.") AND acc_id='".$account->acc_id."'");
-                        $update_account_ids[$account->acc_id] = $account->acc_id;
-                    }
-                }
-                $data['update_account_ids'] = $update_account_ids;
-                $this->load->view(ADMIN_DIR . $this->module_name . '/update_confirmation', $data);
-            }else {
-
 
                 redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
-            }
+
 
         }
     }
@@ -231,18 +181,23 @@ class User_types extends CI_Controller
     public function delete()
     {
         $JSON = array();
-		if(getVar('action')==""){
+
 		$id = getVar('del-id');
-		}else{
-		$id = getVar('del-all');	
-		}
+
 		
-      
-        $SQL = "DELETE FROM " . $this->table . " WHERE `" . $this->id_field . "` IN(" . $id . ")";
-        $this->db->query($SQL);
-		$JSON['notification'] = '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>Record has been deleted..</div>';
-		$redirct_url 		  =  '?msg=Record has been deleted..' ;
-		$JSON['redirect_url'] =  $redirct_url;
+        if($id > 1) {
+             $SQL = "DELETE FROM " . $this->table . " WHERE `" . $this->id_field . "` = '".$id."'";
+            $this->db->query($SQL);
+             $SQL = "DELETE FROM user_type_module_rel WHERE `user_type_id`  = '" . $id . "'";
+            $this->db->query($SQL);
+            $JSON['notification'] = '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>Record has been deleted..</div>';
+            $redirct_url = '?msg=Record has been deleted..';
+            $JSON['redirect_url'] = $redirct_url;
+        }else{
+            $JSON['notification'] = '<div class="alert alert-danger "><button type="button" class="close" data-dismiss="alert">×</button>This record can not be deleted..</div>';
+            $redirct_url = '?error=This record can not be deleted..';
+            $JSON['redirect_url'] = $redirct_url;
+        }
 		echo json_encode($JSON);
     }
 

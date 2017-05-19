@@ -14,8 +14,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                 <!--breadcrumbs start -->
                 <ul class="breadcrumb">
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "members_types"); ?>">Admin</a></li>
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "members_types"); ?>">Branches</a></li>
+                    <li><a href="#">Admin</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "branches"); ?>">Branches</a></li>
                     <li class="active"><?php echo(!empty($row->id) ? 'Edit' : 'Add'); ?></li>
                 </ul>
                 <!--breadcrumbs end -->
@@ -65,24 +65,12 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                class="form-control validate[required]">
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="branch_user" class="col-lg-3 col-sm-3 control-label">Branch User</label>
-                                    <div class="col-lg-6">
-                                        <label class="styled_select">
-                                            <select name="branch_user" id="branch_user" class="styled validate[required]">
-                                                <option value="">-Select-</option>
-                                                <?php
-                                                echo selectBox("select user_id,concat(first_name,' ',surname) from users where u_type = 1",$row->branch_user);
-                                                ?>
-                                            </select>
-                                        </label>
-                                    </div>
-                                </div>
+
                                 <div class="form-group">
                                     <label for="service_charges" class="col-lg-3 col-sm-3 control-label">Status</label>
                                     <div class="col-lg-6">
-                                        <label class="styled_select">
-                                            <select name="status" id="status" class="styled validate[required]">
+
+                                            <select name="status" id="status" class="select validate[required]">
                                                 <option value="1" <?= (($row->branch_name == "1") ? "selected" : ""); ?>>
                                                     Active
                                                 </option>
@@ -90,7 +78,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                     Inactive
                                                 </option>
                                             </select>
-                                        </label>
+
                                     </div>
                                 </div>
                                 <div class="form-group">
