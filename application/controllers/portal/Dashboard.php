@@ -56,10 +56,10 @@ class Dashboard extends CI_Controller
         $json = array();
         /*Get Attendance by Machine*/
         $today_attendance = getAttendenceMachine();
-
         if (count($today_attendance > 0)) {
             /*Exist Attendance by DB*/
             $exist_attendance = $this->module->existMembersAttendance();
+
             $new_attendance = array();
             //$today_data = array_unique(array_column($today_attendance, 'USERID'));
             $exist_data = array_unique(array_column($exist_attendance, 'account_check'));
@@ -67,7 +67,7 @@ class Dashboard extends CI_Controller
             //$exist_type = array_unique(array_column($exist_attendance, 'check_type'));
             $i = 0;
             foreach ($today_attendance as $key=>$row){
-                $account_check = $row['USERID']."_".$row['CHECKTYPE'];
+                $account_check = $row['USERID']."_".$row['CHECKTYPE']."_".$row['sn'];
                 if(in_array($account_check,$exist_data)){
                     $exist_data[] = $account_check;
                     continue;
@@ -86,43 +86,6 @@ class Dashboard extends CI_Controller
                     $i++;
                 }
             }
-            /*foreach ($today_attendance as $key => $row) {
-                if (!in_array($row['USERID'], $exist_data)) {
-
-                    $new_attendance['account_id'] = $row['USERID'];
-                    $new_attendance['datetime'] = $row['CHECKTIME'];
-                    $new_attendance['check_type'] = $row['CHECKTYPE'];
-                    $new_attendance['machine_serial'] = $row['sn'];
-                    $new_attendance['sensored_id'] = $row['SENSORID'];
-                    $new_attendance['status'] = 1;
-                    $exist_attendance[] = $new_attendance;
-                    $exist_data[] = $new_attendance['account_id'];
-                    //save('attendance',$new_attendance);
-                    $json[$i]['account_id'] = $row['USERID'];
-                    $json[$i]['datetime'] = $row['CHECKTIME'];
-                    $json[$i]['check_type'] = $row['CHECKTYPE'];
-                    $i++;
-                } else {
-                    foreach ($exist_attendance as $key2 => $row2) {
-                        if ($row2->account_id == $row['USERID'] and $row2->check_type != $row['CHECKTYPE']) {
-                            $new_attendance['account_id'] = $row['USERID'];
-                            $new_attendance['datetime'] = $row['CHECKTIME'];
-                            $new_attendance['check_type'] = $row['CHECKTYPE'];
-                            $new_attendance['machine_serial'] = $row['sn'];
-                            $new_attendance['sensored_id'] = $row['SENSORID'];
-                            $new_attendance['status'] = 1;
-                            $exist_attendance[] = $new_attendance;
-                            $exist_data[] = $new_attendance['account_id'];
-                            //save('attendance',$new_attendance);
-                            $json[$i]['account_id'] = $row['USERID'];
-                            $json[$i]['datetime'] = $row['CHECKTIME'];
-                            $json[$i]['check_type'] = $row['CHECKTYPE'];
-                            $i++;
-                            echo "=======".$i."<br>";
-                        }
-                    }
-                }
-            }*/
             echo json_encode($json);
         }
     }

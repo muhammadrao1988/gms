@@ -59,10 +59,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->order_column = 'id';
             $grid->selectAllCheckbox = false;
             $grid->actionColumn = array('view');
+            $grid->custom_func = array('monthly_status'=>'getPaymemntStatus');
             $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'member_type');
-            $grid->hide_fields = array('status');
+            $grid->hide_fields = array('id','status','acc_id','invoices_id');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
-            $grid->grid_buttons = array('view');
+            $grid->grid_buttons = array();
             echo $grid->showGrid();
             ?>
             <!--</div>-->
@@ -77,12 +78,12 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
+include dirname(__FILE__) . "/../includes/fees_pay_pop.php";
 
 ?>
 <script type="text/javascript">
     $(document).ready(function () {
         //$('.date-picker').data();
-
         $(".datetime-picker").datetimepicker({format: 'dd-mm-yyyy hh:ii', autoclose: true});
     });
 </script>

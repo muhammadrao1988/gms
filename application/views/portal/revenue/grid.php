@@ -32,7 +32,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                         <div class="form-group">
                             <label for="" class="pull-left  " style="padding: 5px 0;"> Date Range:&nbsp; </label>
 
-                                <div class="input-group input-large" data-date="13/07/2013" data-date-format="mm/dd/yyyy">
+                                <div class="input-group input-large" data-date="13-07-2013" data-date-format="dd-mm-yyyy">
                                     <input type="text" class="form-control datepicker-format" name="from">
                                     <span class="input-group-addon">To</span>
                                     <input type="text" class="form-control datepicker-format" name="to">
@@ -62,7 +62,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->form_buttons = array('new', 'delete');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
             //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');
-            $grid->grid_buttons = array('edit', 'delete', 'acc_status');
+            $grid->grid_buttons = array('view');
             echo $grid->showGrid();
 
             ?>

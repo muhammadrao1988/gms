@@ -82,17 +82,22 @@ class Members extends CI_Controller
                               acc.acc_name,
                               acc.acc_tel,
                               acc.email,
-                              sub.`name`,
                               br.`branch_name`,  
-                              acc.acc_date 
+                              acc.acc_date,
+                              acc.serial_number as machine_serial,
+                              sub.`name`,
+                              IF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>',CONCAT('<span class=\"green\">',
+                                DATEDIFF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY)),CURRENT_DATE())-1,' Days left </span>')) AS subscription_status,
+                               iv.`fees_month` as monthly_status,
+                              iv.status                             
                             FROM
                               accounts AS acc 
                               INNER JOIN branches AS br 
                                 ON (br.`id` = acc.`branch_id`)
                                 INNER JOIN subscriptions AS sub 
-                                ON (sub.`id` = acc.`subscriptin_id`)
+                                ON (sub.`id` = acc.`subscription_id`)
+                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )                                
                                WHERE acc.`status` = 1 ".$branch_id." ".$where;
-
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -127,11 +132,12 @@ class Members extends CI_Controller
 
     public function add()
     {
-        $email_exists = getVal('accounts', 'email', 'WHERE `email`="' . getVar('email') . '"');
+        /*$email_exists = getVal('accounts', 'email', 'WHERE `email`="' . getVar('email') . '"');
         if (!empty($email_exists)) {
             $errors[] = $_POST['error'] = 'E-Mail address already registered.';
-        }
-        if (!$this->module->validate() || count($errors) > 0) {
+        }*/
+        /*if (!$this->module->validate() || count($errors) > 0) {*/
+        if (!$this->module->validate()) {
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {
@@ -144,18 +150,21 @@ class Members extends CI_Controller
                 'display_state'	=> 2,
                 'ip_addr'		=> user_ip()
             );
-            save('audit_log', $user_log_array, $where = '');
+            //save('audit_log', $user_log_array, $where = '');
             #end
 
             $DbArray = getDbArray($this->table);
+            $user_info = $this->session->userdata('user_info');
 
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
             $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
             $DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));;
-            $DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
-            $DBdata['serial_number']    = getVal('accounts','serial_number',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
-
+            /*$DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
+            $DBdata['serial_number']    = getVal('accounts','serial_number',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');*/
+            $DBdata['branch_id']        = $user_info->branch_id;
+            $DBdata['serial_number']    = $user_info->machine_serial;
+            $DBdata['acc_manager']      = $user_info->user_id;
             $id = save($this->table, $DBdata);
 
             /*------------------------------------------------------------------------------------------*/

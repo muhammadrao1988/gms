@@ -80,7 +80,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <div class="col-lg-6">
                                         <input type="text" id="date_of_birth" name="date_of_birth" value="<?=(($row->date_of_birth!='' and $row->date_of_birth!='0000-00-00')?date('d/m/Y',strtotime($row->date_of_birth)):'') ; ?>"
                                                placeholder="DD-MM-YYYY"
-                                               class="form-control validate[required] datepicker-default">
+                                               class="form-control validate[required] datepicker-format">
                                     </div>
                                 </div>
                                 <div class="form-group">

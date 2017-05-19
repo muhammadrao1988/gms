@@ -848,9 +848,21 @@ function getPaymemntStatus($val){
     $datediff = $now - $your_date;
     $month = floor($datediff / (60 * 60 * 24 * 30));
     if($month !='0' and $val[1]['status'] == '1'){
-        $paybutton = '<span class="red"><b>Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['id'].'"><i class="fa fa-money"></i> Pay</button>';
+        $paybutton = '<span class="red"><b>Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['invoices_id'].'"><i class="fa fa-money"></i> Pay</button>';
         return $paybutton;
     }else{
         return '<span class="green"><b>PAID</b></span>';
     }
+}
+function getSubscriptionStatus($val){
+    $now = time();
+    $expire_date    = strtotime(date('Y-m-d',strtotime($val[1]['acc_date'].'+ '.$val[0])));
+    $days_diffrence = $expire_date - $now;
+    $days_left = floor($days_diffrence / (60 * 60 * 24));
+    if($days_left <= 0){
+        return '<span class="red"><b>Expired</b></span>';
+    }else {
+        return '<span class="green"><b>'.$days_left. ' Days Left</b></span>';
+    }
+
 }

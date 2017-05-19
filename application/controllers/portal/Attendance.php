@@ -45,12 +45,19 @@ class Attendance extends CI_Controller
             $where .= ' AND ac.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
         }
         $data['query'] = "SELECT 
-                          /*att.account_id as user_id,*/
-                          ac.machine_member_id as machine_id,
+                          att.id as id,
+                          ac.acc_id,
+                          ac.acc_id as member_id,
+                          ac.machine_member_id as machine_ID,                          
                           ac.acc_name ,
                           act.`Name` ,                      
                           IF(check_type='I','Checked In','Checked Out') as check_type,
-                          att.`datetime`                          
+                          att.`datetime`,
+                          iv.status,
+                          iv.id as invoices_id,
+                          IF(DATE(DATE_ADD(ac.acc_date, INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>',CONCAT('<span class=\"green\">',
+                                DATEDIFF(DATE(DATE_ADD(ac.acc_date, INTERVAL sub.`period` DAY)),CURRENT_DATE())-1,' Days left </span>')) AS subscription_status,
+                          iv.`fees_month` as monthly_status                          
                         FROM
                           attendance AS att
                           INNER JOIN accounts AS ac 
@@ -59,6 +66,10 @@ class Attendance extends CI_Controller
                             ) 
                           INNER JOIN acc_types AS act
                             ON  (act.`acc_type_ID` = ac.`acc_types`)
+                            INNER JOIN subscriptions AS sub 
+                                ON (sub.`id` = ac.`subscription_id`)
+                                LEFT JOIN invoices as iv 
+                                ON( iv.`acc_id` = ac.acc_id )
                               where 1 and att.status = 1 ".$where;
 
 
@@ -72,7 +83,6 @@ class Attendance extends CI_Controller
             $this->session->set_flashdata('errors', show_validation_errors());
             redirect(ADMIN_DIR . $this->module_name . '/');
         }else{
-
             $DbArray = getDbArray($this->table);
 
             $DBdata = $DbArray['dbdata'];

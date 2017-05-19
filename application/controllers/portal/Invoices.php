@@ -105,6 +105,7 @@ class Invoices extends CI_Controller
                             GROUP BY ic.acc_id ".$where;*/
         $data['query'] = "SELECT 
                               iv.`id` AS id,
+                              iv.`id` as invoices_id,
                               iv.`acc_id`,
                               ac.`acc_name`,
                               ac.`acc_date`,

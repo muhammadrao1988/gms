@@ -31,7 +31,10 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 $grid->search_box = false;
                 $grid->selectAllCheckbox = false;
                 $grid->order_column = 'acc_id';
-                $grid->custom_col_name_fields = array('acc_id' => 'ID','acc_name'=>'Name','acc_tel'=>'Mobile','name'=>'Subscription','acc_date'=>'Datetime');
+                $grid->hide_fields = array('machine_serial','status','invoices_id');
+                //$grid->custom_func = array('subscription_status'=>'getSubscriptionStatus');
+                $grid->custom_func = array('monthly_status'=>'getPaymemntStatus');
+                $grid->custom_col_name_fields = array('acc_id' => 'Member ID','acc_name'=>'Name','acc_tel'=>'Mobile','name'=>'Subscription','acc_date'=>'Datetime');
                 $grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
                 $grid->form_buttons = array('new', 'delete');
                 $grid->url = '?' . $_SERVER['QUERY_STRING'];
@@ -49,7 +52,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
-
+include dirname(__FILE__) . "/../includes/fees_pay_pop.php";
 ?>
 <!-- Content -->
   
