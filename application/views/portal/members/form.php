@@ -12,7 +12,6 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
         <!--mini statistics start-->
         <div class="row">
             <div class="col-lg-12">
-
                 <!--breadcrumbs start -->
                 <ul class="breadcrumb">
                     <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">Members</a></li>
@@ -173,9 +172,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 </div>
             </section>
         </div>
-
         <!-- end data table -->
-
     </section>
 </section>
 <!--main content end-->

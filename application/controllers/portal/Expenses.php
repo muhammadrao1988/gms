@@ -90,19 +90,16 @@ class Expenses extends CI_Controller
         $chart = str_replace("GROUP BY id","",$data['query']);
         $chart = $chart." GROUP BY DATE(`expense_date`)";
 
-
-
         $data['chart_total'] = $this->db->query($chart)->result();
         foreach ($data['chart_total'] as $ct) {
-
-
             $total_amount[] = ($ct->total_amount_summary=="" ? 0 : $ct->total_amount_summary);
             $report_days[] = date('dM y', strtotime($ct->expense_date));
-
         }
         $data['total_amount'] = $total_amount;
         $data['report_days'] = $report_days;
         $data['summary_total'] = array_sum($total_amount);
+        echo '<pre>';print_r($data );echo '</pre>';
+        die('Call');
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }

@@ -34,7 +34,44 @@ class Revenue extends CI_Controller
         $where = '';
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
-        $data['query'] = "Select * from invoices where 1";
+        $search_array = getVar('search');
+        //$data['query'] = "Select * from invoices where MONTH (fees_datetime)= MONTH (CURRENT_DATE()) and YEAR(fees_datetime)=YEAR(CURRENT_DATE())";
+        $data['search'] = $search_array;
+        if(getVar('from') && getVar('to')){
+            $from = date('Y-m-d 00:00:00',strtotime(getVar('from')));
+            $to = date('Y-m-d 23:59:59',strtotime(getVar('to')));
+        }elseif(getVar('from') !='' and getVar('to')==''){
+            $from = date('Y-m-d 00:00:00',strtotime(getVar('from')));
+            $to = $to = date('Y-m-d 23:59:59');;
+        }else{
+            $from = date('Y-m-01 00:00:00');
+            $to = date('Y-m-d 23:59:59');
+        }
+        $filter = " AND fees_datetime BETWEEN '".$from."' AND '".$to."' ";
+        $data['query'] = "Select id,
+                              acc_id as account_id,
+                              amount,
+                              description,
+                              fees_datetime,
+                              fees_month,
+                               `type` as invoice_for from invoices where 1 ".$filter.$where ;
+
+        $chart = str_replace("GROUP BY id","",$data['query']);
+        $chart = $chart." GROUP BY DATE(`fees_datetime`)";
+        $data['chart_total'] = $this->db->query($chart)->result();
+        foreach ($data['chart_total'] as $ct) {
+            $total_amount[] = ($ct->amount=="" ? 0 : $ct->amount);
+            $report_days[] = date('dM y', strtotime($ct->fees_datetime));
+        }
+        $data['total_amount'] = $total_amount;
+        $data['report_days'] = $report_days;
+
+        $data['summary_total'] = $this->db->query('SELECT 
+                                              SUM(amount) AS summary_total
+                                            FROM
+                                              invoices                                             
+                                            WHERE 1'.$filter.$where)->row()->summary_total;
+
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 

@@ -876,8 +876,10 @@ function getPaymemntStatus($val){
     $fees_date = $val[0];
     $your_date = strtotime(date('Y-m',strtotime($fees_date)).'-'.date('d',strtotime($val[1]['acc_date'])));
     $datediff = $now - $your_date;
+    $status = getVal('invoices','status',' where acc_id = "'.$val[1]['acc_id'].'" and status = 1');
     $month = floor($datediff / (60 * 60 * 24 * 30));
-    if($month !='0' and $val[1]['status'] == '1'){
+    if($month !='0' and $status == '1'){
+        $val[1]['invoices_id'] = getVal('invoices','id',' where acc_id = "'.$val[1]['acc_id'].'" and status = 1');
         $paybutton = '<span class="red"><b>Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['invoices_id'].'"><i class="fa fa-money"></i> Pay</button>';
         return $paybutton;
     }else{
@@ -926,6 +928,7 @@ function date_manual()
             $_GET['date_range2'] = date('t/m/Y', strtotime($date));
         }
     }
+
 }
 function checkMonthlyFeesPaid($account_date,$last_fees_date){
     $now = time();
@@ -934,4 +937,5 @@ function checkMonthlyFeesPaid($account_date,$last_fees_date){
     $datediff = $now - $your_date;
     $month = floor($datediff / (60 * 60 * 24 * 30));
     return $month;
+
 }

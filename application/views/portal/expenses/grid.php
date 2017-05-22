@@ -34,11 +34,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                             <div class="col-md-4">
                                 <div class="input-group input-large">
                                     <span class="input-group-addon">From</span>
-                                    <input type="text" class="form-control dpd1 datepicker" id="date_range" style="padding-bottom: 0; padding-top: 0" name="date_range"
-                                           value="<?php echo (getVar('date_range')=="" ? date('Y/m/01') : getVar('date_range')); ?>">
+                                    <input type="text" class="form-control datepicker-format" id="date_range11" style="padding-bottom: 0; padding-top: 0" name="date_range"
+                                           value="<?php echo (getVar('date_range')=="" ? date('01-m-Y') : getVar('date_range')); ?>">
                                     <span class="input-group-addon">To</span>
-                                    <input type="text" class="form-control dpd1 datepicker" id="date_range2" style="padding-bottom: 0; padding-top: 0" name="date_range2"
-                                           value="<?php echo (getVar('date_range2')=="" ? date('Y/m/d') : getVar('date_range2')); ?>">
+                                    <input type="text" class="form-control datepicker-format" id="date_range211" style="padding-bottom: 0; padding-top: 0" name="date_range2"
+                                           value="<?php echo (getVar('date_range2')=="" ? date('d-m-Y') : getVar('date_range2')); ?>">
                                 </div>
 
                             </div>

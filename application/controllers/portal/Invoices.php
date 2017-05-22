@@ -104,22 +104,21 @@ class Invoices extends CI_Controller
                               AND ac.`status` = 1 and ic.type = 1 
                             GROUP BY ic.acc_id ".$where;*/
         $data['query'] = "SELECT 
-                              iv.`id` AS id,
-                              iv.`id` as invoices_id,
+                              MAX(iv.`id`) AS id,
                               iv.`acc_id`,
                               ac.`acc_name`,
-                              ac.`acc_date`,
+                              ac.`acc_date` as registration_date,
                               iv.`amount` AS amount,
                               iv.`fees_month`,
-                              DATE_FORMAT(iv.`fees_month`,'%M %Y') AS last_paid_month,
-                              DATE(iv.`fees_datetime`) as paid_date,
-                              iv.`fees_month` as payment_status,
+                              DATE_FORMAT((select ivv.fees_month from invoices as ivv where ivv.id= MAX(iv.`id`)),'%M %Y') AS last_paid_month,
+                              DATE((select ivv.fees_datetime from invoices as ivv where ivv.id = MAX(iv.`id`))) as paid_date,
+                              MAX(iv.`fees_month`) as payment_status,
                               iv.status
                             FROM
                               invoices AS iv 
                               INNER JOIN accounts AS ac 
                                 ON (ac.`acc_id` = iv.`acc_id`) 
-                            WHERE ac.`status` = 1 AND FIND_IN_SET('1', iv.`type`) " .$where;
+                            WHERE ac.`status` = 1 AND FIND_IN_SET('1', iv.`type`) group by iv.acc_id " .$where;
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid_monthly', $data);
     }
 
@@ -167,6 +166,9 @@ class Invoices extends CI_Controller
                 $DBdata['status'] = 1;
             }
             $DBdata['type'] = implode(',',getVar('type'));
+            if(in_array('1',getVar('type'))){
+                $DBdata['status'] = 1;
+            }
             $amount_details[] =   array_filter(getVar('type'));
             $amount_details[] =   array_filter(getVar('amount'));
             $DBdata['amount_details'] = json_encode($amount_details);

@@ -55,14 +55,20 @@ class Attendance extends CI_Controller
                           att.`datetime`,
                           iv.status,
                           iv.id as invoices_id,
-                          IF(DATE(DATE_ADD(ac.acc_date, INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>',CONCAT('<span class=\"green\">',
-                                DATEDIFF(DATE(DATE_ADD(ac.acc_date, INTERVAL sub.`period` DAY)),CURRENT_DATE())-1,' Days left </span>')) AS subscription_status,
-                          iv.`fees_month` as monthly_status                          
+                          IF(DATE(DATE_ADD((SELECT 
+                                  attd.datetime 
+                                FROM
+                                  attendance AS attd 
+                                WHERE attd.account_id = ac.`machine_user_id` 
+                                  AND attd.machine_serial = ac.`serial_number` 
+                                ORDER BY attd.id DESC 
+                                LIMIT 1), INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>','<span class=\"green\">Continue</span>') AS subscription_status,
+                          (select ivv.fees_month from invoices as ivv where ivv.acc_id = ac.acc_id and ivv.status = 1 order by ivv.id desc limit 1) as monthly_status                          
                         FROM
                           attendance AS att
                           INNER JOIN accounts AS ac 
                             ON (
-                              ac.`machine_user_id` = att.`account_id`
+                              ac.`machine_user_id` = att.`account_id` 
                             ) 
                           INNER JOIN acc_types AS act
                             ON  (act.`acc_type_ID` = ac.`acc_types`)
@@ -70,8 +76,7 @@ class Attendance extends CI_Controller
                                 ON (sub.`id` = ac.`subscription_id`)
                                 LEFT JOIN invoices as iv 
                                 ON( iv.`acc_id` = ac.acc_id )
-                              where 1 and att.status = 1 ".$where;
-
+                              where 1 and att.status = 1 GROUP by att.id".$where;
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
