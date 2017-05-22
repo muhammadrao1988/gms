@@ -7,8 +7,15 @@ echo '<div class="loader-dashboard"></div>';
 	}*/
 
 include dirname(__FILE__) . "/../includes/left_side_bar.php";
-$month_member = $this->db->query("SELECT COUNT(acc_id) AS month_member FROM accounts WHERE MONTH(accounts.`acc_date`) = MONTH(CURRENT_DATE()) and `status` = 1")->row()->month_member;
-$total_member= $this->db->query("SELECT COUNT(acc_id) AS total_member FROM accounts WHERE `status` = 1")->row()->total_member;
+$branch_id =  getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
+$month_member = $this->db->query("SELECT COUNT(acc_id) AS month_member FROM accounts WHERE MONTH(accounts.`acc_date`) = MONTH(CURRENT_DATE()) and `status` = 1 AND branch_id = '".$branch_id."'")->row()->month_member;
+$total_member= $this->db->query("SELECT COUNT(acc_id) AS total_member FROM accounts WHERE `status` = 1 AND branch_id = '".$branch_id."'")->row()->total_member;
+$date_range = date('Y-m-01 00:00:00');
+$date_range2 = date('Y-m-d 23:59:59');
+$filter = " AND expense_date BETWEEN '".$date_range."' AND '".$date_range2."' AND  branch_id = '".$branch_id."' ";
+$expense_current_month = $this->db->query("SELECT SUM(total_amount) AS total_expense FROM expenses WHERE 1".$filter)->row()->total_expense;
+$expense_today = $this->db->query("SELECT SUM(total_amount) AS today_expense FROM expenses WHERE 1 AND DATE(expense_date)='".date('Y-m-d')."' AND  branch_id = '".$branch_id."'")->row()->today_expense;
+
 ?>
 <section id="main-content" class="dashboard-main-content">
     <section class="wrapper dashboard-main-wrapper">
@@ -74,22 +81,27 @@ $total_member= $this->db->query("SELECT COUNT(acc_id) AS total_member FROM accou
                 </div>
             </div>
             <div class="col-md-3">
+                <a href="<?php echo site_url(ADMIN_DIR."expenses") ?>">
                 <div class="mini-stat clearfix">
                     <span class="mini-stat-icon blue-b"><i class="fa fa-tags"></i></span>
                     <div class="mini-stat-info">
-                        <span>32720</span>
-                        Expence This Month
+                        <span><?php echo number_format($expense_current_month=="" ? 0 : $expense_current_month);?></span>
+                        Expense This Month
                     </div>
                 </div>
+                </a>
+
             </div>
             <div class="col-md-3">
+                <a href="<?php echo site_url(ADMIN_DIR."expenses") ?>">
                 <div class="mini-stat clearfix">
                     <span class="mini-stat-icon lightblue-b"><i class="fa fa-tag"></i></span>
                     <div class="mini-stat-info">
-                        <span>32720</span>
-                        Expence Per Day
+                        <span><?php echo number_format($expense_today=="" ? 0 : $expense_today);?></span>
+                        Today Expense
                     </div>
                 </div>
+                </a>
             </div>
             <div class="col-md-3">
                 <div class="mini-stat clearfix">

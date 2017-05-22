@@ -33,14 +33,40 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                             <label for="" class="pull-left  " style="padding: 5px 0;"> Date Range:&nbsp; </label>
 
                                 <div class="input-group input-large" data-date="13-07-2013" data-date-format="dd-mm-yyyy">
-                                    <input type="text" class="form-control datepicker-format" name="from">
+                                    <input type="text" class="form-control datepicker-format" name="from" value="<?php echo getVar('from') ?>">
                                     <span class="input-group-addon">To</span>
-                                    <input type="text" class="form-control datepicker-format" name="to">
+                                    <input type="text" class="form-control datepicker-format" name="to" value="<?php echo getVar('to') ?>">
                                 </div>
 
                         </div>
                         <button type="submit" class="btn btn-green">Search</button>
                     </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="xgrid table table-bordered table-checks table-striped">
+                        <tr>
+                            <?php
+                            if(getVar('from')!=""){
+                                $from_date = date('dM Y',strtotime(getVar('from')));
+                                if(getVar('to')!=""){
+                                    $to_date = date('dM Y',strtotime(getVar('to')));
+                                }else{
+                                    $to_date = date('dM Y');
+                                }
+                            }else{
+                                $from_date = date('01M Y');
+                                $to_date = date('dM Y');
+                            }
+                            ?>
+                            <th class="text-center">Revenue From <?php echo $from_date ?> To <?php echo $to_date?> </th>
+                        </tr>
+                        <tr class="grid_row even">
+                            <td class="text-center" id="tot_num">Total Revenue: <strong><?php echo number_format($summary_total); ?></strong></td>
+                        </tr>
+                    </table>
+                    <div class="clearfix">&nbsp;</div>
                 </div>
             </div>
         </div>
@@ -59,6 +85,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->selectAllCheckbox = false;
             $grid->order_column = 'id';
             $grid->hide_fields = array('id', 'status');
+            $grid->custom_func = array('invoice_for'=>'invoice_for');
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new', 'delete');
@@ -80,7 +107,87 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
-
+include dirname(__FILE__) . "/../charts_file/reports_chart_js.php";
 ?>
 <!-- Content -->
+<script type="text/javascript">
+
+    (function(){
+        var t;
+        function size(animate){
+            if (animate == undefined){
+                animate = false;
+            }
+            clearTimeout(t);
+            t = setTimeout(function(){
+                $("canvas").each(function(i,el){
+                    $(el).attr({
+                        "width":$(el).parent().width(),
+                        "height":$(el).parent().outerHeight()
+                    });
+                });
+                redraw(animate);
+                var m = 0;
+                $(".chartJS").height("");
+                $(".chartJS").each(function(i,el){ m = Math.max(m,$(el).height()); });
+                $(".chartJS").height(m);
+            }, 30);
+        }
+        $(window).on('resize', function(){ size(false); });
+
+
+        function redraw(animation){
+            var options = {};
+            if (!animation){
+                options.animation = false;
+            } else {
+                options.animation = true;
+            }
+            var line_chart_options = {
+                scaleGridLineColor : "rgba(0,0,0,.05)",
+                responsive: true
+            };
+
+            var barChartExpense = {
+                labels : <?php echo json_encode($report_days); ?>,
+                datasets : [
+
+                    {
+                        label: "Revenue",
+                        fillColor: "rgba(151,187,205,0.5)",
+                        strokeColor: "rgba(151,187,205,0.8)",
+                        highlightFill: "rgba(151,187,205,0.75)",
+                        highlightStroke: "rgba(151,187,205,1)",
+                        showTooltip: true,
+                        customTooltips: true,
+                        tooltipTemplate: "<%= value %>%",
+                        data :
+                            [<?php echo  implode(",",$total_amount ) ?>]
+
+                    }
+
+
+                ]
+
+            }
+
+
+            /***********************Expense Tab*********************************/
+            var ctx5 = $("#bar-chart-expense").get(0).getContext("2d");
+
+            var myLineChart5 = new Chart(ctx5).Bar(barChartExpense);
+
+            $('#tab_call').on('shown.bs.tab', function (e) {
+
+                myLineChart1 = new Chart(ctx1).Bar(barChartCalls,line_chart_options);
+                var legendHolder = document.createElement('div');
+                legendHolder.innerHTML = myLineChart1.generateLegend();
+
+                document.getElementById('legend').appendChild(legendHolder.firstChild);
+
+            });
+        }
+        size(true);
+    }());
+</script>
   
