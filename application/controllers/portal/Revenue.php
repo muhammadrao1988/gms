@@ -34,7 +34,7 @@ class Revenue extends CI_Controller
         $where = '';
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
-        $data['query'] = "Select * from invoices where 1";
+        $data['query'] = "Select * from invoices where MONTH (fees_datetime)= MONTH (CURRENT_DATE()) and YEAR(fees_datetime)=YEAR(CURRENT_DATE())";
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 

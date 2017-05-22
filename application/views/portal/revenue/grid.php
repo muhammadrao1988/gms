@@ -56,13 +56,15 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             //$grid->title = $this->module_title .' - List';
             $grid->limit = 25;
             $grid->search_box = false;
-            $grid->hide_fields = array('full_name', 'email', 'user_login_status');
+            $grid->selectAllCheckbox = false;
+            $grid->order_column = 'id';
+            $grid->hide_fields = array('id', 'status');
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new', 'delete');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
             //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');
-            $grid->grid_buttons = array('view');
+            $grid->grid_buttons = array();
             echo $grid->showGrid();
 
             ?>

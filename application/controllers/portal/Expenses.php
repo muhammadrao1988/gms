@@ -90,11 +90,8 @@ class Expenses extends CI_Controller
 
         $data['chart_total'] = $this->db->query($chart)->result();
         foreach ($data['chart_total'] as $ct) {
-
-
             $total_amount[] = ($ct->total_amount=="" ? 0 : $ct->total_amount);
             $report_days[] = date('dM y', strtotime($ct->expense_date));
-
         }
         $data['total_amount'] = $total_amount;
         $data['report_days'] = $report_days;

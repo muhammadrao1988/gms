@@ -19,7 +19,6 @@ class M_members extends CI_Model
         $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
         $this->form_validation->set_rules('acc_tel', 'Mobile number', 'required');
         $this->form_validation->set_rules('acc_types', 'Member Type', 'required');
-
         if ($this->form_validation->run() == FALSE) {
             return false;
         } else {
@@ -33,11 +32,19 @@ class M_members extends CI_Model
 
             echo 'file not exist';
         }
-        $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+        //$dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+        try {
+            $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+        }
+        catch (PDOException $e) {
+            $dbh = new PDO("odbc:Driver={Microsoft Access Driver (.mdb, .accdb)}; DBQ=$dbName;");
+        }
         //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');
         $result = $dbh->query("select USERINFO.USERID from USERINFO where Badgenumber = '".$id."'");
 
         $USERID = $result->fetch(PDO::FETCH_ASSOC);
+        echo '<pre>';print_r($USERID );echo '</pre>';
+        die('Call');
         return $USERID['USERID'];
     }
 }

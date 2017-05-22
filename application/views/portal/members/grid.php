@@ -36,7 +36,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 $grid->custom_func = array('monthly_status'=>'getPaymemntStatus');
                 $grid->custom_col_name_fields = array('acc_id' => 'Member ID','acc_name'=>'Name','acc_tel'=>'Mobile','name'=>'Subscription','acc_date'=>'Datetime');
                 $grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
-                $grid->form_buttons = array('new', 'delete');
+                $grid->form_buttons = array('new');
                 $grid->url = '?' . $_SERVER['QUERY_STRING'];
                 //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');
                 $grid->grid_buttons = array( 'view_attendance','edit', 'delete');

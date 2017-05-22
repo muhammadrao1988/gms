@@ -75,8 +75,8 @@ class Members extends CI_Controller
         if($this->session->userdata('user_info')->u_type != '1'){
             $branch_id = ' AND acc.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
         }
-
-        $data['query'] = "SELECT 
+        /*22-05-2017 According to subscription period*/
+        /*$data['query'] = "SELECT
                               acc.acc_id,
                               acc.machine_member_id as machine_id,
                               acc.acc_name,
@@ -97,7 +97,31 @@ class Members extends CI_Controller
                                 INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = acc.`subscription_id`)
                                 LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )                                
-                               WHERE acc.`status` = 1 ".$branch_id." ".$where;
+                               WHERE acc.`status` = 1 GROUP BY acc.acc_id ".$branch_id." ".$where;*/
+        /*22-05-2017 Expire according to last attendance date.*/
+        $data['query'] = "SELECT 
+                              acc.acc_id,
+                              acc.machine_member_id as machine_id,
+                              acc.acc_name,
+                              acc.acc_tel,
+                              acc.email,
+                              br.`branch_name`,  
+                              acc.acc_date,
+                              acc.serial_number as machine_serial,
+                              sub.`name`,
+                              IF(DATE(DATE_ADD((SELECT att.datetime FROM attendance AS att WHERE att.account_id = acc.`machine_user_id` AND att.machine_serial = acc.`serial_number` ORDER BY att.id DESC LIMIT 1), INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>','<span class=\"green\">Continue</span>') AS subscription_status,
+                              MAX(iv.`fees_month`) as monthly_status,
+                              iv.status
+                            FROM
+                              accounts AS acc 
+                              INNER JOIN branches AS br 
+                                ON (br.`id` = acc.`branch_id`)
+                                INNER JOIN subscriptions AS sub 
+                                ON (sub.`id` = acc.`subscription_id`)
+                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )                                
+                               WHERE acc.`status` = 1 group by acc.acc_id".$branch_id." ".$where;
+        /*echo $data['query'];
+        die('Call');*/
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -175,11 +199,7 @@ class Members extends CI_Controller
 
     public function update()
     {
-        $email_exists = getVal('accounts', 'email', 'WHERE `email`="' . getVar('email') . '" AND acc_id !="' . getVar('user_id') . '"');
-        if ($email_exists != '') {
-            $errors[] = $_POST['error'] = 'E-Mail address already registered.';
-        }
-        if (!$this->module->validate() || count($errors) > 0) {
+        if (!$this->module->validate()) {
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {

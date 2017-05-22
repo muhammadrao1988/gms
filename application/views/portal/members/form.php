@@ -12,7 +12,6 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
         <!--mini statistics start-->
         <div class="row">
             <div class="col-lg-12">
-
                 <!--breadcrumbs start -->
                 <ul class="breadcrumb">
                     <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">Members</a></li>
@@ -150,7 +149,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Subscription: </label>
                                     <div class="col-lg-6">
                                         <label class="styled_select">
-                                            <select name="subscriptin_id" id="subscriptin_id" class="styled validate[required]">
+                                            <select name="subscription_id" id="subscription_id" class="styled validate[required]">
                                                 <option value=""> - Select -</option>
                                                 <?= selectBox("SELECT id,CONCAT(`name`,' - ',period_duration) AS subsribe_name FROM `subscriptions` WHERE `status` = 1", $row->subscriptin_id); ?>
                                             </select>
@@ -173,9 +172,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 </div>
             </section>
         </div>
-
         <!-- end data table -->
-
     </section>
 </section>
 <!--main content end-->
