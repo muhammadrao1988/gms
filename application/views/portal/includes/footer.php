@@ -94,6 +94,7 @@
                 data: {id: 1},
                 complete: function (data) {
                     var json = $.parseJSON(data.responseText);
+                    console.log(json);
                     if(json.length > 0 ) {
                         $.each(json, function (key, value) {
                             //console.log(key+"=>>>>>"+value.account_id);
@@ -101,15 +102,16 @@
                                 // (string | mandatory) the heading of the notification
                                 title: 'Member '+value.account_id+' '+((value.check_type=="I")?"Checked In":"Checked Out"),
                                 // (string | mandatory) the text inside the notification
-                                text: 'Member id = '+value.account_id +' has checked at date time '+value.datetime,
+                                text: 'Member id = '+value.account_id +' has checked at date time '+value.datetime+
+                                        '<br> Fee Status : '+value.monthly_fee,
                                 class_name: ((value.check_type=="I")?"gritter-in":"gritter-out"),
-                                sticky: false
+                                sticky: true
                             });
                         });
                     }
                 }
                 });
-        },6000);
+        },1000000);
 
     });
 </script>

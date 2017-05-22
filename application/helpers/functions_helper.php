@@ -833,7 +833,15 @@ function getAttendenceMachine()
         echo 'file not exist';
     } else {
 
-        $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+        //$dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+        try {
+            $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+
+
+        }
+        catch (PDOException $e) {
+            $dbh = new PDO("odbc:Driver={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=$dbName;");
+        }
         //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');
         $result = $dbh->query("select CHECKINOUT.* from CHECKINOUT where 1 AND CHECKTIME>#".date('Y-m-d')."# ORDER BY CHECKINOUT.CHECKTIME DESC");
 
@@ -918,4 +926,12 @@ function date_manual()
             $_GET['date_range2'] = date('t/m/Y', strtotime($date));
         }
     }
+}
+function checkMonthlyFeesPaid($account_date,$last_fees_date){
+    $now = time();
+    $fees_date = $last_fees_date;
+    $your_date = strtotime(date('Y-m',strtotime($fees_date)).'-'.date('d',strtotime($account_date)));
+    $datediff = $now - $your_date;
+    $month = floor($datediff / (60 * 60 * 24 * 30));
+    return $month;
 }

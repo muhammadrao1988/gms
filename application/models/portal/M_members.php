@@ -33,11 +33,23 @@ class M_members extends CI_Model
 
             echo 'file not exist';
         }
-        $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+        //$dbh = new PDO("odbc:DRIVER={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=$dbName;");
+        try {
+            $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+
+
+        }
+        catch (PDOException $e) {
+            $dbh = new PDO("odbc:Driver={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=$dbName;");
+        }
+
         //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');
+
         $result = $dbh->query("select USERINFO.USERID from USERINFO where Badgenumber = '".$id."'");
 
+
         $USERID = $result->fetch(PDO::FETCH_ASSOC);
+
         return $USERID['USERID'];
     }
 }

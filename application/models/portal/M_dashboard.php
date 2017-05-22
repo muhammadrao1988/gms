@@ -13,7 +13,7 @@ class M_dashboard extends CI_Model
         }
     }
     function existMembersAttendance(){
-        return $this->db->query("SELECT *,CONCAT(account_id,'_',check_type,'_',machine_serial) as account_check FROM attendance WHERE `datetime` >= '".date('Y-m-d')." 00:00:00' and status = 1")->result();
+        return $this->db->query("SELECT *,CONCAT(account_id,'_',check_type,'_',machine_serial) as account_check FROM attendance WHERE `datetime` >= '".date('Y-m-d')." 00:00:00' and `status` = 1")->result_array();
     }
 
 }
