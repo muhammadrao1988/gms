@@ -32,16 +32,13 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                     <form   onsubmit="return validate_calender();">
                         <div class="form-group" style="margin-top:15px;">
                             <div class="col-md-4">
-                                <input type="hidden" name="date_frame" value="Custom Dates"/>
-                                <input type="hidden" name="range_type" value="Custom" id="Custom"/>
-
                                 <div class="input-group input-large">
                                     <span class="input-group-addon">From</span>
                                     <input type="text" class="form-control dpd1 datepicker" id="date_range" style="padding-bottom: 0; padding-top: 0" name="date_range"
-                                           value="<?php echo getVar('date_range'); ?>">
+                                           value="<?php echo (getVar('date_range')=="" ? date('Y/m/01') : getVar('date_range')); ?>">
                                     <span class="input-group-addon">To</span>
                                     <input type="text" class="form-control dpd1 datepicker" id="date_range2" style="padding-bottom: 0; padding-top: 0" name="date_range2"
-                                           value="<?php echo getVar('date_range2'); ?>">
+                                           value="<?php echo (getVar('date_range2')=="" ? date('Y/m/d') : getVar('date_range2')); ?>">
                                 </div>
 
                             </div>
@@ -57,48 +54,81 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                             Please Select Date Range
                         </div>
                     </form>
-                </div>
-
-        </div>
-        <div class="clearfix">&nbsp;</div>
-        <!-- page top buttons -->
-        <?php $chart_total = $chart_total;
+                    <table class="xgrid table table-bordered table-checks table-striped">
 
 
-       ?>
-        <div class="page-middle-btn">
-            <div class="col-sm-12">
-                <section class="panel">
-                    <header class="panel-heading panel-heading-theme reports-chart-tabs">
+                        <tr>
+                            <?php
+                            if(getVar('date_range')!=""){
+                                $from_date = date('dM Y',strtotime(getVar('date_range')));
+                                $to_date = date('dM Y',strtotime(getVar('date_range2')));
+
+                            }else{
+                                $from_date = date('01M Y');
+                                $to_date = date('dM Y');
+
+                            }
+                            ?>
+
+                            <th class="text-center">Expenses From <?php echo $from_date ?> To <?php echo $to_date?> </th>
+
+
+                        </tr>
+
+
+                        <tr class="grid_row even">
+
+                            <td class="text-center" id="tot_num">Total Expense: <strong><?php echo number_format($summary_total); ?></strong></td>
+
+
+                        </tr>
+
+                    </table>
+                    <div class="clearfix">&nbsp;</div>
+                    <div class="page-middle-btn">
+
+                        <div class="col-sm-12">
+                            <section class="panel">
+                                <header class="panel-heading panel-heading-theme reports-chart-tabs">
                     <span class="tools pull-right" style="margin-top: -5px">
                             <a href="javascript:;" class="fa fa-chevron-down"></a>
 
                          </span>
 
-                    </header>
-                    <div class="panel-body">
-                        <div class="tab-content">
+                                </header>
+                                <div class="panel-body">
+                                    <div class="tab-content">
 
-                            <div id="expense" class="tab-pane active">
-
-
-                                <div class="chartJS" style="height: 265px;">
-                                    <canvas id="bar-chart-expense" height="260" width="1603"
-                                            style="width: 100%; height: 260px;"></canvas>
-                                    <div id="legend"></div>
+                                        <div id="expense" class="tab-pane active">
 
 
+                                            <div class="chartJS" style="height: 265px;">
+                                                <canvas id="bar-chart-expense" height="260" width="1603"
+                                                        style="width: 100%; height: 260px;"></canvas>
+                                                <div id="legend"></div>
+
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
                                 </div>
-                                Monthlys
-                            </div>
-
+                            </section>
                         </div>
                     </div>
-                </section>
-            </div>
+                    <div class="clearfix">&nbsp;</div>
+
+                </div>
+
         </div>
         <div class="clearfix">&nbsp;</div>
+        <!-- page top buttons -->
+        <?php $chart_total = $chart_total; ?>
+
+        <div class="clearfix">&nbsp;</div>
         <div class="row page-table">
+            <a href="<?php echo site_url(ADMIN_DIR."expenses/form") ?>" class="btn btn-download" style="margin-left: 15px">Add New Expense</a>
             <div class="clearfix"></div>
                 <?php
                 $grid = new grid();
@@ -107,8 +137,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 $grid->limit = 25;
                 $grid->search_box = false;
                 $grid->selectAllCheckbox = false;
-                $grid->order_column = 'id';
-                $grid->hide_fields = array('id');
+                $grid->order_column = 'expense_date';
+                $grid->order = 'DESC';
+                $grid->hide_fields = array('id','total_amount_summary');
                 $grid->custom_col_name_fields = array();
                 $grid->search_fields_html = array('status' => $status, );
                 $grid->form_buttons = array('');

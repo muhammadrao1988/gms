@@ -59,10 +59,16 @@ class Expenses extends CI_Controller
         $where .= getFindQuery();
         $search_array = getVar('search');
         $data['search'] = $search_array;
-        if(getVar('date_range')){
+        if(getVar('date_range') && getVar('date_range2')){
+            $date_range = date('Y-m-d 00:00:00',strtotime(getVar('date_range')));
+            $date_range2 = date('Y-m-d 23:59:59',strtotime(getVar('date_range2')));
+
+        }else{
+            $date_range = date('Y-m-01 00:00:00');
+            $date_range2 = date('Y-m-d 23:59:59');
 
         }
-
+        $filter = " AND expense_date BETWEEN '".$date_range."' AND '".$date_range2."' ";
 
         $data['query'] = "SELECT 
                               id,
@@ -75,29 +81,28 @@ class Expenses extends CI_Controller
                                ELSE 'N/A'
                                END as 'status',
                                
-                               expense_date
+                               expense_date,
+                               SUM(total_amount) as total_amount_summary
                             FROM
                               expenses 
-                               WHERE branch_id = ' ".$this->branch_id."' ".$where. "";
-        $currentMonth = " AND expense_date BETWEEN '".date('Y-m-01 00:00:00')."' AND '".date('Y-m-d H:i:s')."' ";
-         $chart = "SELECT 
-                              expense_date,
-                              SUM(total_amount) as total_amount
-                            FROM
-                              expenses 
-                               WHERE branch_id = ' ".$this->branch_id."'  "  .$where.$currentMonth." GROUP BY expense_date";
+                               WHERE branch_id = ' ".$this->branch_id."' ".$filter.$where. " GROUP BY id";
+
+        $chart = str_replace("GROUP BY id","",$data['query']);
+        $chart = $chart." GROUP BY DATE(`expense_date`)";
+
 
 
         $data['chart_total'] = $this->db->query($chart)->result();
         foreach ($data['chart_total'] as $ct) {
 
 
-            $total_amount[] = ($ct->total_amount=="" ? 0 : $ct->total_amount);
+            $total_amount[] = ($ct->total_amount_summary=="" ? 0 : $ct->total_amount_summary);
             $report_days[] = date('dM y', strtotime($ct->expense_date));
 
         }
         $data['total_amount'] = $total_amount;
         $data['report_days'] = $report_days;
+        $data['summary_total'] = array_sum($total_amount);
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
