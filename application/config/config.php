@@ -36,7 +36,7 @@ define('ASSETS_URL', DOMAIN_URL . 'assets/');
 
 define('PHPTHUMB_URL', DOMAIN_URL . 'application/libraries/PHPthumbs/phpthumbs.php');
 
-define('ACCESS_DATABASE' , urldecode("C:\Users\Muhammad Rao\Desktop\ddd\abc.mdb"));
+define('ACCESS_DATABASE' , urldecode("C:\Users\Rao\Desktop\ddd\abc.mdb"));
 
 $config['base_url'] = DOMAIN_URL;
 

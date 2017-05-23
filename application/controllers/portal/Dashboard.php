@@ -67,12 +67,15 @@ class Dashboard extends CI_Controller
             $exist_data = array_unique(array_column($exist_attendance, 'account_check'));
 
             $i = 0;
+            echo '<pre>';print_r($exist_data );echo '</pre>';
+            echo '<pre>';print_r($today_attendance );echo '</pre>';
             foreach ($today_attendance as $key=>$row){
                 $account_check = $row['USERID']."_".$row['CHECKTYPE']."_".$row['sn'];
                 if(in_array($account_check,$exist_data)){
                     $exist_data[] = $account_check;
                     continue;
                 }else{
+
                     $new_attendance['account_id'] = $row['USERID'];
                     $new_attendance['datetime'] = $row['CHECKTIME'];
                     $new_attendance['check_type'] = $row['CHECKTYPE'];
@@ -109,11 +112,38 @@ class Dashboard extends CI_Controller
                         }
                         /***********************END*********************************/
                         /***********************Subscription Checking**************/
+                        $getLastAttendance = $this->db->query("SELECT `datetime` AS last_attendance, id FROM attendance WHERE machine_serial = '".$new_attendance['machine_serial']."' AND account_id = '".$new_attendance['account_id']."' ORDER BY id DESC LIMIT 1")->row();
+                        if($getLastAttendance->id > 0){
+                            $getSubscriptionDay = $this->db->query("SELECT `period` FROM subscriptions WHERE id='".$getAccountDetail->subscription_id."'")->row();
+                            if($getSubscriptionDay->period==""){
+                                $json[$i]['subscription_status'] = "No Subscription assigned to this user.";
+                            }else{
+                                $subscriptionDay = $getSubscriptionDay->period;
+                                $lastAttendance = $getLastAttendance->last_attendance;
+                                $totDay = dayDifference($lastAttendance);
+                                if($totDay > $subscriptionDay){
+                                    $json[$i]['subscription_status'] = "Expired";
+                                }else{
+                                    $json[$i]['subscription_status'] = "Valid";
+                                }
+                            }
+
+                        }else{
+                            $json[$i]['subscription_status'] = "First Attendance entered.";
+
+                        }
                         /***********************END*********************************/
                         save('attendance',$new_attendance);
                         $json[$i]['account_id'] = $row['USERID'];
                         $json[$i]['datetime'] = $row['CHECKTIME'];
                         $json[$i]['check_type'] = $row['CHECKTYPE'];
+                        echo json_encode($json);
+                    }else{
+                        $json[$i]['account_id'] = $row['USERID'];
+                        $json[$i]['datetime'] = $row['CHECKTIME'];
+                        $json[$i]['check_type'] = $row['CHECKTYPE'];
+                        $json[$i]['monthly_fee'] = "Invalid User";
+                        $json[$i]['subscription_status'] = "Invalid User";
                         echo json_encode($json);
                     }
 
