@@ -67,27 +67,23 @@ class Dashboard extends CI_Controller
             $exist_data = array_unique(array_column($exist_attendance, 'account_check'));
 
             $i = 0;
-            echo '<pre>';print_r($exist_data );echo '</pre>';
-            echo '<pre>';print_r($today_attendance );echo '</pre>';
             foreach ($today_attendance as $key=>$row){
                 $account_check = $row['USERID']."_".$row['CHECKTYPE']."_".$row['sn'];
                 if(in_array($account_check,$exist_data)){
                     $exist_data[] = $account_check;
                     continue;
                 }else{
-
                     $new_attendance['account_id'] = $row['USERID'];
                     $new_attendance['datetime'] = $row['CHECKTIME'];
                     $new_attendance['check_type'] = $row['CHECKTYPE'];
                     $new_attendance['machine_serial'] = $row['sn'];
                     $new_attendance['sensored_id'] = $row['SENSORID'];
                     $new_attendance['status'] = 1;
-                    $getAccountDetail = $this->db->query("SELECT acc_id,acc_date,subscription_id FROM accounts WHERE `serial_number`='".$new_attendance['machine_serial']."' AND machine_user_id='".$new_attendance['account_id']."' LIMIT 1")->row();
+                    $getAccountDetail = $this->db->query("SELECT acc_id,acc_date,subscription_id,acc_name FROM accounts WHERE `serial_number`='".$new_attendance['machine_serial']."' AND machine_user_id='".$new_attendance['account_id']."' LIMIT 1")->row();
                     if($getAccountDetail->acc_id!=""){
                         /***********************Monthly Fee Checking**************/
                         //check monthly fee invoice generated or not.
                         $invoiceCheck = $this->db->query("SELECT COUNT(id) AS tot_rec FROM  invoices where acc_id = '".$getAccountDetail->acc_id."' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
-
                         if($invoiceCheck > 0) {
                             $getInvoice = $this->db->query("SELECT * FROM invoices WHERE `status`=1 AND acc_id='" . $getAccountDetail->acc_id . "' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
 
@@ -105,15 +101,15 @@ class Dashboard extends CI_Controller
                                 $json[$i]['monthly_fee'] = "Please adjust monthly fee invoice of this user manually.";
                             }
 
-                        }
-                        else{
+                        }else{
                             //monthly invoice not created
                             $json[$i]['monthly_fee'] = "Please create monthly fee invoice of this user.";
                         }
                         /***********************END*********************************/
                         /***********************Subscription Checking**************/
                         $getLastAttendance = $this->db->query("SELECT `datetime` AS last_attendance, id FROM attendance WHERE machine_serial = '".$new_attendance['machine_serial']."' AND account_id = '".$new_attendance['account_id']."' ORDER BY id DESC LIMIT 1")->row();
-                        if($getLastAttendance->id > 0){
+                        if($getLastAttendance->id > 0)
+                        {
                             $getSubscriptionDay = $this->db->query("SELECT `period` FROM subscriptions WHERE id='".$getAccountDetail->subscription_id."'")->row();
                             if($getSubscriptionDay->period==""){
                                 $json[$i]['subscription_status'] = "No Subscription assigned to this user.";
@@ -134,16 +130,11 @@ class Dashboard extends CI_Controller
                         }
                         /***********************END*********************************/
                         save('attendance',$new_attendance);
-                        $json[$i]['account_id'] = $row['USERID'];
+                        $json[$i]['account_id'] = $getAccountDetail->acc_id;
                         $json[$i]['datetime'] = $row['CHECKTIME'];
                         $json[$i]['check_type'] = $row['CHECKTYPE'];
-                        echo json_encode($json);
-                    }else{
-                        $json[$i]['account_id'] = $row['USERID'];
-                        $json[$i]['datetime'] = $row['CHECKTIME'];
-                        $json[$i]['check_type'] = $row['CHECKTYPE'];
-                        $json[$i]['monthly_fee'] = "Invalid User";
-                        $json[$i]['subscription_status'] = "Invalid User";
+                        $json[$i]['account_name'] = $getAccountDetail->acc_name;
+                        $json[$i]['is_valid_user'] = 1;
                         echo json_encode($json);
                     }
 

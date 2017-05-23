@@ -26,8 +26,7 @@ class M_members extends CI_Model
         }
     }
     function getMachineUserId($id){
-        $dbName = urldecode(ACCESS_DATABASE);
-
+        $dbName = ACCESS_DATABASE;
         if (!file_exists($dbName)) {
 
             echo 'file not exist';
@@ -37,15 +36,19 @@ class M_members extends CI_Model
             $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
         }
         catch (PDOException $e) {
-            $dbh = new PDO("odbc:Driver={Microsoft Access Driver (.mdb, .accdb)}; DBQ=$dbName;");
+            $dbh = new PDO("odbc:Driver={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=$dbName;");
         }
         //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');
         $result = $dbh->query("select USERINFO.USERID from USERINFO where Badgenumber = '".$id."'");
-
         $USERID = $result->fetch(PDO::FETCH_ASSOC);
         /*echo '<pre>';print_r($USERID );echo '</pre>';
         die('Call');*/
-        return $USERID['USERID'];
+        if($USERID['USERID']!=''){
+            return $USERID['USERID'];
+        }else{
+            return 0;
+        }
+
     }
 }
 
