@@ -826,10 +826,8 @@ function emailFooter(){
 
 function getAttendenceMachine()
 {
-    $dbName = urldecode(ACCESS_DATABASE);
-
+    $dbName = ACCESS_DATABASE;
     if (!file_exists($dbName)) {
-
         echo 'file not exist';
     } else {
 
@@ -838,6 +836,7 @@ function getAttendenceMachine()
             $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
         }
         catch (PDOException $e) {
+            /*echo '<pre>';print_r($e );echo '</pre>';*/
             $dbh = new PDO("odbc:Driver={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=$dbName;");
         }
         //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');

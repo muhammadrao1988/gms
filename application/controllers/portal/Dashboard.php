@@ -57,6 +57,7 @@ class Dashboard extends CI_Controller
 
         /*Get Attendance by Machine*/
         $today_attendance = getAttendenceMachine();
+
         if (count($today_attendance > 0)) {
             /*Exist Attendance by DB*/
             $exist_attendance = $this->module->existMembersAttendance();
@@ -116,9 +117,6 @@ class Dashboard extends CI_Controller
                         $json[$i]['check_type'] = $row['CHECKTYPE'];
                         echo json_encode($json);
                     }
-
-
-
                     $exist_data[] = $account_check;
                     $i++;
                 }

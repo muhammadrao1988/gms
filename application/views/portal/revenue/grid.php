@@ -11,7 +11,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             <div class="col-lg-12">
 
                 <ul class="breadcrumb">
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "members"); ?>>">Members</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "members"); ?>>">Fees Management</a></li>
                     <li class="active"><?php echo $title ?></li>
                 </ul>
                 <!--breadcrumbs end -->
@@ -27,18 +27,24 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 <!--<div class="pull-left" style="margin-left: 15px;">
                     <label for="" style="padding: 5px 0;"> Month: </label>
                 </div>-->
-                <div class="col-md-9">
-                    <form class="form-inline" role="form">
-                        <div class="form-group">
+                <div class="col-md-8">
+                    <form class="form-inline" role="form" method="get"
+                          action="<?= base_url(ADMIN_DIR . '/revenue'); ?>">
+                        <div class="form-group col-md-8">
                             <label for="" class="pull-left  " style="padding: 5px 0;"> Date Range:&nbsp; </label>
-                                <div class="input-group input-large" data-date="13-07-2013" data-date-format="dd-mm-yyyy">
-                                    <input type="text" class="form-control datepicker-format" name="from" value="<?php echo getVar('from') ?>">
-                                    <span class="input-group-addon">To</span>
-                                    <input type="text" class="form-control datepicker-format" name="to" value="<?php echo getVar('to') ?>">
-                                </div>
+                            <div class="input-group input-large" data-date="13-07-2013" data-date-format="dd-mm-yyyy">
+                                <input type="text" class="form-control datepicker-format" name="from"
+                                       value="<?php echo getVar('from') ?>">
+                                <span class="input-group-addon">To</span>
+                                <input type="text" class="form-control datepicker-format" name="to"
+                                       value="<?php echo getVar('to') ?>">
+                            </div>
 
                         </div>
-                        <button type="submit" class="btn btn-green">Search</button>
+                        <div class="form-group col-md-4">
+                            <button type="submit" class="btn btn-green">Search</button>
+                            <a href="<?= base_url(ADMIN_DIR . '/revenue'); ?>" class="btn btn-black">Reset</a>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -47,22 +53,24 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                     <table class="xgrid table table-bordered table-checks table-striped">
                         <tr>
                             <?php
-                            if(getVar('from')!=""){
-                                $from_date = date('dM Y',strtotime(getVar('from')));
-                                if(getVar('to')!=""){
-                                    $to_date = date('dM Y',strtotime(getVar('to')));
-                                }else{
+                            if (getVar('from') != "") {
+                                $from_date = date('dM Y', strtotime(getVar('from')));
+                                if (getVar('to') != "") {
+                                    $to_date = date('dM Y', strtotime(getVar('to')));
+                                } else {
                                     $to_date = date('dM Y');
                                 }
-                            }else{
+                            } else {
                                 $from_date = date('01M Y');
                                 $to_date = date('dM Y');
                             }
                             ?>
-                            <th class="text-center">Revenue From <?php echo $from_date ?> To <?php echo $to_date?> </th>
+                            <th class="text-center">Revenue From <?php echo $from_date ?>
+                                To <?php echo $to_date ?> </th>
                         </tr>
                         <tr class="grid_row even">
-                            <td class="text-center" id="tot_num">Total Revenue: <strong><?php echo number_format($summary_total); ?></strong></td>
+                            <td class="text-center" id="tot_num">Total Revenue:
+                                <strong><?php echo number_format($summary_total); ?></strong></td>
                         </tr>
                     </table>
                     <div class="clearfix">&nbsp;</div>
@@ -107,7 +115,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->selectAllCheckbox = false;
             $grid->order_column = 'id';
             $grid->hide_fields = array('id', 'status');
-            $grid->custom_func = array('invoice_for'=>'invoice_for');
+            $grid->custom_func = array('invoice_for' => 'invoice_for');
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new', 'delete');
@@ -135,45 +143,51 @@ include dirname(__FILE__) . "/../charts_file/reports_chart_js.php";
 <!-- Content -->
 <script type="text/javascript">
 
-    (function(){
+    (function () {
         var t;
-        function size(animate){
-            if (animate == undefined){
+
+        function size(animate) {
+            if (animate == undefined) {
                 animate = false;
             }
             clearTimeout(t);
-            t = setTimeout(function(){
-                $("canvas").each(function(i,el){
+            t = setTimeout(function () {
+                $("canvas").each(function (i, el) {
                     $(el).attr({
-                        "width":$(el).parent().width(),
-                        "height":$(el).parent().outerHeight()
+                        "width": $(el).parent().width(),
+                        "height": $(el).parent().outerHeight()
                     });
                 });
                 redraw(animate);
                 var m = 0;
                 $(".chartJS").height("");
-                $(".chartJS").each(function(i,el){ m = Math.max(m,$(el).height()); });
+                $(".chartJS").each(function (i, el) {
+                    m = Math.max(m, $(el).height());
+                });
                 $(".chartJS").height(m);
             }, 30);
         }
-        $(window).on('resize', function(){ size(false); });
+
+        $(window).on('resize', function () {
+            size(false);
+        });
 
 
-        function redraw(animation){
+        function redraw(animation) {
             var options = {};
-            if (!animation){
+            if (!animation) {
                 options.animation = false;
             } else {
                 options.animation = true;
             }
             var line_chart_options = {
-                scaleGridLineColor : "rgba(0,0,0,.05)",
+                scaleGridLineColor: "rgba(0,0,0,.05)",
                 responsive: true
             };
 
             var barChartExpense = {
-                labels : <?php echo json_encode($report_days); ?>,
-                datasets : [
+                labels: <?php echo json_encode($report_days); ?>,
+                datasets: [
 
                     {
                         label: "Revenue",
@@ -184,8 +198,7 @@ include dirname(__FILE__) . "/../charts_file/reports_chart_js.php";
                         showTooltip: true,
                         customTooltips: true,
                         tooltipTemplate: "<%= value %>%",
-                        data :
-                            [<?php echo  implode(",",$total_amount ) ?>]
+                        data: [<?php echo implode(",", $total_amount) ?>]
 
                     }
 
@@ -202,7 +215,7 @@ include dirname(__FILE__) . "/../charts_file/reports_chart_js.php";
 
             $('#tab_call').on('shown.bs.tab', function (e) {
 
-                myLineChart1 = new Chart(ctx1).Bar(barChartCalls,line_chart_options);
+                myLineChart1 = new Chart(ctx1).Bar(barChartCalls, line_chart_options);
                 var legendHolder = document.createElement('div');
                 legendHolder.innerHTML = myLineChart1.generateLegend();
 
@@ -210,6 +223,7 @@ include dirname(__FILE__) . "/../charts_file/reports_chart_js.php";
 
             });
         }
+
         size(true);
     }());
 </script>
