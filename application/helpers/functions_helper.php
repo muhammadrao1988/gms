@@ -936,3 +936,11 @@ function checkMonthlyFeesPaid($account_date,$last_fees_date){
     return $month;
 
 }
+function dayDifference($lastDate){
+    $now = time(); // or your date as well
+    $lastDate = strtotime($lastDate);
+    $datediff = $now - $lastDate;
+
+    return floor($datediff / (60 * 60 * 24));
+
+}

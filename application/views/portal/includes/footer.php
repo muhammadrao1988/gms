@@ -95,15 +95,16 @@
                 complete: function (data) {
                     var json = $.parseJSON(data.responseText);
                     console.log(json);
-                    if(json.length > 0 ) {
+                    if(json) {
+                        console.log("in");
                         $.each(json, function (key, value) {
                             //console.log(key+"=>>>>>"+value.account_id);
                             $.gritter.add({
                                 // (string | mandatory) the heading of the notification
-                                title: 'Member '+value.account_id+' '+((value.check_type=="I")?"Checked In":"Checked Out"),
+                                title: 'Member '+value.account_name+' '+((value.check_type=="I")?"Checked In":"Checked Out"),
                                 // (string | mandatory) the text inside the notification
-                                text: 'Member id = '+value.account_id +' has checked at date time '+value.datetime+
-                                        '<br> Fee Status : '+value.monthly_fee,
+                                text: 'Account id : '+value.account_id +' <br> Date Time: '+value.datetime+
+                                        '<br> Fee Status : '+value.monthly_fee +'<br> Subscription : '+value.subscription_status,
                                 class_name: ((value.check_type=="I")?"gritter-in":"gritter-out"),
                                 sticky: true
                             });
@@ -111,7 +112,7 @@
                     }
                 }
                 });
-        },1000000);
+        },4000);
 
     });
 </script>
