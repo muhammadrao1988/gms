@@ -52,6 +52,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->selectAllCheckbox = false;
             $grid->hide_fields = array('acc_id','fees_month','id','status','invoices_id');
             $grid->order_column = 'id';
+            $grid->record_not_found = 'No monthly invoice';
             $grid->custom_func = array('payment_status'=>'getPaymemntStatus','amount'=>'getTotalfeesAmount');
             //$grid->form_buttons = array('new');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];

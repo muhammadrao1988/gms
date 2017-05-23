@@ -31,7 +31,6 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                     <form class="form-inline" role="form">
                         <div class="form-group">
                             <label for="" class="pull-left  " style="padding: 5px 0;"> Date Range:&nbsp; </label>
-
                                 <div class="input-group input-large" data-date="13-07-2013" data-date-format="dd-mm-yyyy">
                                     <input type="text" class="form-control datepicker-format" name="from" value="<?php echo getVar('from') ?>">
                                     <span class="input-group-addon">To</span>
@@ -66,6 +65,29 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                             <td class="text-center" id="tot_num">Total Revenue: <strong><?php echo number_format($summary_total); ?></strong></td>
                         </tr>
                     </table>
+                    <div class="clearfix">&nbsp;</div>
+                    <div class="page-middle-btn">
+                        <div class="col-sm-12">
+                            <section class="panel">
+                                <header class="panel-heading panel-heading-theme reports-chart-tabs">
+                    <span class="tools pull-right" style="margin-top: -5px">
+                            <a href="javascript:;" class="fa fa-chevron-down"></a>
+                         </span>
+                                </header>
+                                <div class="panel-body">
+                                    <div class="tab-content">
+                                        <div id="expense" class="tab-pane active">
+                                            <div class="chartJS" style="height: 265px;">
+                                                <canvas id="bar-chart-expense" height="260" width="1603"
+                                                        style="width: 100%; height: 260px;"></canvas>
+                                                <div id="legend"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
                     <div class="clearfix">&nbsp;</div>
                 </div>
             </div>
@@ -108,6 +130,7 @@ include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
 include dirname(__FILE__) . "/../charts_file/reports_chart_js.php";
+
 ?>
 <!-- Content -->
 <script type="text/javascript">

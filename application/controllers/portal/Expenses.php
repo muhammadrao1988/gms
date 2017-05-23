@@ -98,8 +98,6 @@ class Expenses extends CI_Controller
         $data['total_amount'] = $total_amount;
         $data['report_days'] = $report_days;
         $data['summary_total'] = array_sum($total_amount);
-        echo '<pre>';print_r($data );echo '</pre>';
-        die('Call');
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }

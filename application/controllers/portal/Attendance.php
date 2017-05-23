@@ -154,7 +154,6 @@ class Attendance extends CI_Controller
     public function view()
     {
         $id = intval(getUri(4));
-
         if ($id > 0) {
             $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "'";
             $data['row'] = $this->db->query($SQL)->row();
@@ -186,11 +185,8 @@ class Attendance extends CI_Controller
             );
             save('audit_log', $user_log_array, $where = '');
             #end
-
             $DbArray = getDbArray($this->table);
-
             $DBdata = $DbArray['dbdata'];
-
             $id = save($this->table, $DBdata);
 
             /*------------------------------------------------------------------------------------------*/
@@ -233,14 +229,9 @@ class Attendance extends CI_Controller
 
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
-
-
-
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
-
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
-
         }
     }
 

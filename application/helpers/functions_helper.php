@@ -863,7 +863,7 @@ function invoice_for($val){
      //getVal('invoice_types','group_concat(name)',' where id in ('.(($val[0]=='')?0:$val[0]).')');
 }
 
-function getPaymemntStatus($val){
+function  getPaymemntStatus($val){
     $now = time();
     $fees_date = $val[0];
     $your_date = strtotime(date('Y-m',strtotime($fees_date)).'-'.date('d',strtotime($val[1]['acc_date'])));

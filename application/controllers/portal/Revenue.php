@@ -27,6 +27,7 @@ class Revenue extends CI_Controller
         $this->table = $this->module->table;
         $this->id_field = $this->module->id_field;
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
+        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         $this->iic_user_type = intval(get_option('iic_user_type'));
     }
     public function index()
@@ -54,13 +55,15 @@ class Revenue extends CI_Controller
                               description,
                               fees_datetime,
                               fees_month,
-                               `type` as invoice_for from invoices where 1 ".$filter.$where ;
+                              SUM(amount) as total_amount_summary,
+                               `type` as invoice_for from invoices where 1 AND branch_id = '".$this->branch_id."' ".$filter.$where." GROUP BY id " ;
+
 
         $chart = str_replace("GROUP BY id","",$data['query']);
         $chart = $chart." GROUP BY DATE(`fees_datetime`)";
         $data['chart_total'] = $this->db->query($chart)->result();
         foreach ($data['chart_total'] as $ct) {
-            $total_amount[] = ($ct->amount=="" ? 0 : $ct->amount);
+            $total_amount[] = ($ct->total_amount_summary=="" ? 0 : $ct->total_amount_summary);
             $report_days[] = date('dM y', strtotime($ct->fees_datetime));
         }
         $data['total_amount'] = $total_amount;

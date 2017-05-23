@@ -28,6 +28,7 @@ class Invoices extends CI_Controller
         $this->table = $this->module->table;
         $this->id_field = $this->module->id_field;
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
+        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         $this->iic_user_type = intval(get_option('iic_user_type'));
     }
     public function index()
@@ -47,7 +48,7 @@ class Invoices extends CI_Controller
                             FROM
                               invoices AS ic 
                                INNER JOIN accounts AS ac 
-                                ON (ac.acc_id = ic.acc_id) 
+                                ON (ac.acc_id = ic.acc_id) WHERE 1 AND ic.branch_id = '".$this->branch_id."'
                            ".$where;
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
@@ -106,7 +107,7 @@ class Invoices extends CI_Controller
         $data['query'] = "SELECT 
                               MAX(iv.`id`) AS id,
                               iv.`acc_id`,
-                              ac.`acc_name`,
+                              ac.`acc_name` as member_name,
                               ac.`acc_date` as registration_date,
                               iv.`amount` AS amount,
                               iv.`fees_month`,
@@ -118,7 +119,12 @@ class Invoices extends CI_Controller
                               invoices AS iv 
                               INNER JOIN accounts AS ac 
                                 ON (ac.`acc_id` = iv.`acc_id`) 
-                            WHERE ac.`status` = 1 AND FIND_IN_SET('1', iv.`type`) group by iv.acc_id " .$where;
+                            WHERE 1 AND iv.branch_id = '".$this->branch_id."' 
+                            AND ac.`status` = 1 
+                            AND FIND_IN_SET('1', iv.`type`)
+                            AND iv.branch_id = '".$this->branch_id."'
+                            AND (SELECT DATE_ADD(CONCAT(YEAR(ivvv.fees_month),'-',MONTH(ivvv.fees_month),'-',DAY(ac.`acc_date`)),INTERVAL 30 DAY) AS month_interval FROM invoices AS ivvv WHERE ivvv.acc_id = ac.`acc_id` AND ivvv.`status` = 1) <= CURRENT_DATE() 
+                            group by iv.acc_id " .$where;
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid_monthly', $data);
     }
 
@@ -166,6 +172,7 @@ class Invoices extends CI_Controller
             if(in_array('1',getVar('type'))){
                 $DBdata['status'] = 1;
             }
+            $DBdata['branch_id'] = $this->branch_id;
             $amount_details[] =   array_filter(getVar('type'));
             $amount_details[] =   array_filter(getVar('amount'));
             $DBdata['amount_details'] = json_encode($amount_details);
@@ -253,6 +260,7 @@ class Invoices extends CI_Controller
             $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
             $DBdata['type'] = 1;
             $DBdata['status'] = 1;
+            $DBdata['branch_id'] = $this->branch_id;
             $amount_details[] = array((string)$DBdata['type']);
             $amount_details[] = array($DBdata['amount']);
             $DBdata['amount_details'] = json_encode($amount_details);
