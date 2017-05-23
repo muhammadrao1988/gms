@@ -33,16 +33,17 @@ define('DOMAIN_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/' . ROOT_DIR);
 
 define('ASSETS_URL', DOMAIN_URL . 'assets/');
 
-
 define('PHPTHUMB_URL', DOMAIN_URL . 'application/libraries/PHPthumbs/phpthumbs.php');
-
-define('ACCESS_DATABASE' , urldecode("C:\Users\Muhammad Rao\Desktop\ddd\abc.mdb"));
 
 $config['base_url'] = DOMAIN_URL;
 
+if($_SERVER['HTTP_HOST']=='localhost') {
+    define('ACCESS_DATABASE', urldecode("C:\Users\Muhammad Rao\Desktop\ddd\abc.mdb"));
+}else{
+    define('ACCESS_DATABASE' , urldecode(dirname(__FILE__)."/../../machine_data/abc.mdb"));
+}
+
 define("MONTHLY_FEES",300);
-
-
 /*
 |--------------------------------------------------------------------------
 | Index File
