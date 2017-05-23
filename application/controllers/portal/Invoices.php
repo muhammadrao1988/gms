@@ -168,6 +168,9 @@ class Invoices extends CI_Controller
             $DBdata['fees_month'] = date('Y-m-d',strtotime(getVar('fees_month')));
             $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
             $DBdata['amount'] = array_sum(getVar('amount'));
+            if(in_array('1',getVar('type'))){
+                $DBdata['status'] = 1;
+            }
             $DBdata['type'] = implode(',',getVar('type'));
             if(in_array('1',getVar('type'))){
                 $DBdata['status'] = 1;

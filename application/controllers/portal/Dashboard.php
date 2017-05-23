@@ -54,6 +54,7 @@ class Dashboard extends CI_Controller
     public function checkNewData()
     {
         $json = array();
+
         /*Get Attendance by Machine*/
         $today_attendance = getAttendenceMachine();
         if (count($today_attendance > 0)) {
@@ -61,10 +62,10 @@ class Dashboard extends CI_Controller
             $exist_attendance = $this->module->existMembersAttendance();
 
             $new_attendance = array();
+
             //$today_data = array_unique(array_column($today_attendance, 'USERID'));
             $exist_data = array_unique(array_column($exist_attendance, 'account_check'));
-            //$today_type = array_unique(array_column($today_attendance, 'CHECKTYPE'));
-            //$exist_type = array_unique(array_column($exist_attendance, 'check_type'));
+
             $i = 0;
             foreach ($today_attendance as $key=>$row){
                 $account_check = $row['USERID']."_".$row['CHECKTYPE']."_".$row['sn'];
@@ -78,15 +79,51 @@ class Dashboard extends CI_Controller
                     $new_attendance['machine_serial'] = $row['sn'];
                     $new_attendance['sensored_id'] = $row['SENSORID'];
                     $new_attendance['status'] = 1;
-                    save('attendance',$new_attendance);
-                    $json[$i]['account_id'] = $row['USERID'];
-                    $json[$i]['datetime'] = $row['CHECKTIME'];
-                    $json[$i]['check_type'] = $row['CHECKTYPE'];
+                    $getAccountDetail = $this->db->query("SELECT acc_id,acc_date,subscription_id FROM accounts WHERE `serial_number`='".$new_attendance['machine_serial']."' AND machine_user_id='".$new_attendance['account_id']."' LIMIT 1")->row();
+                    if($getAccountDetail->acc_id!=""){
+                        /***********************Monthly Fee Checking**************/
+                        //check monthly fee invoice generated or not.
+                        $invoiceCheck = $this->db->query("SELECT COUNT(id) AS tot_rec FROM  invoices where acc_id = '".$getAccountDetail->acc_id."' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
+
+                        if($invoiceCheck > 0) {
+                            $getInvoice = $this->db->query("SELECT * FROM invoices WHERE `status`=1 AND acc_id='" . $getAccountDetail->acc_id . "' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
+
+
+                            if ($getInvoice->id!="") {
+
+                               $tot_month =  checkMonthlyFeesPaid($getAccountDetail->acc_date,$getInvoice->fees_month);
+
+                               if($tot_month > 0){
+                                   $json[$i]['monthly_fee'] = $tot_month. " months fee UNPAID";
+                               }else{
+                                   $json[$i]['monthly_fee'] = "All monthly fees are PAID";
+                               }
+                            }else{
+                                $json[$i]['monthly_fee'] = "Please adjust monthly fee invoice of this user manually.";
+                            }
+
+                        }
+                        else{
+                            //monthly invoice not created
+                            $json[$i]['monthly_fee'] = "Please create monthly fee invoice of this user.";
+                        }
+                        /***********************END*********************************/
+                        /***********************Subscription Checking**************/
+                        /***********************END*********************************/
+                        save('attendance',$new_attendance);
+                        $json[$i]['account_id'] = $row['USERID'];
+                        $json[$i]['datetime'] = $row['CHECKTIME'];
+                        $json[$i]['check_type'] = $row['CHECKTYPE'];
+                        echo json_encode($json);
+                    }
+
+
+
                     $exist_data[] = $account_check;
                     $i++;
                 }
             }
-            echo json_encode($json);
+
         }
     }
 

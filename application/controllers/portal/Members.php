@@ -183,12 +183,14 @@ class Members extends CI_Controller
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
             $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
+
             $DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));;
             /*$DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
             $DBdata['serial_number']    = getVal('accounts','serial_number',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');*/
             $DBdata['branch_id']        = $user_info->branch_id;
             $DBdata['serial_number']    = $user_info->machine_serial;
             $DBdata['acc_manager']      = $user_info->user_id;
+
             $id = save($this->table, $DBdata);
 
             /*------------------------------------------------------------------------------------------*/
@@ -200,6 +202,7 @@ class Members extends CI_Controller
     public function update()
     {
         if (!$this->module->validate()) {
+
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {

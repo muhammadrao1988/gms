@@ -32,6 +32,18 @@ class M_members extends CI_Model
 
             echo 'file not exist';
         }
+<<<<<<< HEAD
+        //$dbh = new PDO("odbc:DRIVER={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=$dbName;");
+        try {
+            $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
+
+
+        }
+        catch (PDOException $e) {
+            $dbh = new PDO("odbc:Driver={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=$dbName;");
+        }
+
+=======
         //$dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
         try {
             $dbh = new PDO("odbc:DRIVER={Driver do Microsoft Access (*.mdb)}; DBQ=$dbName;");
@@ -39,12 +51,19 @@ class M_members extends CI_Model
         catch (PDOException $e) {
             $dbh = new PDO("odbc:Driver={Microsoft Access Driver (.mdb, .accdb)}; DBQ=$dbName;");
         }
+>>>>>>> 2b15803409e6b0073a319921b4b29859bc62dc6e
         //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');
+
         $result = $dbh->query("select USERINFO.USERID from USERINFO where Badgenumber = '".$id."'");
 
+
         $USERID = $result->fetch(PDO::FETCH_ASSOC);
+<<<<<<< HEAD
+
+=======
         echo '<pre>';print_r($USERID );echo '</pre>';
         die('Call');
+>>>>>>> 2b15803409e6b0073a319921b4b29859bc62dc6e
         return $USERID['USERID'];
     }
 }
