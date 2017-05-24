@@ -332,7 +332,9 @@ class Dashboard extends CI_Controller
 
         if(is_array($attendance_arr) and count($attendance_arr) > 0){
             foreach($attendance_arr as $key=>$attendance){
-                $this->db->query("INSERT INTO `attendance` SET `account_id` = '".$attendance->USERID."', `status` = '1', `datetime` = '".$attendance->CHECKTIME."', `check_type` = '".$attendance->CHECKTYPE."', `machine_serial` = '".$attendance->sn."', `sensored_id` = '".$attendance->SENSORID."' ");
+                if(!getVal("attendance","id","WHERE `account_id` = '".$attendance->USERID."' AND `check_type` = '".$attendance->CHECKTYPE."' AND `machine_serial` = '".$attendance->sn."' AND DATE_FORMAT(`datetime`,'%Y-%m-%d') = '".date('Y-m-d', strtotime($attendance->CHECKTIME))."' ")){
+                    $this->db->query("INSERT INTO `attendance` SET `account_id` = '".$attendance->USERID."', `status` = '1', `datetime` = '".$attendance->CHECKTIME."', `check_type` = '".$attendance->CHECKTYPE."', `machine_serial` = '".$attendance->sn."', `sensored_id` = '".$attendance->SENSORID."' ");
+                }
             }
         }
     }
