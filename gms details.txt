@@ -1,0 +1,17 @@
+Cpanel
+username: bodyshape
+password:Body@1234
+
+
+FTP Username: developer@bodyshape.pk
+FTP server: ftp.bodyshape.pk
+FTP & explicit FTPS port:  21
+
+pass: yp8f%8%N!ia-
+
+
+database
+host: 192.185.56.141
+Username: bodyshap_gms
+password: .O1bA3B-sd#C
+database: bodyshap_gms

@@ -97,3 +97,6 @@ define('OPEN_RESELLER_IDS', '2');
 define('CLOSED_RESELLER_IDS', '3');
 
 define('DEFAULT_OWNER', '50000');
+
+
+define('ATTENDANCE_DATA_URL', 'http://localhost:8011/Projects/gym_management_db/saqib_atd.php');

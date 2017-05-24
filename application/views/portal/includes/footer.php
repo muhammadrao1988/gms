@@ -4,6 +4,7 @@
     &nbsp;&nbsp; &copy; <?php echo date('Y').' '.PROJECT_TITLE; ?> . All rights
     reserved.
 </div>
+<div id="att_data_html" class="att_data_html hide"></div>
 <!-- End main container -->
 
 <!-- Placed js at the end of the document so the pages load faster -->
@@ -116,6 +117,33 @@
 
     });
 </script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        setInterval(function () {
+            var client = new XMLHttpRequest();
+
+            client.open('GET', '<?=ATTENDANCE_DATA_URL;?>');
+            client.onreadystatechange = function() {
+                document.getElementById("att_data_html").innerHTML = client.responseText;
+                var json_string_value = client.responseText;
+
+                $.ajax({
+                    type: "POST",
+                    data: "json_string=" + json_string_value,
+                    url: "<?= site_url(ADMIN_DIR. '/dashboard/update_attendance_live'); ?>",
+                    complete: function (data) {
+                        console.log(data.responseText);
+                    }
+                });
+
+            }
+            client.send();
+        },4000);
+
+    });
+</script>
+
 </body>
 </html>
 

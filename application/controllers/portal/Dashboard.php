@@ -326,6 +326,17 @@ class Dashboard extends CI_Controller
 
     }
 
+    public function update_attendance_live(){
+
+        $attendance_arr = json_decode($_REQUEST['json_string']);
+
+        if(is_array($attendance_arr) and count($attendance_arr) > 0){
+            foreach($attendance_arr as $key=>$attendance){
+                $this->db->query("INSERT INTO `attendance` SET `account_id` = '".$attendance->USERID."', `status` = '1', `datetime` = '".$attendance->CHECKTIME."', `check_type` = '".$attendance->CHECKTYPE."', `machine_serial` = '".$attendance->sn."', `sensored_id` = '".$attendance->SENSORID."' ");
+            }
+        }
+    }
+
 
 }
 
