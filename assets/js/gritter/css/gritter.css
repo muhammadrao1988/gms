@@ -116,3 +116,10 @@
 .gritter-out .gritter-top{
     background:#9972b5;
 }
+.gritter-exist .gritter-item,
+.gritter-exist .gritter-bottom,
+.gritter-exist .gritter-top{
+    background: #fd270c;
+    color: #ffffff;
+}
+

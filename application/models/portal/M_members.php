@@ -25,8 +25,10 @@ class M_members extends CI_Model
             return true;
         }
     }
-    function getMachineUserId($id){
-        $dbName = ACCESS_DATABASE;
+
+    function getMachineUserId($id,$redirect_url)
+    {
+        /*$dbName = ACCESS_DATABASE;
         if (!file_exists($dbName)) {
 
             echo 'file not exist';
@@ -41,14 +43,37 @@ class M_members extends CI_Model
         //$result = $dbh->query('SELECT * from CHECKINOUT where userid = 1');
         $result = $dbh->query("select USERINFO.USERID from USERINFO where Badgenumber = '".$id."'");
         $USERID = $result->fetch(PDO::FETCH_ASSOC);
-        /*echo '<pre>';print_r($USERID );echo '</pre>';
-        die('Call');*/
+
         if($USERID['USERID']!=''){
             return $USERID['USERID'];
         }else{
             return 0;
-        }
-
+        }*/
+        ?>
+        <script type="text/javascript">
+            document.write('Redirecting....');
+            setTimeout(function () {
+                var client = new XMLHttpRequest();
+                client.open('GET', '<?=USERID_DATA_URL;?>?member_id=<?php echo $id; ?>');
+                client.onreadystatechange = function () {
+                    //document.getElementById("att_data_html").innerHTML = client.responseText;
+                    var json_string_value = client.responseText;
+                    console.log(json_string_value);
+                    if(json_string_value!='') {
+                        var ajax = new XMLHttpRequest();
+                        ajax.open('GET', '<?=base_url(ADMIN_DIR . '/members/insertuserid');?>?member_id=<?php echo $id; ?>&userID=' + json_string_value);
+                        ajax.onreadystatechange = function () {
+                            var json_string_valuedd = client.responseText;
+                            console.log(json_string_valuedd);
+                            window.location.href = "<?php echo $redirect_url;?>";
+                        };
+                        ajax.send();
+                    }
+                };
+                client.send();
+            },1000);
+        </script>
+        <?php
     }
 }
 

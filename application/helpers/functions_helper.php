@@ -871,6 +871,10 @@ function invoice_for($val){
 function  getPaymemntStatus($val){
     $now = time();
     $fees_date = $val[0];
+    if($fees_date == "") {
+        $paybutton = '<a href="'.base_url(ADMIN_DIR.'invoices/form').'"><span class="red"><b>Generate First Invoice</b></span></a>';
+        return $paybutton;
+    }
     $your_date = strtotime(date('Y-m',strtotime($fees_date)).'-'.date('d',strtotime($val[1]['acc_date'])));
     $datediff = $now - $your_date;
     $status = getVal('invoices','status',' where acc_id = "'.$val[1]['acc_id'].'" and status = 1');

@@ -151,7 +151,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         <label class="styled_select">
                                             <select name="subscription_id" id="subscription_id" class="styled validate[required]">
                                                 <option value=""> - Select -</option>
-                                                <?= selectBox("SELECT id,CONCAT(`name`,' - ',period_duration) AS subsribe_name FROM `subscriptions` WHERE `status` = 1", $row->subscriptin_id); ?>
+                                                <?= selectBox("SELECT id,CONCAT(`name`,' - ',period_duration) AS subsribe_name FROM `subscriptions` WHERE `status` = 1", $row->subscription_id); ?>
                                             </select>
                                             <span class="help-block"></span>
                                         </label>

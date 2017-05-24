@@ -50,7 +50,6 @@ class Members extends CI_Controller
 
     public function index()
     {
-
         $where = '';
         $where .= getFindQuery();
 
@@ -184,7 +183,7 @@ class Members extends CI_Controller
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
             $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
 
-            $DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));;
+            //$DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));
             /*$DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
             $DBdata['serial_number']    = getVal('accounts','serial_number',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');*/
             $DBdata['branch_id']        = $user_info->branch_id;
@@ -192,9 +191,9 @@ class Members extends CI_Controller
             $DBdata['acc_manager']      = $user_info->user_id;
 
             $id = save($this->table, $DBdata);
-
+            $this->module->getMachineUserId(getVar('machine_member_id'),base_url(ADMIN_DIR . 'invoices/form/?msg=Member has been created. Please generate first inovice.'));
             /*------------------------------------------------------------------------------------------*/
-            redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been inserted..');
+            redirect(ADMIN_DIR . 'invoices/form/?msg=Member has been created. Please generate first inovice.');
         }
     }
 
@@ -210,13 +209,13 @@ class Members extends CI_Controller
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
             $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
-            $DBdata['machine_user_id']  = $this->module->getMachineUserId($_REQUEST['machine_member_id']);;
-            $DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
-            $DBdata['serial_number']    = getVal('accounts','serial_number',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
+            //$DBdata['machine_user_id']  = $this->module->getMachineUserId($_REQUEST['machine_member_id']);;
+            $DBdata['branch_id']        = getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
+            $DBdata['serial_number']    = getVal('users','machine_serial',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
 
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
-
+            $this->module->getMachineUserId($_REQUEST['machine_member_id'],base_url(ADMIN_DIR . $this->module_name.'/?msg=Member has been updated.'));
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
 
         }
@@ -275,7 +274,9 @@ class Members extends CI_Controller
 
         //echo json_encode($JSON);
     }
-
+    public function insertuserid(){
+        save('accounts',array('machine_user_id'=>getVar('userID')),' machine_member_id="'.getVar('member_id').'"');
+    }
 }
 
 /* End of file pages.php */
