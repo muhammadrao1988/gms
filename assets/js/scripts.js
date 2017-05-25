@@ -71,6 +71,9 @@
 	 //===== Select box with search =====//
     $(".styled_select select").uniform();
 	$(".select").select2();
+    $('.select-default').select2({
+        minimumResultsForSearch: -1
+    });
 	 //===== Tags =====//
 
     $('.tags').tagsInput({width: '100%'});
@@ -211,6 +214,7 @@
 
 	 
 	 $('.datepicker').datepicker({ dateFormat: 'yy/mm/dd' }).val();
+	 $('.datepicker-sql').datepicker({ dateFormat: 'yy-mm-dd' }).val();
 	$( ".datepicker" ).datepicker( "option", "maxDate", '+0m +0w' );//calendar end date restrict to today
 	
 	 

@@ -127,6 +127,22 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
+                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Registration Date: </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" id="acc_date" name="acc_date" value="<?=(($row->acc_date!='' and $row->acc_date!='0000-00-00')?date('d-m-Y',strtotime($row->acc_date)):'') ; ?>"
+                                               placeholder="DD-MM-YYYY"
+                                               class="form-control validate[required] datepicker-format">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">User ID: </label>
+                                    <div class="col-lg-6">
+                                        <input type="text"
+                                               value="<?= $row->machine_member_id; ?>" placeholder="User ID"
+                                               class="form-control validate[required,custom[integer]]">
+                                    </div>
+                                </div>
+                                <div class="form-group">
                                     <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Machine Member ID: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="machine_member_id" name="machine_member_id"

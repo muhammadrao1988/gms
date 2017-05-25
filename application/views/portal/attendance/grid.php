@@ -50,7 +50,19 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
             <div class="clearfix"></div>
             <?php
-            $monthly_sttaus = '<span  style="overflow: hidden;background: #616365;"></span>';
+            $search = getVar('search');
+            $monthly_status = '<span  style="overflow: hidden;background: #616365;"></span>';
+            $check_type = '<select name="search[check_type]" class="form-control select-default">
+                                    <option value="">-select-</option>
+                                    <option value="I" '.(($search['check_type']=='I')?"selected":"").'>Checked In</option>
+                                    <option value="O" '.(($search['check_type']=='O')?"selected":"").'>Checked Out</option>
+                                    </select>';
+            $datetime = '<input type="text" class="form-control datepicker-sql" name="search[att:datetime]" value="'.$search['att:datetime'].'"/>';
+            $subsction_status = '<select name="search[subscription_status]" class="form-control select-default">
+                                    <option value="">-select-</option>
+                                    <option value="continue" '.(($search['subscription_status']=='continue')?"selected":"").'>Continue</option>
+                                    <option value="expired" '.(($search['subscription_status']=='expired')?"selected":"").'>Expired</option>
+                                    </select>';
 
             $grid = new grid();
             $grid->query = $query;
@@ -60,7 +72,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->order_column = 'id';
             $grid->selectAllCheckbox = false;
             $grid->actionColumn = array('view');
-            $grid->search_fields_html = array('monthly_status'=>$monthly_sttaus);
+            $grid->search_fields_html = array('monthly_status'=>$monthly_sttaus,'check_type'=>$check_type,'datetime'=>$datetime,'subscription_status'=>$subsction_status);
             $grid->custom_func = array('monthly_status'=>'getPaymemntStatus');
             $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'member_type','machine_member_id'=>'machine_ID','acc_id'=>'member_id');
             $grid->hide_fields = array('id','status','invoices_id');
