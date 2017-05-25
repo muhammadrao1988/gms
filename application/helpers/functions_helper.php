@@ -881,7 +881,7 @@ function  getPaymemntStatus($val){
     $month = floor($datediff / (60 * 60 * 24 * 30));
     if($month !='0' and $status == '1'){
         $val[1]['invoices_id'] = getVal('invoices','id',' where acc_id = "'.$val[1]['acc_id'].'" and status = 1');
-        $paybutton = '<span class="red"><b>Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['invoices_id'].'"><i class="fa fa-money"></i> Pay</button>';
+        $paybutton = '<span class="red"><b>'.$month.' Month Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['invoices_id'].'"><i class="fa fa-money"></i> Pay</button>';
         return $paybutton;
     }else{
         return '<span class="green"><b>PAID</b></span>';

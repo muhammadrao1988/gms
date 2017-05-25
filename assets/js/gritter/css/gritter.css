@@ -101,7 +101,7 @@
 .gritter-light .gritter-title {
     text-shadow: none;
 }
-.gritter-in,.gritter-out{
+.gritter-in,.gritter-out,.gritter-exist{
     border-radius:5px;
     overflow: hidden;
 }

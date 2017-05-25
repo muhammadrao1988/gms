@@ -43,7 +43,7 @@ class Invoices extends CI_Controller
                               ic.acc_id,
                               ac.acc_name as member_name,
                               date(ic.fees_datetime) as paid_date,
-                              MONTHNAME(ic.fees_month) as last_paid_month,
+                              CONCAT(MONTHNAME(ic.fees_month),' ',YEAR (ic.fees_month)) as last_paid_month,
                               ic.`type` as invoice_for                              
                             FROM
                               invoices AS ic 
@@ -123,7 +123,7 @@ class Invoices extends CI_Controller
                             AND ac.`status` = 1 
                             AND FIND_IN_SET('1', iv.`type`)
                             AND iv.branch_id = '".$this->branch_id."'
-                            AND (SELECT DATE_ADD(CONCAT(YEAR(ivvv.fees_month),'-',MONTH(ivvv.fees_month),'-',DAY(ac.`acc_date`)),INTERVAL 30 DAY) AS month_interval FROM invoices AS ivvv WHERE ivvv.acc_id = ac.`acc_id` AND ivvv.`status` = 1) <= CURRENT_DATE() 
+                            AND (SELECT DATE_ADD(CONCAT(YEAR(ivvv.fees_month),'-',MONTH(ivvv.fees_month),'-',DAY(ac.`acc_date`)),INTERVAL 30 DAY) AS month_interval FROM invoices AS ivvv WHERE ivvv.acc_id = ac.`acc_id` AND ivvv.`status` = 1 ORDER BY ivvv.`id` DESC LIMIT 1) <= CURRENT_DATE() 
                             group by iv.acc_id " .$where;
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid_monthly', $data);
     }

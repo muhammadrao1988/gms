@@ -11,7 +11,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             <div class="col-lg-12">
 
                 <ul class="breadcrumb">
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "members"); ?>>">Members</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "invoices"); ?>">Fees Management</a></li>
                     <li class="active"><?php echo $title ?></li>
                 </ul>
                 <!--breadcrumbs end -->

@@ -50,6 +50,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
             <div class="clearfix"></div>
             <?php
+            $monthly_sttaus = '<span  style="overflow: hidden;background: #616365;"></span>';
 
             $grid = new grid();
             $grid->query = $query;
@@ -59,9 +60,10 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->order_column = 'id';
             $grid->selectAllCheckbox = false;
             $grid->actionColumn = array('view');
+            $grid->search_fields_html = array('monthly_status'=>$monthly_sttaus);
             $grid->custom_func = array('monthly_status'=>'getPaymemntStatus');
-            $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'member_type');
-            $grid->hide_fields = array('id','status','acc_id','invoices_id');
+            $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'member_type','machine_member_id'=>'machine_ID','acc_id'=>'member_id');
+            $grid->hide_fields = array('id','status','invoices_id');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
             $grid->grid_buttons = array();
             echo $grid->showGrid();
