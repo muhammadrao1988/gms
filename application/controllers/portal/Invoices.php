@@ -269,8 +269,13 @@ class Invoices extends CI_Controller
             $DBdata['amount_details'] = json_encode($amount_details);
             $id = save($this->table, $DBdata);
             $id = save($this->table, array('status'=>2),' id = "'.getVar('invoice_id').'"');
-            /*------------------------------------------------------------------------------------------*/
-            redirect(ADMIN_DIR . $this->module_name . '/monthlyInvoice/?msg=Record has been inserted..');
+
+            if(getVar('redirect_page')!=""){
+                echo "<script>location.href='".getVar('redirect_page')."'</script>";
+            }else {
+                /*------------------------------------------------------------------------------------------*/
+                redirect(ADMIN_DIR . $this->module_name . '/monthlyInvoice/?msg=Record has been inserted..');
+            }
         }
 
     }

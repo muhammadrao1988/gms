@@ -39,7 +39,7 @@
                 </div>
                 <div class="modal-footer">
                     <input type="hidden" name="invoice_id" id="invoice_id" value=""/>
-                    <input type="hidden" name="redirect_page" value="<?php echo getUri(2); ?>">
+                    <input type="hidden" name="redirect_page" value="<?php echo current_url().( $_SERVER['QUERY_STRING']!="" ? '?msg=Invoice added successfully.' . $_SERVER['QUERY_STRING'] : ""); ?>">
                     <button data-dismiss="modal" class="btn btn-black" type="button">Close</button>
                     <button class="btn btn-green" type="submit">Pay Payment</button>
                 </div>

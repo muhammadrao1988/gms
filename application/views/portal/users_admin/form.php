@@ -68,7 +68,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">User
-                                        Template</label>
+                                        Role</label>
                                     <div class="col-lg-6">
 
                                             <select name="user_template_id" id="user_template_id"

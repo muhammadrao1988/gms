@@ -37,7 +37,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                         ' . selectBox("SELECT id, branch_name FROM branches", $search_ar['branch_id']) . '
                       </select>';
             $template = '<select class="select" name="search[user_template_id]" id="user_template_id" style="width: 100%">
-                        <option value=""> - Select Template - </option>
+                        <option value=""> - Select Role - </option>
                         ' . selectBox("SELECT id, user_type FROM user_types_template", $search_ar['user_template_id']) . '
                       </select>';
             $s_user_id = '<input class="form-control" type="text" name="search[user_id]" id="search_user_id" value="' . $search_ar['user_id'] . '" placeholder="Acc id">';
@@ -55,7 +55,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
             $grid->form_buttons = array('new', 'delete');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
-            $grid->custom_col_name_fields = array('user_type'=>'User Template');
+            $grid->custom_col_name_fields = array('user_type'=>'User Role');
             //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');
             $grid->grid_buttons = array('edit', 'delete', 'acc_status');
             echo $grid->showGrid();
