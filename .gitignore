@@ -29,4 +29,3 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 *.sublime-project
 application/config/config-live.php
 application/config/config.php
-local_files/gmsDATA.ldb
