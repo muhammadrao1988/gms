@@ -99,4 +99,6 @@ define('CLOSED_RESELLER_IDS', '3');
 define('DEFAULT_OWNER', '50000');
 
 
-define('ATTENDANCE_DATA_URL', 'http://localhost:8011/Projects/gym_management_db/saqib_atd.php');
+//define('ATTENDANCE_DATA_URL', 'http://localhost:8011/Projects/gym_management_db/saqib_atd.php');
+define('ATTENDANCE_DATA_URL', 'http://localhost/gms/local_files/getMachineAttendance.php');
+define('USERID_DATA_URL', 'http://localhost/gms/local_files/getUserID.php');

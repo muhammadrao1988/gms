@@ -56,6 +56,11 @@ class Dashboard extends CI_Controller
         $json = array();
 
         /*Get Attendance by Machine*/
+        $today_attendance = json_decode(getVar($_REQUEST['machineAttendance']));
+        echo '<pre>';
+        print_r($today_attendance);
+        echo '</pre>';
+        die('Call');
         $today_attendance = getAttendenceMachine();
 
         if (count($today_attendance > 0)) {
@@ -68,69 +73,68 @@ class Dashboard extends CI_Controller
             $exist_data = array_unique(array_column($exist_attendance, 'account_check'));
 
             $i = 0;
-            foreach ($today_attendance as $key=>$row){
-                $account_check = $row['USERID']."_".$row['CHECKTYPE']."_".$row['sn'];
-                if(in_array($account_check,$exist_data)){
+            foreach ($today_attendance as $key => $row) {
+                $account_check = $row['USERID'] . "_" . $row['CHECKTYPE'] . "_" . $row['sn'];
+                if (in_array($account_check, $exist_data)) {
                     $exist_data[] = $account_check;
                     continue;
-                }else{
+                } else {
                     $new_attendance['account_id'] = $row['USERID'];
                     $new_attendance['datetime'] = $row['CHECKTIME'];
                     $new_attendance['check_type'] = $row['CHECKTYPE'];
                     $new_attendance['machine_serial'] = $row['sn'];
                     $new_attendance['sensored_id'] = $row['SENSORID'];
                     $new_attendance['status'] = 1;
-                    $getAccountDetail = $this->db->query("SELECT acc_id,acc_date,subscription_id,acc_name FROM accounts WHERE `serial_number`='".$new_attendance['machine_serial']."' AND machine_user_id='".$new_attendance['account_id']."' LIMIT 1")->row();
-                    if($getAccountDetail->acc_id!=""){
+                    $getAccountDetail = $this->db->query("SELECT acc_id,acc_date,subscription_id,acc_name FROM accounts WHERE `serial_number`='" . $new_attendance['machine_serial'] . "' AND machine_user_id='" . $new_attendance['account_id'] . "' LIMIT 1")->row();
+                    if ($getAccountDetail->acc_id != "") {
                         /***********************Monthly Fee Checking**************/
                         //check monthly fee invoice generated or not.
-                        $invoiceCheck = $this->db->query("SELECT COUNT(id) AS tot_rec FROM  invoices where acc_id = '".$getAccountDetail->acc_id."' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
-                        if($invoiceCheck > 0) {
+                        $invoiceCheck = $this->db->query("SELECT COUNT(id) AS tot_rec FROM  invoices where acc_id = '" . $getAccountDetail->acc_id . "' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
+                        if ($invoiceCheck > 0) {
                             $getInvoice = $this->db->query("SELECT * FROM invoices WHERE `status`=1 AND acc_id='" . $getAccountDetail->acc_id . "' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
 
 
-                            if ($getInvoice->id!="") {
+                            if ($getInvoice->id != "") {
 
-                               $tot_month =  checkMonthlyFeesPaid($getAccountDetail->acc_date,$getInvoice->fees_month);
+                                $tot_month = checkMonthlyFeesPaid($getAccountDetail->acc_date, $getInvoice->fees_month);
 
-                               if($tot_month > 0){
-                                   $json[$i]['monthly_fee'] = $tot_month. " months fee UNPAID";
-                               }else{
-                                   $json[$i]['monthly_fee'] = "All monthly fees are PAID";
-                               }
-                            }else{
+                                if ($tot_month > 0) {
+                                    $json[$i]['monthly_fee'] = $tot_month . " months fee UNPAID";
+                                } else {
+                                    $json[$i]['monthly_fee'] = "All monthly fees are PAID";
+                                }
+                            } else {
                                 $json[$i]['monthly_fee'] = "Please adjust monthly fee invoice of this user manually.";
                             }
 
-                        }else{
+                        } else {
                             //monthly invoice not created
                             $json[$i]['monthly_fee'] = "Please create monthly fee invoice of this user.";
                         }
                         /***********************END*********************************/
                         /***********************Subscription Checking**************/
-                        $getLastAttendance = $this->db->query("SELECT `datetime` AS last_attendance, id FROM attendance WHERE machine_serial = '".$new_attendance['machine_serial']."' AND account_id = '".$new_attendance['account_id']."' ORDER BY id DESC LIMIT 1")->row();
-                        if($getLastAttendance->id > 0)
-                        {
-                            $getSubscriptionDay = $this->db->query("SELECT `period` FROM subscriptions WHERE id='".$getAccountDetail->subscription_id."'")->row();
-                            if($getSubscriptionDay->period==""){
+                        $getLastAttendance = $this->db->query("SELECT `datetime` AS last_attendance, id FROM attendance WHERE machine_serial = '" . $new_attendance['machine_serial'] . "' AND account_id = '" . $new_attendance['account_id'] . "' ORDER BY id DESC LIMIT 1")->row();
+                        if ($getLastAttendance->id > 0) {
+                            $getSubscriptionDay = $this->db->query("SELECT `period` FROM subscriptions WHERE id='" . $getAccountDetail->subscription_id . "'")->row();
+                            if ($getSubscriptionDay->period == "") {
                                 $json[$i]['subscription_status'] = "No Subscription assigned to this user.";
-                            }else{
+                            } else {
                                 $subscriptionDay = $getSubscriptionDay->period;
                                 $lastAttendance = $getLastAttendance->last_attendance;
                                 $totDay = dayDifference($lastAttendance);
-                                if($totDay > $subscriptionDay){
+                                if ($totDay > $subscriptionDay) {
                                     $json[$i]['subscription_status'] = "Expired";
-                                }else{
+                                } else {
                                     $json[$i]['subscription_status'] = "Valid";
                                 }
                             }
 
-                        }else{
+                        } else {
                             $json[$i]['subscription_status'] = "First Attendance entered.";
 
                         }
                         /***********************END*********************************/
-                        save('attendance',$new_attendance);
+                        save('attendance', $new_attendwance);
                         $json[$i]['account_id'] = $getAccountDetail->acc_id;
                         $json[$i]['datetime'] = $row['CHECKTIME'];
                         $json[$i]['check_type'] = $row['CHECKTYPE'];
@@ -215,127 +219,96 @@ class Dashboard extends CI_Controller
 
     }
 
-    public function save_dashboard_configuration()
-    {
-        $owner_id = $this->session->userdata['user_info']->parent_child;
-        if (getVar('save_dashboard_config') == 1 && $owner_id != "") {
 
-            $report_array = array("today", "yesterday", "this_week", "current_month");
-            $graph_array = array("call", "min", "acd", "mcall");
-
-            $selected_graph_value = getVar('selected_graph_value');
-            $selected_report_value = getVar('selected_report_value');
-
-
-            if (in_array($selected_graph_value, $graph_array) && in_array($selected_report_value, $report_array)) {
-
-                $configuration = array(
-                    'report_summary' => array(
-                        'date_frame' => $selected_report_value,
-                        'selected_graph' => $selected_graph_value
-                    )
-                );
-                $json_encode_configuration = json_encode($configuration);
-                $dbdata['configuration'] = $json_encode_configuration;
-                $where = "acc_id ='" . $owner_id . "'";
-                save("accounts", $dbdata, $where);
-                $result_array = array('result' => 200);
-                echo json_encode($result_array);
-            } else {
-                $result_array = array('result' => 400);
-                echo json_encode($result_array);
-            }
-
-        }
-    }
-
-    public function viewSearchResult()
+    public function update_attendance_live()
     {
 
-        if (getVar('number') != '') {
-            $data = array();
-            $owner_id = $this->session->userdata['user_info']->parent_child;
-            $where = " WHERE numbers.owner = '" . $owner_id . "'";
+        $attendance_arr = json_decode($_POST['json_string']);
 
-            $full_number = getVar('number');
-            /////// to remove intial zero
-            $getfirstletter = substr($full_number, 0, 1);
-            if ($getfirstletter == 0) {
-                $length_number = strlen($full_number);
-                $full_number = substr($full_number, 1, $length_number);
+
+        if (is_array($attendance_arr) and count($attendance_arr) > 0) {
+
+            $i = 0;
+
+            foreach ($attendance_arr as $key => $attendance) {
+                $getAccountDetail = $this->db->query("SELECT acc_id,acc_date,subscription_id,acc_name FROM accounts WHERE `serial_number`='" . $attendance->sn . "' AND machine_user_id='" . $attendance->USERID . "' LIMIT 1")->row();
+                if ($getAccountDetail->acc_id != "") {
+
+                    if (!getVal("attendance", "id", "WHERE `account_id` = '" . $attendance->USERID . "' AND `check_type` = '" . $attendance->CHECKTYPE . "' AND `machine_serial` = '" . $attendance->sn . "' AND DATE_FORMAT(`datetime`,'%Y-%m-%d') = '" . date('Y-m-d', strtotime($attendance->CHECKTIME)) . "'")) {
+
+
+                        /***********************Monthly Fee Checking**************/
+                        //check monthly fee invoice generated or not.
+                        $invoiceCheck = $this->db->query("SELECT COUNT(id) AS tot_rec FROM  invoices where acc_id = '" . $getAccountDetail->acc_id . "' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
+                        if ($invoiceCheck > 0) {
+                            $getInvoice = $this->db->query("SELECT * FROM invoices WHERE `status`=1 AND acc_id='" . $getAccountDetail->acc_id . "' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
+                            if ($getInvoice->id != "") {
+                                $tot_month = checkMonthlyFeesPaid($getAccountDetail->acc_date, $getInvoice->fees_month);
+                                if ($tot_month > 0) {
+                                    $json[$i]['monthly_fee'] = $tot_month . " months fee UNPAID";
+                                } else {
+                                    $json[$i]['monthly_fee'] = "All monthly fees are PAID";
+                                }
+                            } else {
+                                $json[$i]['monthly_fee'] = "Please adjust monthly fee invoice of this user manually.";
+                            }
+                        } else {
+                            //monthly invoice not created
+                            $json[$i]['monthly_fee'] = "Please create monthly fee invoice of this user.";
+                        }
+
+
+                        /***********************END*********************************/
+                        /***********************Subscription Checking**************/
+
+                        $getLastAttendance = $this->db->query("SELECT `datetime` AS last_attendance, id FROM attendance WHERE machine_serial = '" . $attendance->sn . "' AND account_id = '" . $attendance->USERID . "' ORDER BY id DESC LIMIT 1")->row();
+
+                        if ($getLastAttendance->id > 0) {
+                            $getSubscriptionDay = $this->db->query("SELECT `period` FROM subscriptions WHERE id='" . $getAccountDetail->subscription_id . "'")->row();
+
+                            if ($getSubscriptionDay->period == "") {
+                                $json[$i]['subscription_status'] = "No Subscription assigned to this user.";
+                            } else {
+                                $subscriptionDay = $getSubscriptionDay->period;
+                                $lastAttendance = $getLastAttendance->last_attendance;
+                                $totDay = dayDifference($lastAttendance);
+                                if ($totDay > $subscriptionDay) {
+                                    $json[$i]['subscription_status'] = "Expired";
+                                } else {
+                                    $json[$i]['subscription_status'] = "Valid";
+                                }
+                            }
+
+                        } else {
+                            $json[$i]['subscription_status'] = "First Attendance entered.";
+
+                        }
+
+
+                        /***********************END*********************************/
+                        $this->db->query("INSERT INTO `attendance` SET `account_id` = '" . $attendance->USERID . "', `status` = '1', `datetime` = '" . $attendance->CHECKTIME . "', `check_type` = '" . $attendance->CHECKTYPE . "', `machine_serial` = '" . $attendance->sn . "', `sensored_id` = '" . $attendance->SENSORID . "'");
+
+                        $json[$i]['account_id'] = $getAccountDetail->acc_id;
+                        $json[$i]['datetime'] = $attendance->CHECKTIME;
+                        $json[$i]['check_type'] = $attendance->CHECKTYPE;
+                        $json[$i]['account_name'] = $getAccountDetail->acc_name;
+                        $json[$i]['is_valid_user'] = 1;//first attendance
+
+
+                    }
+                    else{
+                        $json[$i]['account_id'] = $getAccountDetail->acc_id;
+                        $json[$i]['datetime'] = $attendance->CHECKTIME;
+                        $json[$i]['check_type'] = $attendance->CHECKTYPE;
+                        $json[$i]['account_name'] = $getAccountDetail->acc_name;
+                        $json[$i]['is_valid_user'] = 2;//more than one attendance in a day
+                    }
+                    $i++;
+                }
+
             }
-            //$where 				.= str_replace("full_number = '".$search_data['full_number']."'","full_number LIKE '%".$full_number."%'",getFindQuery());
-            //$where 			.= getFindQuery();
 
-            $data['title'] = $this->module_title;
-
-            $where .= ' AND numbers.full_number LIKE "%' . $full_number . '"';
-
-
-            $queryAll = "SELECT COUNT(id) as num_row FROM numbers" . $where;
-            $total_row = $this->db->query($queryAll)->row();
-            $data['total_record'] = $total_row->num_row;
-
-            if ($data['total_record'] > 0) {
-                $data['resultsPerPage'] = $resultsPerPage = 10;
-                $data['paged'] = $paged = getVar('page');
-                if ($paged > 0) {
-                    $page_limit = $resultsPerPage * ($paged - 1);
-                    $pagination_sql = " LIMIT  $page_limit, $resultsPerPage";
-                } else {
-                    $pagination_sql = " LIMIT 0 , $resultsPerPage";
-                }
-                $queryResult = "SELECT id,full_number,num_name FROM numbers" . $where . $pagination_sql;
-
-
-                $data['num_rows'] = $num_rows = $this->db->query($queryResult)->num_rows();
-                $data['allRows'] = $allRows = $this->db->query($queryResult)->result();
-                $html = '';
-                foreach ($allRows as $row) {
-                    $html .= '<div class="panel">
-                                <div class="panel-heading accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse' . $row->full_number . '">
-                                    <h4 class="panel-title">' . numberWithSpace($row->full_number) . ' - ' . $row->num_name . '
-                                        <span class="tools pull-right"><a href="javascript:void(0);" class="fa fa-chevron-right"></a></span>
-                                    </h4>
-                                </div>
-                                <div id="collapse' . $row->full_number . '" class="panel-collapse collapse">
-                                    <div class="panel-body">
-                                        <div class="col-md-12">
-                                            <p>Please select what you would like to do</p>
-                                            <a action="report_number" href="' . site_url(ADMIN_DIR . "my_numbers_reports/detailed_view/?number=" . $row->full_number) . '&date_frame=today" class="btn btn-report styled-btn" data-original-title="REPORT"><i class="fa fa-file-text-o"></i> View Report</a>
-                                            &nbsp;
-                                            <a action="edit" href="' . site_url(ADMIN_DIR . "numbers/form/number_manager/" . $row->full_number) . '" class="btn btn-black styled-btn" data-original-title="Manage"><i class="fa fa-wrench"></i>Edit Configuration</a>
-                                            <br><br>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>';
-                }
-                if ($num_rows == $resultsPerPage) {
-                    $html .= '<div class="loadbutton" style="text-align: center; padding-top: 5px;"><span class="loadmore link-color" style="font-weight: bold;cursor: pointer" data-page="' . ($paged + 1) . '">View More</span></div>';
-                }
-                echo $html;
-            } else {
-                echo '<div class="alert alert-info ">No Record found.</div>';
-            }
-        } else {
-            echo '<div class="alert alert-info ">Invalid number found. Please try again</div>';
-        }
-
-        // echo $this->load->view(ADMIN_DIR . 'dashboard/dashboard_search_modal', $data, true);
-
-    }
-
-    public function update_attendance_live(){
-
-        $attendance_arr = json_decode($_REQUEST['json_string']);
-
-        if(is_array($attendance_arr) and count($attendance_arr) > 0){
-            foreach($attendance_arr as $key=>$attendance){
-                if(!getVal("attendance","id","WHERE `account_id` = '".$attendance->USERID."' AND `check_type` = '".$attendance->CHECKTYPE."' AND `machine_serial` = '".$attendance->sn."' AND DATE_FORMAT(`datetime`,'%Y-%m-%d') = '".date('Y-m-d', strtotime($attendance->CHECKTIME))."' ")){
-                    $this->db->query("INSERT INTO `attendance` SET `account_id` = '".$attendance->USERID."', `status` = '1', `datetime` = '".$attendance->CHECKTIME."', `check_type` = '".$attendance->CHECKTYPE."', `machine_serial` = '".$attendance->sn."', `sensored_id` = '".$attendance->SENSORID."' ");
-                }
-            }
+            echo json_encode($json);
         }
     }
 

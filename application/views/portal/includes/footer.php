@@ -85,13 +85,13 @@
 <script type="text/javascript" src="<?php echo  base_url('assets/tiny_mce/tiny_mce_setting.js'); ?>"></script>
 
 <script type="text/javascript" src="<?php echo base_url('assets/js/my_plugins.js');?>"></script>
-<script type="text/javascript">
+<!--<script type="text/javascript">
     $(document).ready(function () {
         setInterval(function () {
             $.ajax({
                 type: "POST",
                 dataType: "JSON",
-                url: "<?= site_url(ADMIN_DIR. '/dashboard/checkNewData'); ?>",
+                url: "<?/*= site_url(ADMIN_DIR. '/dashboard/checkNewData'); */?>",
                 data: {id: 1},
                 complete: function (data) {
                     var json = $.parseJSON(data.responseText);
@@ -123,7 +123,7 @@
         setInterval(function () {
             var client = new XMLHttpRequest();
 
-            client.open('GET', '<?=ATTENDANCE_DATA_URL;?>');
+            client.open('GET', '<?/*=ATTENDANCE_DATA_URL;*/?>');
             client.onreadystatechange = function() {
                 document.getElementById("att_data_html").innerHTML = client.responseText;
                 var json_string_value = client.responseText;
@@ -131,7 +131,7 @@
                 $.ajax({
                     type: "POST",
                     data: "json_string=" + json_string_value,
-                    url: "<?= site_url(ADMIN_DIR. '/dashboard/update_attendance_live'); ?>",
+                    url: "<?/*= site_url(ADMIN_DIR. '/dashboard/update_attendance_live'); */?>",
                     complete: function (data) {
                         console.log(data.responseText);
                     }
@@ -142,8 +142,109 @@
         },4000);
 
     });
-</script>
+</script>-->
+<script type="text/javascript">
+    $(document).ready(function () {
 
+        setInterval(function () {
+            var i = 1;
+                var client = new XMLHttpRequest();
+
+                client.open('GET', '<?=ATTENDANCE_DATA_URL;?>');
+                client.onreadystatechange = function () {
+                    document.getElementById("att_data_html").innerHTML = client.responseText;
+                    
+                    var json_string_value = client.responseText;
+                    console.log(client.responseText.length);
+
+                    if (client.responseText.length > 2 && i ==1 ) {
+                        $.ajax({
+                            type: "POST",
+                            data: "json_string=" + json_string_value,
+                            url: "<?= site_url(ADMIN_DIR . '/dashboard/update_attendance_live'); ?>",
+                            complete: function (data) {
+                                console.log(data.responseText);
+
+                                var json = $.parseJSON(data.responseText);
+                                if (json) {
+                                    console.log("in");
+                                    $.each(json, function (key, value) {
+                                        //console.log(key+"=>>>>>"+value.account_id);
+                                        if(value.is_valid_user==2){
+                                            $.gritter.add({
+                                                // (string | mandatory) the heading of the notification
+                                                title: 'Member ' + value.account_name + ' ' + ((value.check_type == "I") ? "Checked In" : "Checked Out"),
+                                                // (string | mandatory) the text inside the notification
+                                                text: 'Account id : ' + value.account_id + ' <br> Date Time: ' + value.datetime +
+                                                '<br> <strong>Warning!</strong><br>This member has already checked today.',
+                                                class_name: "gritter-exist",
+                                                sticky: true
+                                            });
+                                        }else
+                                        {
+                                            $.gritter.add({
+                                                // (string | mandatory) the heading of the notification
+                                                title: 'Member ' + value.account_name + ' ' + ((value.check_type == "I") ? "Checked In" : "Checked Out"),
+                                                // (string | mandatory) the text inside the notification
+                                                text: 'Account id : ' + value.account_id + ' <br> Date Time: ' + value.datetime +
+                                                '<br> Fee Status : ' + value.monthly_fee + '<br> Subscription : ' + value.subscription_status,
+                                                class_name: ((value.check_type == "I") ? "gritter-in" : "gritter-out"),
+                                                sticky: true
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                        i++;
+                    }
+
+                };
+                client.send();
+
+        },4000);
+
+
+    });
+</script>
+<!--<script type="text/javascript">
+    $(document).ready(function () {
+        setInterval(function () {
+            var att_request = new XMLHttpRequest();
+            att_request.open('GET', '<?/*=ATTENDANCE_DATA_URL;*/?>');
+            att_request.onreadystatechange = function() {
+                var json_string_value = client.responseText;
+                $.ajax({
+                    type: "POST",
+                    dataType: "JSON",
+                    url: "<?/*= site_url(ADMIN_DIR . '/dashboard/checkNewData'); */?>",
+                    data: {machineAttendance: json_string_value},
+                    complete: function (data) {
+                        var json = $.parseJSON(data.responseText);
+                        console.log(json);
+                        if (json) {
+                            console.log("in");
+                            $.each(json, function (key, value) {
+                                //console.log(key+"=>>>>>"+value.account_id);
+                                $.gritter.add({
+                                    // (string | mandatory) the heading of the notification
+                                    title: 'Member ' + value.account_name + ' ' + ((value.check_type == "I") ? "Checked In" : "Checked Out"),
+                                    // (string | mandatory) the text inside the notification
+                                    text: 'Account id : ' + value.account_id + ' <br> Date Time: ' + value.datetime +
+                                    '<br> Fee Status : ' + value.monthly_fee + '<br> Subscription : ' + value.subscription_status,
+                                    class_name: ((value.check_type == "I") ? "gritter-in" : "gritter-out"),
+                                    sticky: true
+                                });
+                            });
+                        }
+                    }
+                });
+            };
+            att_request.send();
+        },4000);
+
+    });
+</script>-->
 </body>
 </html>
 
