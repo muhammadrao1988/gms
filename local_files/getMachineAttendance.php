@@ -11,6 +11,7 @@ $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
 //$result = $dbh->query("select CHECKINOUT.* from CHECKINOUT where 1 AND CHECKTIME>#".date('Y-m-d')."# ORDER BY CHECKINOUT.CHECKTIME DESC");
 $data = $dbh->query("SELECT * FROM CHECKINOUT WHERE IsProcess=0")->fetchAll();
+
 foreach ($data as $row) {
     $dbh->query("UPDATE CHECKINOUT SET IsProcess=1 WHERE USERID=".$row['USERID']." ");
 }

@@ -46,9 +46,8 @@ class Attendance extends CI_Controller
         }
         $data['query'] = "SELECT 
                           att.id as id,
-                          ac.acc_id,
-                          ac.acc_id as member_id,
-                          ac.machine_member_id as machine_ID,                          
+                          ac.acc_id,                        
+                          ac.machine_member_id,                 
                           ac.acc_name ,
                           act.`Name` ,                      
                           IF(check_type='I','Checked In','Checked Out') as check_type,
@@ -76,7 +75,7 @@ class Attendance extends CI_Controller
                                 ON (sub.`id` = ac.`subscription_id`)
                                 LEFT JOIN invoices as iv 
                                 ON( iv.`acc_id` = ac.acc_id )
-                              where 1 and att.status = 1 GROUP by att.id".$where;
+                              where 1 and att.status = 1 ".$where." GROUP by att.id";
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }

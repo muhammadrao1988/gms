@@ -13,7 +13,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 <!--breadcrumbs start -->
                 <ul class="breadcrumb">
                     <li><a href="<?php echo site_url(ADMIN_DIR . "invoices"); ?>">Fees Management</a></li>
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "invoices/view/" . $row->id); ?>">Invoice</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "invoices/view/" . $row->id); ?>">View Invoice</a></li>
                     <li class="active">View</li>
                 </ul>
                 <!--breadcrumbs end -->

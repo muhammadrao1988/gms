@@ -144,9 +144,26 @@
     });
 </script>-->
 <script type="text/javascript">
+    function onBlur() {
+        document.body.className = 'blurred';
+    };
+    function onFocus(){
+        document.body.className = 'focused';
+    };
+
+    if (/*@cc_on!@*/false) { // check for Internet Explorer
+        document.onfocusin = onFocus;
+        document.onfocusout = onBlur;
+    } else {
+        window.onfocus = onFocus;
+        window.onblur = onBlur;
+    }
     $(document).ready(function () {
 
         setInterval(function () {
+            if($('body').hasClass('blurred')) {
+                return false;
+            }
             var i = 1;
                 var client = new XMLHttpRequest();
 
@@ -202,8 +219,7 @@
                 };
                 client.send();
 
-        },4000);
-
+        },3000);
 
     });
 </script>

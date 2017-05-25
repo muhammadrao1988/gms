@@ -14,8 +14,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                 <!--breadcrumbs start -->
                 <ul class="breadcrumb">
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "members_types"); ?>">Members</a></li>
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "members_types"); ?>">Members Type</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "invoices"); ?>">Fees Management</a></li>
+                    <li class=""><a href="<?php echo site_url(ADMIN_DIR . "revenue"); ?>">Revenue</a></li>
                     <li class="active"><?php echo(!empty($row->acc_type_ID) ? 'Edit' : 'Add'); ?></li>
                 </ul>
                 <!--breadcrumbs end -->

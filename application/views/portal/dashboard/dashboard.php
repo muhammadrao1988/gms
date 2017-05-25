@@ -30,7 +30,7 @@ $monthly_invoices = $this->db->query("SELECT
                                               AND iv.`status` = 1
                                               AND iv.branch_id = '" . $branch_id . "'
                                               AND FIND_IN_SET('1', iv.`type`) 
-                                              AND (SELECT DATE_ADD(CONCAT(YEAR(ivv.fees_month),'-',MONTH(ivv.fees_month),'-',DAY(ac.`acc_date`)),INTERVAL 30 DAY) AS month_interval FROM invoices AS ivv WHERE ivv.acc_id = ac.`acc_id` AND ivv.`status` = 1) <= CURRENT_DATE()
+                                              AND (SELECT DATE_ADD(CONCAT(YEAR(ivv.fees_month),'-',MONTH(ivv.fees_month),'-',DAY(ac.`acc_date`)),INTERVAL 30 DAY) AS month_interval FROM invoices AS ivv WHERE ivv.acc_id = ac.`acc_id` AND ivv.`status` = 1 ORDER BY ivv.`id` DESC LIMIT 1) <= CURRENT_DATE()
                                             GROUP BY iv.acc_id")->row()->monthly_invoice;
 
 ?>
