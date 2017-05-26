@@ -88,6 +88,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">Invoice Entry Type</label>
                                     <div class="form-inline col-md-9" id="invoice_entries">
                                         <?php
+                                        $hideAddmore = 0 ;
                                         if($row->id==""){ ?>
                                             <div class="default-row">
                                                 <div class="form-group" style="margin: 0;">
@@ -108,21 +109,16 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                 </div>
                                             </div>
                                         <?php }else {
+                                            $type = explode(",",$row->type);
                                             $amount_details = json_decode($row->amount_details);
                                             $j = 0;
-                                            foreach ($amount_details[0] as $key => $val) {
-                                                ?>
-                                                <div class="<?php echo (($j > 0)?'append_row':'default-row'); ?>">
+                                            if(in_array(1,$type)) {
+                                                $hideAddmore = 1;
+                                                foreach ($amount_details[0] as $key => $val) { ?>
                                                     <div class="form-group" style="margin: 0;">
-                                                        <select name="type[]" id="type"
-                                                                class="select validate[required]"
-                                                                tabindex="-1"
-                                                                data-placeholder="Select invoice types">
-                                                            <option value="">- select -</option>
-                                                            <?php
-                                                            echo selectBox("select `id`,`name` from `invoice_types`", $val);
-                                                            ?>
-                                                        </select>
+                                                        <input type="hidden" name="type[]" value="<?php echo $val; ?>">
+                                                        Monthly Fees:
+
                                                     </div>
                                                     <div class="form-group" style="margin: 0;">
                                                         <!--<label for="amount" class="col-lg-3 col-sm-3 control-label">Amount</label>-->
@@ -131,27 +127,62 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                                id="amount" name="amount[]" placeholder="amount e.g 1500"
                                                                value="<?= $amount_details[1][$key]; ?>">
                                                     </div>
-                                                    <?php
-                                                    if($j > 0){
+
+                                                <?php  $j++;
+                                                }
+                                            }else{
+
+
+                                                    foreach ($amount_details[0] as $key => $val) {
                                                         ?>
-                                                        <div class="form-group" style="margin: 0;" >
-                                                            <button type="button" class="btn btn-warning" onclick="$(this).closest('.append_row').remove();">Remove</button>
+                                                        <div class="<?php echo(($j > 0) ? 'append_row' : 'default-row'); ?>">
+                                                            <div class="form-group" style="margin: 0;">
+                                                                <select name="type[]" id="type"
+                                                                        class="select validate[required]"
+                                                                        tabindex="-1"
+                                                                        data-placeholder="Select invoice types">
+                                                                    <option value="">- select -</option>
+                                                                    <?php
+                                                                    echo selectBox("select `id`,`name` from `invoice_types` WHERE id!=1", $val);
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group" style="margin: 0;">
+                                                                <!--<label for="amount" class="col-lg-3 col-sm-3 control-label">Amount</label>-->
+                                                                <input type="text"
+                                                                       class="form-control validate[required,custom[integer]] col-md-12"
+                                                                       id="amount" name="amount[]"
+                                                                       placeholder="amount e.g 1500"
+                                                                       value="<?= $amount_details[1][$key]; ?>">
+                                                            </div>
+                                                            <?php
+                                                            if ($j > 0) {
+                                                                ?>
+                                                                <div class="form-group" style="margin: 0;">
+                                                                    <button type="button" class="btn btn-warning"
+                                                                            onclick="$(this).closest('.append_row').remove();">
+                                                                        Remove
+                                                                    </button>
+                                                                </div>
+                                                            <?php }
+                                                            ?>
                                                         </div>
-                                                    <?php }
-                                                    ?>
-                                                </div>
-                                                <?php
-                                                $j++ ; }
+                                                        <?php
+                                                        $j++;
+                                                    }
+                                                }
                                         }
                                         ?>
                                     </div>
                                 </div>
+                                <?php if($hideAddmore==0){?>
                                 <div class="form-group">
                                     <label for="addmorebtn" class="col-lg-3 col-sm-3 control-label">&nbsp;</label>
                                     <div class="col-lg-6">
                                         <button class="btn btn-green" type="button" id="add-more-btn">Add More Invoice Entry</button>
                                     </div>
                                 </div>
+                                <?php }?>
                                 <div class="form-group">
                                     <label for="description" class="col-lg-3 col-sm-3 control-label">Description</label>
                                     <div class="col-lg-6">
@@ -160,7 +191,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Fees Month</label>
+                                    <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Fees Period</label>
                                     <div class="col-lg-6">
                                         <input type="text" id="fees_month" placeholder="DD/MM/YYYY"
                                                style="padding: 0 10px;"
@@ -212,7 +243,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                     data-placeholder="Select invoice types">
                 <option value="">- select -</option>
                 <?php
-                echo selectBox("select `id`,`name` from `invoice_types`");
+                if($row->id!="" ) {
+                    echo selectBox("select `id`,`name` from `invoice_types` WHERE id!='1'");
+                }else{
+                    echo selectBox("select `id`,`name` from `invoice_types` ");
+                }
                 ?>
             </select>
         </div>

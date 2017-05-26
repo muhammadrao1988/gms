@@ -118,9 +118,14 @@ class Members extends CI_Controller
                                     LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )
                                    WHERE acc.`status` = 1 GROUP BY acc.acc_id ".$branch_id." ".$where;*/
             /*22-05-2017 Expire according to last attendance date.*/
+//echo "<a href=\"\""
+//<a href=""
         $data['query'] = "SELECT 
                               acc.acc_id,
-                              acc.machine_member_id ,
+                              IF(acc.machine_member_id > 0 , acc.machine_member_id ,
+                           
+                              CONCAT('<a  style=\"font-weight:bold;color:red\" href=\"".site_url(ADMIN_DIR.'members/form/\',acc.acc_id,\'')."\">Create Machine Id</a>')
+                              ) AS machine_member_id,
                               acc.acc_name,
                               acc.acc_tel,                          
                               br.`branch_name`,  
@@ -296,6 +301,12 @@ class Members extends CI_Controller
     }
     public function insertuserid(){
         save('accounts',array('machine_user_id'=>getVar('userID')),' machine_member_id="'.getVar('member_id').'"');
+    }
+
+    public function invoice(){
+
+
+        $this->load->view(ADMIN_DIR . $this->module_name . '/aa', $data);
     }
 }
 
