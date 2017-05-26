@@ -68,11 +68,17 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 <div class="form-group">
                                     <label for="Name" class="col-lg-3 col-sm-3 control-label">Member Name</label>
                                     <div class="col-lg-6">
+                                        <?php
+                                        if(getVar('tempID')!=""){
+                                            $row->acc_id = getVar('tempID');
+                                        }
+                                        ?>
+
 
                                         <select name="acc_id" id="acc_id" class="select validate[required]">
                                             <option value="">-Select-</option>
                                             <?php
-                                            echo selectBox("select acc_id,acc_name from accounts where status = 1 order by acc_id desc", $row->acc_id);
+                                            echo selectBox("select acc_id,CONCAT(machine_member_id,') ',acc_name) AS acc_name from accounts where status = 1 AND machine_member_id!='' order by acc_id desc", $row->acc_id);
                                             ?>
                                         </select>
 

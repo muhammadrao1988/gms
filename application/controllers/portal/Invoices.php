@@ -37,18 +37,37 @@ class Invoices extends CI_Controller
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
         //$data['query'] = "Select * from ".$this->table." where 1".$where;
+        $search = getVar('search');
+        if($search['ic:type']!=""){
+            $where = str_replace("AND ic.type = '".$search['ic:type']."'"," AND FIND_IN_SET('".$search['ic:type']."', ic.`type`)",$where);
+        }
+        if($search['ic:fees_month']!=""){
+
+             $fees_month = date('Ym',strtotime($search['ic:fees_month']));
+
+
+            $where = str_replace(
+                "AND ic.fees_month LIKE '%".$search['ic:fees_month']."%'",
+                " AND EXTRACT( YEAR_MONTH FROM `fees_month` ) = '".$fees_month."'",
+                $where);
+
+        }
+
+        //AND FIND_IN_SET('1', iv.`type`)
+
         $data['query'] = "SELECT 
                               ic.`id`,
+                               ic.machine_member_id,
+                               ac.acc_name ,
                               ic.amount,
                               ic.acc_id,
-                              ac.acc_name as member_name,
-                              date(ic.fees_datetime) as paid_date,
-                              CONCAT(MONTHNAME(ic.fees_month),' ',YEAR (ic.fees_month)) as last_paid_month,
-                              ic.`type` as invoice_for                              
+                              date(ic.fees_datetime) as fees_datetime,
+                              CONCAT(MONTHNAME(ic.fees_month),' ',YEAR (ic.fees_month)) as fees_month,
+                              ic.`type`                            
                             FROM
                               invoices AS ic 
                                INNER JOIN accounts AS ac 
-                                ON (ac.acc_id = ic.acc_id) WHERE 1 AND ic.branch_id = '".$this->branch_id."'
+                                ON (ac.acc_id = ic.acc_id) WHERE 1 AND ic.branch_id = '".$this->branch_id."' AND ac.machine_member_id !=''
                            ".$where;
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
@@ -104,11 +123,12 @@ class Invoices extends CI_Controller
                             WHERE 1 
                               AND ac.`status` = 1 and ic.type = 1 
                             GROUP BY ic.acc_id ".$where;*/
-        $data['query'] = "SELECT 
+         $data['query'] = "SELECT 
                               MAX(iv.`id`) AS id,
                               iv.`acc_id`,
+                              iv.`machine_member_id`,
                               ac.`acc_name` as member_name,
-                              ac.`acc_date` as registration_date,
+                              ac.`acc_date`,
                               iv.`amount` AS amount,
                               iv.`fees_month`,
                               DATE_FORMAT((select ivv.fees_month from invoices as ivv where ivv.id= MAX(iv.`id`)),'%M %Y') AS last_paid_month,
@@ -122,6 +142,7 @@ class Invoices extends CI_Controller
                             WHERE 1 AND iv.branch_id = '".$this->branch_id."' 
                             AND ac.`status` = 1 
                             AND FIND_IN_SET('1', iv.`type`)
+                            AND ac.machine_member_id !=''
                             AND iv.branch_id = '".$this->branch_id."'
                             AND (SELECT DATE_ADD(CONCAT(YEAR(ivvv.fees_month),'-',MONTH(ivvv.fees_month),'-',DAY(ac.`acc_date`)),INTERVAL 30 DAY) AS month_interval FROM invoices AS ivvv WHERE ivvv.acc_id = ac.`acc_id` AND ivvv.`status` = 1 ORDER BY ivvv.`id` DESC LIMIT 1) <= CURRENT_DATE() 
                             group by iv.acc_id " .$where;
@@ -179,6 +200,7 @@ class Invoices extends CI_Controller
             $amount_details[] =   array_filter(getVar('type'));
             $amount_details[] =   array_filter(getVar('amount'));
             $DBdata['amount_details'] = json_encode($amount_details);
+            $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
 
             $id = save($this->table, $DBdata);
             /*------------------------------------------------------------------------------------------*/
@@ -203,6 +225,7 @@ class Invoices extends CI_Controller
             $amount_details[] =   array_filter(getVar('type'));
             $amount_details[] =   array_filter(getVar('amount'));
             $DBdata['amount_details'] = json_encode($amount_details);
+            $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
@@ -267,6 +290,7 @@ class Invoices extends CI_Controller
             $amount_details[] = array((string)$DBdata['type']);
             $amount_details[] = array($DBdata['amount']);
             $DBdata['amount_details'] = json_encode($amount_details);
+            $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
             $id = save($this->table, $DBdata);
             $id = save($this->table, array('status'=>2),' id = "'.getVar('invoice_id').'"');
 

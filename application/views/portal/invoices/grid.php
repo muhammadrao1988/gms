@@ -29,17 +29,25 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             <?php
 
             $search_ar = getVar('search');
-
+            $machine_member = '<input class="form-control" type="text" name="search[ic:machine_member_id]" id="search_machine_member_ids" value="'.$search_ar['ic:machine_member_id'].'">';
+            $fees_datetime = '<input type="text" class="form-control datepicker-sql" name="search[ic:fees_datetime]" value="'.$search_ar['ic:fees_datetime'].'"/>';
+            $last_paid = '<input type="text" class="form-control date-picker" name="search[ic:fees_month]" value="'.$search_ar['ic:fees_month'].'"/>';
+            $invoice_type = '<select class="select" name="search[ic:type]" id="ic:type" style="width: 100%">
+                        <option value=""> - Select Invoice Type - </option>
+                        ' . selectBox("SELECT id, name FROM invoice_types", $search_ar['ic:type']) . '
+                      </select>';
             $grid = new grid();
             $grid->query = $query;
             //$grid->title = $this->module_title .' - List';
             $grid->limit = 25;
-            $grid->search_box = false;
+            $grid->search_box = true;
             $grid->selectAllCheckbox = false;
-            $grid->hide_fields = array('acc_id','fees_month','id');
+            $grid->hide_fields = array('acc_id','id');
             $grid->order_column = 'id';
+            $grid->custom_col_name_fields = array('acc_name'=>'Member Name','fees_datetime'=>'Paid Date','type'=>'Invoice For','fees_month'=>'last_paid_month');
+            $grid->search_fields_html = array('machine_member_id'=>$machine_member,'fees_datetime'=>$fees_datetime,'type'=>$invoice_type,'fees_month'=>$last_paid);
             //$grid->custom_func = array('amount'=>'getTotalfeesAmount');
-            $grid->custom_func = array('invoice_for'=>'invoice_for');
+            $grid->custom_func = array('type'=>'invoice_for');
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new');
@@ -61,5 +69,18 @@ include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
 ?>
+<script>
+    $(function() {
+        $('.date-picker').datepicker( {
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            dateFormat: 'MM yy',
+            onClose: function(dateText, inst) {
+                $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+            }
+        });
+    });
+</script>
 <!-- Content -->
   
