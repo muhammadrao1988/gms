@@ -74,36 +74,55 @@ class Members extends CI_Controller
         if($this->session->userdata('user_info')->u_type != '1'){
             $branch_id = ' AND acc.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
         }
-        /*22-05-2017 According to subscription period*/
-        /*$data['query'] = "SELECT
-                              acc.acc_id,
-                              acc.machine_member_id as machine_id,
-                              acc.acc_name,
-                              acc.acc_tel,
-                              acc.email,
-                              br.`branch_name`,  
-                              acc.acc_date,
-                              acc.serial_number as machine_serial,
-                              sub.`name`,
-                              IF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>',CONCAT('<span class=\"green\">',
-                                DATEDIFF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY)),CURRENT_DATE())-1,' Days left </span>')) AS subscription_status,
-                               iv.`fees_month` as monthly_status,
-                              iv.status                             
-                            FROM
-                              accounts AS acc 
-                              INNER JOIN branches AS br 
-                                ON (br.`id` = acc.`branch_id`)
-                                INNER JOIN subscriptions AS sub 
-                                ON (sub.`id` = acc.`subscription_id`)
-                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )                                
-                               WHERE acc.`status` = 1 GROUP BY acc.acc_id ".$branch_id." ".$where;*/
-        /*22-05-2017 Expire according to last attendance date.*/
+        $search = getVar('search');
+        if($search['subscription_status']!=''){
+            $where = str_replace("AND subscription_status LIKE '%continue%'","",$where);
+            $where = str_replace("AND subscription_status LIKE '%expired%'","",$where);
+            $where .=' AND
+                                  DATE(
+                                      DATE_ADD(
+                                        (SELECT 
+                                          att.datetime 
+                                        FROM
+                                          attendance AS att 
+                                        WHERE att.account_id = acc.`machine_user_id` 
+                                          AND att.machine_serial = acc.`serial_number` 
+                                        ORDER BY att.id DESC 
+                                        LIMIT 1),
+                                        INTERVAL sub.`period` DAY
+                                      )
+                                    ) '.((strtolower($search['subscription_status'])=="continue")?">":"<=").' CURRENT_DATE()' ;
+
+        }
+            /*22-05-2017 According to subscription period*/
+            /*$data['query'] = "SELECT
+                                  acc.acc_id,
+                                  acc.machine_member_id as machine_id,
+                                  acc.acc_name,
+                                  acc.acc_tel,
+                                  acc.email,
+                                  br.`branch_name`,
+                                  acc.acc_date,
+                                  acc.serial_number as machine_serial,
+                                  sub.`name`,
+                                  IF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>',CONCAT('<span class=\"green\">',
+                                    DATEDIFF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY)),CURRENT_DATE())-1,' Days left </span>')) AS subscription_status,
+                                   iv.`fees_month` as monthly_status,
+                                  iv.status
+                                FROM
+                                  accounts AS acc
+                                  INNER JOIN branches AS br
+                                    ON (br.`id` = acc.`branch_id`)
+                                    INNER JOIN subscriptions AS sub
+                                    ON (sub.`id` = acc.`subscription_id`)
+                                    LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )
+                                   WHERE acc.`status` = 1 GROUP BY acc.acc_id ".$branch_id." ".$where;*/
+            /*22-05-2017 Expire according to last attendance date.*/
         $data['query'] = "SELECT 
                               acc.acc_id,
-                              acc.machine_member_id as machine_id,
+                              acc.machine_member_id ,
                               acc.acc_name,
-                              acc.acc_tel,
-                              acc.email,
+                              acc.acc_tel,                          
                               br.`branch_name`,  
                               acc.acc_date,
                               acc.serial_number as machine_serial,
@@ -118,9 +137,8 @@ class Members extends CI_Controller
                                 INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = acc.`subscription_id`)
                                 LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )                                
-                               WHERE acc.`status` = 1 group by acc.acc_id".$branch_id." ".$where;
-        /*echo $data['query'];
-        die('Call');*/
+                               WHERE acc.`status` = 1 ".$where." ".$branch_id." group by acc.acc_id" ;
+
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -181,6 +199,7 @@ class Members extends CI_Controller
 
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
+            $DBdata['acc_date']    = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
             $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
 
             //$DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));

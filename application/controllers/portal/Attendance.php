@@ -44,6 +44,23 @@ class Attendance extends CI_Controller
         if($this->session->userdata('user_info')->u_type != '1'){
             $where .= ' AND ac.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
         }
+        $search = getVar('search');
+        if($search['Name']!=''){
+            $where = str_replace('Name','act.`Name`',$where);
+        }
+        if($search['subscription_status']!=''){
+            $where = str_replace("AND subscription_status LIKE '%continue%'","",$where);
+            $where = str_replace("AND subscription_status LIKE '%expired%'","",$where);
+            $where .=' AND DATE(DATE_ADD((SELECT 
+                                  attd.datetime 
+                                FROM
+                                  attendance AS attd 
+                                WHERE attd.account_id = ac.`machine_user_id` 
+                                  AND attd.machine_serial = ac.`serial_number` 
+                                ORDER BY attd.id DESC 
+                                LIMIT 1), INTERVAL sub.`period` DAY)) '.((strtolower($search['subscription_status'])=="continue")?">":"<=").' CURRENT_DATE()' ;
+
+        }
         $data['query'] = "SELECT 
                           att.id as id,
                           ac.acc_id,                        
@@ -76,6 +93,7 @@ class Attendance extends CI_Controller
                                 LEFT JOIN invoices as iv 
                                 ON( iv.`acc_id` = ac.acc_id )
                               where 1 and att.status = 1 ".$where." GROUP by att.id";
+
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
