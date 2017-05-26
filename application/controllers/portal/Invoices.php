@@ -204,7 +204,7 @@ class Invoices extends CI_Controller
 
             $id = save($this->table, $DBdata);
             /*------------------------------------------------------------------------------------------*/
-            redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been inserted..');
+            redirect(ADMIN_DIR . $this->module_name . '/view/'.$id);
         }
     }
 
@@ -228,7 +228,8 @@ class Invoices extends CI_Controller
             $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
-            redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
+            redirect(ADMIN_DIR . $this->module_name . '/view/'.gerVar('id'));
+            //redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
         }
     }
 
