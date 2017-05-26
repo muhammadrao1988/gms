@@ -1,7 +1,31 @@
+@media print {
+    body {
+        visibility: hidden;
 
-body {
-    padding: 15px;
-    margin: 15px;
+    }
 
+    body * {
+        visibility: hidden;
+
+    }
+
+    #print_page {
+        visibility: visible;
+        background-color: red;
+    }
+
+    #print_page * {
+        visibility: visible;
+        background-color: red;
+    }
+
+    table {
+        width: 250px;
+    }
+
+    /*table tbody tr td{
+        border: 1px solid #000000;
+    }*/
 }
+
 

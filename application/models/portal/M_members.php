@@ -53,34 +53,37 @@ class M_members extends CI_Model
         <script type="text/javascript">
             document.write('Please wait user synchronizing with machine......');
             setTimeout(function () {
+                var j = 1;
                 var client = new XMLHttpRequest();
                 client.open('GET', '<?=USERID_DATA_URL;?>?member_id=<?php echo $id; ?>');
                 client.onreadystatechange = function () {
-                    /*console.log(client);
-                    return false;*/
-                    if (client.status == 200) {
-                        //document.getElementById("att_data_html").innerHTML = client.responseText;
-                        var json_string_value = client.responseText;
-                        console.log(json_string_value);
-                        if (json_string_value != '') {
-                            var ajax = new XMLHttpRequest();
-                            ajax.open('GET', '<?=base_url(ADMIN_DIR . '/members/insertuserid');?>?member_id=<?php echo $id; ?>&userID=' + json_string_value);
-                            ajax.onreadystatechange = function () {
-                                if (ajax.status == 200) {
-                                    var json_string_valuedd = client.responseText;
-                                    console.log(json_string_valuedd);
-                                    window.location.href = "<?php echo $redirect_url;?>";
-                                }else{
-                                    window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=iiiError in synchronizing please edit member and try again.');?>";
-                                }
-                            };
-                            ajax.send();
-                        }else{
-                            window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=tttError in synchronizing please edit member and try again.');?>";
+                    if(j == 1) {
+                        if (client.status == "200") {
+                            console.log('<?=USERID_DATA_URL;?>?member_id=<?php echo $id; ?>');
+                            //document.getElementById("att_data_html").innerHTML = client.responseText;
+                            var json_string_value = client.responseText;
+                            if (parseInt(json_string_value)>0) {
+                                var ajax = new XMLHttpRequest();
+                                ajax.open('GET', '<?=base_url(ADMIN_DIR . '/members/insertuserid');?>?member_id=<?php echo $id; ?>&userID=' + json_string_value);
+                                ajax.onreadystatechange = function () {
+                                    if (ajax.status == "200") {
+                                        var json_string_valuedd = client.responseText;
+                                        window.location.href = "<?php echo $redirect_url;?>";
+                                    } else {
+                                        window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=iiiError in synchronizing please edit member and try again.');?>";
+                                    }
+                                };
+                                ajax.send();
+                            } else {
+                                console.log('user id not found');
+                                window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=tttError in synchronizing please edit member and try again.');?>";
+                            }
+                        } else {
+                            console.log('script has error');
+                            window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=kkkError in synchronizing please edit member and try again.');?>";
                         }
-                    }else{
-                        window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=kkkError in synchronizing please edit member and try again.');?>";
                     }
+                    j++;
                 };
                 client.send();
             },1000);

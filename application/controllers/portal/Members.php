@@ -124,7 +124,7 @@ class Members extends CI_Controller
                               acc.acc_name,
                               acc.acc_tel,                          
                               br.`branch_name`,  
-                              acc.acc_date,
+                              DATE(acc.acc_date) as acc_date,
                               acc.serial_number as machine_serial,
                               sub.`name`,
                               IF(DATE(DATE_ADD((SELECT att.datetime FROM attendance AS att WHERE att.account_id = acc.`machine_user_id` AND att.machine_serial = acc.`serial_number` ORDER BY att.id DESC LIMIT 1), INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>','<span class=\"green\">Continue</span>') AS subscription_status,
@@ -200,7 +200,7 @@ class Members extends CI_Controller
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
             $DBdata['acc_date']    = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
-            $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
+            $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
 
             //$DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));
             /*$DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
@@ -210,7 +210,7 @@ class Members extends CI_Controller
             $DBdata['acc_manager']      = $user_info->user_id;
 
             $id = save($this->table, $DBdata);
-            $this->module->getMachineUserId(getVar('machine_member_id'),base_url(ADMIN_DIR . 'invoices/form/?msg=Member has been created. Please generate first inovice.'));
+            $this->module->getMachineUserId(getVar('machine_member_id'),base_url(ADMIN_DIR . 'invoices/form/?tempID='.$id.'&msg=Member has been created. Please generate first inovice.'));
             /*------------------------------------------------------------------------------------------*/
             redirect(ADMIN_DIR . 'invoices/form/?msg=Member has been created. Please generate first inovice.');
         }
@@ -227,7 +227,8 @@ class Members extends CI_Controller
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
-            $DBdata['acc_manager']      = $this->session->userdata('user_info')->acc_id;
+            $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
+            $DBdata['acc_date']    = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
             //$DBdata['machine_user_id']  = $this->module->getMachineUserId($_REQUEST['machine_member_id']);;
             $DBdata['branch_id']        = getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
             $DBdata['serial_number']    = getVal('users','machine_serial',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');

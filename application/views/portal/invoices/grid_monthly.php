@@ -43,17 +43,20 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             <?php
 
             $search_ar = getVar('search');
+            $machine_member = '<input class="form-control" type="text" name="search[iv:machine_member_id]" id="search_machine_member_ids" value="'.$search_ar['iv:machine_member_id'].'">';
 
             $grid = new grid();
             $grid->query = $query;
             //$grid->title = $this->module_title .' - List';
             $grid->limit = 25;
-            $grid->search_box = false;
+            $grid->search_box = true;
             $grid->selectAllCheckbox = false;
             $grid->hide_fields = array('acc_id','fees_month','id','status','invoices_id');
             $grid->order_column = 'id';
             $grid->record_not_found = 'No monthly invoice';
             $grid->custom_func = array('payment_status'=>'getPaymemntStatus','amount'=>'getTotalfeesAmount');
+            $grid->custom_col_name_fields = array('acc_date'=>'Registration Date');
+            $grid->search_fields_html = array('machine_member_id'=>$machine_member,'acc_date'=>'','amount'=>'','last_paid_month'=>'','paid_date'=>'','payment_status'=>'');
             //$grid->form_buttons = array('new');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
             //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');

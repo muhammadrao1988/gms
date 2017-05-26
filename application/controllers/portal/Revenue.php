@@ -58,7 +58,6 @@ class Revenue extends CI_Controller
                               SUM(amount) as total_amount_summary,
                                `type` as invoice_for from invoices where 1 AND branch_id = '".$this->branch_id."' ".$filter.$where." GROUP BY id " ;
 
-
         $chart = str_replace("GROUP BY id","",$data['query']);
         $chart = $chart." GROUP BY DATE(`fees_datetime`)";
         $data['chart_total'] = $this->db->query($chart)->result();
