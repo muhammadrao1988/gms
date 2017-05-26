@@ -164,12 +164,19 @@ class Invoices extends CI_Controller
 
     public function view()
     {
-        $id = intval(getUri(4));
+        if(getUri(4)!=''){
+            $id = intval(getUri(4));
+        }elseif(getVar('id') !=''){
+            $id = getVar('id');
+        }else{
+            $this->load->view(ADMIN_DIR . $this->module_name . '?error=Invoice id not found.');
+        }
 
         if ($id > 0) {
-            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "'";
-            $data['row'] = $this->db->query($SQL)->row();
-            $SQL2 = "SELECT * FROM accounts WHERE acc_id='" . $data['row']->acc_id . "'";
+            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . " IN (" . $id . ")";
+            $data['rows'] = $this->db->query($SQL)->result();
+
+            $SQL2 = "SELECT * FROM accounts WHERE acc_id='" . $data['rows'][0]->acc_id . "'";
             $data['row2'] = $this->db->query($SQL2)->row();
         }
         $data['buttons'] = array();
@@ -184,27 +191,73 @@ class Invoices extends CI_Controller
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {
+            $redirect_id = "";
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
             $DBdata['fees_month'] = date('Y-m-d',strtotime(getVar('fees_month')));
             $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
-            $DBdata['amount'] = array_sum(getVar('amount'));
-            if(in_array('1',getVar('type'))){
-                $DBdata['status'] = 1;
+            $amount = getVar('amount');
+            $type = getVar('type');
+            $i = 0 ;
+            $fee_amount = array();//invoice type fees
+            $fee_type = array();//invoice type fees
+            //separating fees invoice type
+            foreach ($type as $t){
+
+                if($t==1){
+                    $fee_type[] = $type[$i];
+                    $fee_amount[] = $amount[$i];
+                    unset($amount[$i]);
+                    unset($type[$i]);
+                }
+                $i++;
             }
-            $DBdata['type'] = implode(',',getVar('type'));
-            if(in_array('1',getVar('type'))){
-                $DBdata['status'] = 1;
-            }
+
+
+
+            $DBdata['amount'] = array_sum($amount);
+            $DBdata['type'] = implode(',',$type);
+
             $DBdata['branch_id'] = $this->branch_id;
-            $amount_details[] =   array_filter(getVar('type'));
-            $amount_details[] =   array_filter(getVar('amount'));
+            $type = array_values($type);
+            $amount = array_values($amount);
+
+            $amount_details[] =   array_filter($type);
+            $amount_details[] =   array_filter($amount);
             $DBdata['amount_details'] = json_encode($amount_details);
             $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
+          
+            if(count($type) > 0) {
+                $id = save($this->table, $DBdata);
+                $redirect_id = $id;
+            }
 
-            $id = save($this->table, $DBdata);
+
+            if(count($fee_type) > 0)
+            {
+
+                $DBdata['type'] = implode(',',$fee_type);
+                $DBdata['amount'] = array_sum($fee_amount);
+                $amount_details_fee[] =   array_filter($fee_type);
+                $amount_details_fee[] =   array_filter($fee_amount);
+                $DBdata['amount_details'] = json_encode($amount_details_fee);
+                $DBdata['status'] = 1;
+                $id_fees = save($this->table, $DBdata);
+
+                if($id_fees > 0){
+
+                        $where =  "id ='" . $id_fees . "'";
+                        save($this->table, array('parent_id' => $id), $where);
+
+                    $where =  "acc_id ='" . $DBdata['acc_id'] . "' AND machine_member_id = '".$DBdata['machine_member_id']."' AND `status`=1 AND id!='".$id_fees."'";
+                    save($this->table, array('status' => 2), $where);
+                    $redirect_id = ($redirect_id=="" ? $id_fees : $id.",".$id_fees );
+                }
+
+
+            }
             /*------------------------------------------------------------------------------------------*/
-            redirect(ADMIN_DIR . $this->module_name . '/view/'.$id);
+            redirect(ADMIN_DIR . $this->module_name . '/view?id='.$redirect_id);
         }
     }
 
@@ -228,6 +281,7 @@ class Invoices extends CI_Controller
             $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
+
             redirect(ADMIN_DIR . $this->module_name . '/view/'.gerVar('id'));
             //redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
         }
