@@ -106,7 +106,7 @@ class Attendance extends CI_Controller
             redirect(ADMIN_DIR . $this->module_name . '/');
         }else{
             $DbArray = getDbArray($this->table);
-
+            $user_info  = $this->session->userdata('user_info');
             $DBdata = $DbArray['dbdata'];
             if(getVar('datetime')==''){
                 $DBdata['datetime'] = $this->pk_date_time;
@@ -114,7 +114,8 @@ class Attendance extends CI_Controller
             $DBdata['datetime'] = date('Y-m-d H:i:s',strtotime($DBdata['datetime']));
             $DBdata['datetime'] = date('Y-m-d H:i:s',strtotime($DBdata['datetime']));
 
-            $DBdata['account_id'] = getVal('accounts','machine_user_id',' where acc_id = "'.getVar('account_id').'"');
+            $DBdata['account_id'] = getVal('accounts','machine_user_id',' where machine_member_id = "'.getVar('account_id').'"');
+            $DBdata['machine_serial'] = $user_info->machine_serial;
             $DBdata['sensored_id'] = 1;
             $DBdata['status'] = 1;
             $id = save($this->table, $DBdata);
@@ -127,8 +128,10 @@ class Attendance extends CI_Controller
     function account_exist($str){
         if ($str > 0)
         {
-            if(getVal('accounts','acc_id',' where acc_id = "'.$str.'"') > 0) {
-                if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
+            //check machine member id
+            if(getVal('accounts','acc_id',' where machine_member_id = "'.$str.'"') > 0) {
+                //check attendance
+                if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where machine_member_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
                     $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
                     return FALSE;
                 }

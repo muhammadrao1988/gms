@@ -192,7 +192,7 @@
                                                 // (string | mandatory) the heading of the notification
                                                 title: 'Member ' + value.account_name + ' ' + ((value.check_type == "I") ? "Checked In" : "Checked Out"),
                                                 // (string | mandatory) the text inside the notification
-                                                text: 'Account id : ' + value.account_id + ' <br> Date Time: ' + value.datetime +
+                                                text: 'Member id : ' + value.account_id + ' <br> Date Time: ' + value.datetime +
                                                 '<br> <strong>Warning!</strong><br>This member has already checked today.',
                                                 class_name: "gritter-exist",
                                                 sticky: true
@@ -203,7 +203,7 @@
                                                 // (string | mandatory) the heading of the notification
                                                 title: 'Member ' + value.account_name + ' ' + ((value.check_type == "I") ? "Checked In" : "Checked Out"),
                                                 // (string | mandatory) the text inside the notification
-                                                text: 'Account id : ' + value.account_id + ' <br> Date Time: ' + value.datetime +
+                                                text: 'Member id : ' + value.account_id + ' <br> Date Time: ' + value.datetime +
                                                 '<br> Fee Status : ' + value.monthly_fee + '<br> Subscription : ' + value.subscription_status,
                                                 class_name: ((value.check_type == "I") ? "gritter-in" : "gritter-out"),
                                                 sticky: true
