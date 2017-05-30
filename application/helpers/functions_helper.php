@@ -875,13 +875,14 @@ function  getPaymemntStatus($val){
         $paybutton = '<a href="'.base_url(ADMIN_DIR.'invoices/form?tempID='.$val[1]['acc_id']).'"><span class="red"><b>Generate First Invoice</b></span></a>';
         return $paybutton;
     }
-    $your_date = strtotime(date('Y-m',strtotime($fees_date)).'-'.date('d',strtotime($val[1]['acc_date'])));
+    $acc_date_day = date('d',strtotime($val[1]['acc_date']));
+    $your_date = strtotime(date('Y-m',strtotime($fees_date)).'-'.$acc_date_day);
     $datediff = $now - $your_date;
     $status = getVal('invoices','status',' where acc_id = "'.$val[1]['acc_id'].'" and status = 1');
     $month = floor($datediff / (60 * 60 * 24 * 30));
     if($month !='0' and $status == '1'){
         $val[1]['invoices_id'] = getVal('invoices','id',' where acc_id = "'.$val[1]['acc_id'].'" and status = 1');
-        $paybutton = '<span class="red"><b>'.$month.' Month Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['invoices_id'].'"><i class="fa fa-money"></i> Pay</button>';
+        $paybutton = '<span class="red"><b>'.$month.' Month Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['invoices_id'].'" data-id="'.$val[1]['acc_id'].'" data-month="'.$month.'" data-acc-date="'.$acc_date_day.'"><i class="fa fa-money"></i> Pay</button>';
         return $paybutton;
     }else{
         return '<span class="green"><b>PAID</b></span>';
