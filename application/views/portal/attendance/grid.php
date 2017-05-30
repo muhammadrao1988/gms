@@ -74,7 +74,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->actionColumn = array('view');
             $grid->search_fields_html = array('monthly_status'=>$monthly_sttaus,'check_type'=>$check_type,'datetime'=>$datetime,'subscription_status'=>$subsction_status);
             $grid->custom_func = array('monthly_status'=>'getPaymemntStatus');
-            $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'member_type');
+            $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'member_type','machine_member_id'=>'member ID');
             $grid->hide_fields = array('id','status','invoices_id','acc_id');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
             $grid->grid_buttons = array();
