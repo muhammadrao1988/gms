@@ -5,6 +5,33 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
 ?>
 <link rel="stylesheet" href="<?php echo base_url('assets/css/print_invoice.css') ; ?>">
+<style>
+    @media print {
+        body {
+            visibility: hidden;
+
+        }
+
+        body * {
+            visibility: hidden;
+
+        }
+
+        #print_page {
+            visibility: visible;
+            background-color: red;
+        }
+
+        #print_page * {
+            visibility: visible;
+            background-color: red;
+        }
+
+        /*table tbody tr td{
+            border: 1px solid #000000;
+        }*/
+    }
+</style>
 <section id="main-content" class="inner-main-pages">
     <section class="wrapper">
         <!--mini statistics start-->

@@ -51,7 +51,8 @@ class Revenue extends CI_Controller
         $filter = " AND fees_datetime BETWEEN '".$from."' AND '".$to."' ";
         $data['query'] = "Select id,
                               acc_id as account_id,
-                              amount,
+                              machine_member_id,
+                              amount,                              
                               description,
                               fees_datetime,
                               fees_month,

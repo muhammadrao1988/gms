@@ -114,8 +114,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->search_box = false;
             $grid->selectAllCheckbox = false;
             $grid->order_column = 'id';
-            $grid->hide_fields = array('id', 'status');
+            $grid->hide_fields = array( 'status','account_id','amount');
             $grid->custom_func = array('invoice_for' => 'invoice_for');
+            $grid->custom_col_name_fields = array('machine_member_id'=>'member_id','id'=>'invoice No.');
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new', 'delete');
