@@ -73,15 +73,43 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 </section>
 
 <?php
+echo "<div id='payment_pop_modal2'></div>";
 include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
-include dirname(__FILE__) . "/../includes/fees_pay_pop.php";
+//include dirname(__FILE__) . "/../includes/fees_pay_pop.php";
+
 ?>
 <script type="text/javascript">
     $(document).ready(function () {
         $('.sub li.active a:contains("Invoices")').parent('li').removeClass('active');
         $('.sub li a:contains("Monthly Invoice")').parent('li').addClass('active');
+    });
+    $('body').on('click', '.payment_pop', function () {
+
+        var last_invoice = $(this).attr('data-invoice');
+        var acc_id = $(this).attr('data-id');
+        var month_due = $(this).attr('data-month');
+        var register_day = $(this).attr('data-acc-date');
+        $("#payment_pop_modal2").modal('show');
+        //
+        $.ajax({
+            type: "POST",
+            url: "<?= site_url(ADMIN_DIR . "invoices/payNew"); ?>",
+            data: "last_invoice=" + last_invoice +"&acc_id="+acc_id+"&month_due="+month_due+"&register_day="+register_day,
+            complete: function (data) {
+                console.log(data.responseText);
+
+
+                    $('#payment_pop_modal2').html(data.responseText);
+                   // $('.ajax_form').AJAX_Form();
+
+                   // $("#payment_pop_modal2 .validation_html").validationEngine();
+
+
+            }
+        });
+
     });
 </script>
 <!-- Content -->

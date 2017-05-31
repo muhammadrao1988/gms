@@ -358,6 +358,15 @@ class Invoices extends CI_Controller
         }
 
     }
+    function payNew(){
+        $data['last_invoice'] = getVar('last_invoice');
+        $data['acc_id'] = getVar('acc_id');
+        $data['month_due'] = getVar('month_due');
+        $data['register_day'] = getVar('register_day');
+        $acc_types = getVal("accounts","acc_types"," WHERE acc_id='".$data['acc_id']."'");
+        $data['one_month_fee'] = getVal("acc_types","service_charges"," WHERE acc_type_ID='".$acc_types."'");
+        echo $this->load->view(ADMIN_DIR . $this->module_name . '/fees_pay_pop', $data, true);
+    }
 }
 
 /* End of file pages.php */
