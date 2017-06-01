@@ -15,7 +15,7 @@ class M_attendance extends CI_Model
     function validate_id_validate()
     {
 
-        $this->form_validation->set_rules('account_id', 'Member ID', 'callback_account_exist');
+        $this->form_validation->set_rules('acc_id', 'Member ID', 'callback_account_exist');
         if ($this->form_validation->run() == FALSE) {
             return false;
         } else {

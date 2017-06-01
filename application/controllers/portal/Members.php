@@ -41,7 +41,7 @@ class Members extends CI_Controller
 
         $this->table = $this->module->table;
         $this->id_field = $this->module->id_field;
-
+        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->iic_user_type = intval(get_option('iic_user_type'));
 
@@ -71,9 +71,10 @@ class Members extends CI_Controller
           LEFT JOIN account_status ac_s
             ON (users.login_status = ac_s.id)
         WHERE 1 ". $where;*/
-        if($this->session->userdata('user_info')->u_type != '1'){
-            $branch_id = ' AND acc.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
-        }
+        /*if($this->session->userdata('user_info')->u_type != '1'){*/
+            //$branch_id = ' AND acc.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
+            $branch_id = ' AND acc.branch_id = "'.$this->branch_id.'"';
+        /*}*/
         $search = getVar('search');
         if($search['subscription_status']!=''){
             $where = str_replace("AND subscription_status LIKE '%continue%'","",$where);

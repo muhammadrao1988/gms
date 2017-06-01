@@ -78,7 +78,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         <select name="acc_id" id="acc_id" class="select validate[required]">
                                             <option value="">-Select-</option>
                                             <?php
-                                            echo selectBox("select acc_id,CONCAT(machine_member_id,') ',acc_name) AS acc_name from accounts where status = 1 AND machine_member_id!='' order by acc_id desc", $row->acc_id);
+                                            echo selectBox("select acc_id,CONCAT(machine_member_id,') ',acc_name) AS acc_name from accounts where status = 1 AND machine_member_id!='' AND branch_id='".$this->session->userdata('user_info')->branch_id."' order by acc_id desc", $row->acc_id);
                                             ?>
                                         </select>
 

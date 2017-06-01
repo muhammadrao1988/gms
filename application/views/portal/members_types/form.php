@@ -81,11 +81,19 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                class="form-control validate[required,custom[integer]]">
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <!--<div class="form-group">
                                     <label for="service_charges" class="col-lg-3 col-sm-3 control-label">Service Charges</label>
                                     <div class="col-lg-6">
-                                        <input type="text" id="service_charges" name="service_charges" value="<?= $row->service_charges; ?>"
+                                        <input type="text" id="service_charges" name="service_charges" value="<?/*= $row->service_charges; */?>"
                                                placeholder="Service Charges"
+                                               class="form-control validate[required,custom[integer]]">
+                                    </div>
+                                </div>-->
+                                <div class="form-group">
+                                    <label for="monthly_charges" class="col-lg-3 col-sm-3 control-label">Monthly Charges</label>
+                                    <div class="col-lg-6">
+                                        <input type="text" id="monthly_charges" name="monthly_charges" value="<?= $row->monthly_charges; ?>"
+                                               placeholder="Monthly Charges"
                                                class="form-control validate[required,custom[integer]]">
                                     </div>
                                 </div>

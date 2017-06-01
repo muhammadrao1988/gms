@@ -29,6 +29,7 @@ class Attendance extends CI_Controller
 
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->iic_user_type = intval(get_option('iic_user_type'));
+        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         date_default_timezone_set('Asia/Karachi');
         $this->pk_date_time = date('d-m-Y H:i');
     }
@@ -41,9 +42,9 @@ class Attendance extends CI_Controller
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
         $data['pk_date_time'] = $this->pk_date_time;
-        if($this->session->userdata('user_info')->u_type != '1'){
-            $where .= ' AND ac.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
-        }
+        /*if($this->session->userdata('user_info')->u_type != '1'){*/
+            $where .= ' AND ac.branch_id = "'.$this->branch_id.'"';
+        //}
         $search = getVar('search');
         if($search['Name']!=''){
             $where = str_replace('Name','act.`Name`',$where);
@@ -59,6 +60,10 @@ class Attendance extends CI_Controller
                                   AND attd.machine_serial = ac.`serial_number` 
                                 ORDER BY attd.id DESC 
                                 LIMIT 1), INTERVAL sub.`period` DAY)) '.((strtolower($search['subscription_status'])=="continue")?">":"<=").' CURRENT_DATE()' ;
+
+        }
+        if($search['account_id']!=''){
+            $where = str_replace(" AND account_id = '".$search['account_id']."'"," AND ac.acc_id = '".$search['account_id']."'",$where);
 
         }
         $data['query'] = "SELECT 
@@ -93,8 +98,6 @@ class Attendance extends CI_Controller
                                 LEFT JOIN invoices as iv 
                                 ON( iv.`acc_id` = ac.acc_id )
                               where 1 and att.status = 1 ".$where." GROUP by att.id";
-
-
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -114,7 +117,7 @@ class Attendance extends CI_Controller
             $DBdata['datetime'] = date('Y-m-d H:i:s',strtotime($DBdata['datetime']));
             $DBdata['datetime'] = date('Y-m-d H:i:s',strtotime($DBdata['datetime']));
 
-            $DBdata['account_id'] = getVal('accounts','machine_user_id',' where machine_member_id = "'.getVar('account_id').'"');
+            $DBdata['account_id'] = getVal('accounts','machine_user_id',' where acc_id = "'.getVar('acc_id').'"');
             $DBdata['machine_serial'] = $user_info->machine_serial;
             $DBdata['sensored_id'] = 1;
             $DBdata['status'] = 1;
@@ -129,9 +132,9 @@ class Attendance extends CI_Controller
         if ($str > 0)
         {
             //check machine member id
-            if(getVal('accounts','acc_id',' where machine_member_id = "'.$str.'"') > 0) {
+            if(getVal('accounts','acc_id',' where acc_id = "'.$str.'"') > 0) {
                 //check attendance
-                if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where machine_member_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
+                if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
                     $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
                     return FALSE;
                 }
