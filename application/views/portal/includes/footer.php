@@ -204,7 +204,8 @@
                                                 title: 'Member ' + value.account_name + ' ' + ((value.check_type == "I") ? "Checked In" : "Checked Out"),
                                                 // (string | mandatory) the text inside the notification
                                                 text: 'Member id : ' + value.account_id + ' <br> Date Time: ' + value.datetime +
-                                                '<br> Fee Status : ' + value.monthly_fee + '<br> Subscription : ' + value.subscription_status,
+                                                '<br> Fee Status : ' + value.monthly_fee + '<br> Subscription : ' + value.subscription_status +
+                                                '<br> Unpaid Invoice : ' + value.unpaid_invoice ,
                                                 class_name: ((value.check_type == "I") ? "gritter-in" : "gritter-out"),
                                                 sticky: true
                                             });

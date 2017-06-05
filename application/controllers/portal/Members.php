@@ -44,6 +44,7 @@ class Members extends CI_Controller
 
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->iic_user_type = intval(get_option('iic_user_type'));
+        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
 
     }
 
@@ -71,27 +72,19 @@ class Members extends CI_Controller
           LEFT JOIN account_status ac_s
             ON (users.login_status = ac_s.id)
         WHERE 1 ". $where;*/
-        if($this->session->userdata('user_info')->u_type != '1'){
-            $branch_id = ' AND acc.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
-        }
+
         $search = getVar('search');
+        $having_record = "";
         if($search['subscription_status']!=''){
             $where = str_replace("AND subscription_status LIKE '%continue%'","",$where);
             $where = str_replace("AND subscription_status LIKE '%expired%'","",$where);
-            $where .=' AND
-                                  DATE(
-                                      DATE_ADD(
-                                        (SELECT 
-                                          att.datetime 
-                                        FROM
-                                          attendance AS att 
-                                        WHERE att.account_id = acc.`machine_user_id` 
-                                          AND att.machine_serial = acc.`serial_number` 
-                                        ORDER BY att.id DESC 
-                                        LIMIT 1),
-                                        INTERVAL sub.`period` DAY
-                                      )
-                                    ) '.((strtolower($search['subscription_status'])=="continue")?">":"<=").' CURRENT_DATE()' ;
+            $where = str_replace("AND subscription_status LIKE '%no_attendance%'","",$where);
+            if($search['subscription_status']=="continue") {
+                $having_record = " HAVING subscription_status > 0 ";
+            }else if($search['subscription_status']=="expired") {
+                $having_record = " HAVING subscription_status <= 0 ";
+            }
+
 
         }
             /*22-05-2017 According to subscription period*/
@@ -130,10 +123,12 @@ class Members extends CI_Controller
                               acc.acc_tel,                          
                               br.`branch_name`,  
                               DATE(acc.acc_date) as acc_date,
+                              DATE_FORMAT( acc.`invoice_generate_date`, '%d') AS day_invoice,
                               acc.serial_number as machine_serial,
                               sub.`name`,
-                              IF(DATE(DATE_ADD((SELECT att.datetime FROM attendance AS att WHERE att.account_id = acc.`machine_user_id` AND att.machine_serial = acc.`serial_number` ORDER BY att.id DESC LIMIT 1), INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>','<span class=\"green\">Continue</span>') AS subscription_status,
-                              MAX(iv.`fees_month`) as monthly_status,
+                             
+                             sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att.`datetime`)))   AS subscription_status,
+                              FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
                               iv.status
                             FROM
                               accounts AS acc 
@@ -141,8 +136,12 @@ class Members extends CI_Controller
                                 ON (br.`id` = acc.`branch_id`)
                                 INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = acc.`subscription_id`)
-                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )                                
-                               WHERE acc.`status` = 1 ".$where." ".$branch_id." group by acc.acc_id" ;
+                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id  AND FIND_IN_SET(iv.`type`, '1') AND iv.`state` IN (1, 2)  )  
+                                LEFT JOIN attendance att ON (acc.`machine_user_id` = att.`account_id` AND acc.`serial_number` = att.`machine_serial`) 
+                               WHERE acc.`status` = 1 
+                               AND acc.branch_id='".$this->branch_id."'
+                               ".$where."  group by acc.acc_id".$having_record ;
+
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
@@ -204,7 +203,7 @@ class Members extends CI_Controller
 
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
-            $DBdata['acc_date']    = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
+            $DBdata['acc_date'] = $DBdata['invoice_generate_date']   = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
             $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
 
             //$DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));
@@ -233,7 +232,7 @@ class Members extends CI_Controller
             $DBdata = $DbArray['dbdata'];
             $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
             $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
-            $DBdata['acc_date']    = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
+            $DBdata['acc_date']     = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
             //$DBdata['machine_user_id']  = $this->module->getMachineUserId($_REQUEST['machine_member_id']);;
             $DBdata['branch_id']        = getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
             $DBdata['serial_number']    = getVal('users','machine_serial',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');

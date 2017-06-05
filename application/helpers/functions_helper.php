@@ -867,26 +867,51 @@ function invoice_for($val){
     return $CI->db->query($sql)->row()->types;
      //getVal('invoice_types','group_concat(name)',' where id in ('.(($val[0]=='')?0:$val[0]).')');
 }
-
+function invoice_name($val){
+    $CI = & get_instance();
+    $sql = "SELECT `name` FROM invoice_types WHERE id ='".$val."'";
+    return $CI->db->query($sql)->row()->name;
+    //getVal('invoice_types','group_concat(name)',' where id in ('.(($val[0]=='')?0:$val[0]).')');
+}
 function  getPaymemntStatus($val){
-    $now = time();
+
     $fees_date = $val[0];
-    if($fees_date == "") {
-        $paybutton = '<a href="'.base_url(ADMIN_DIR.'invoices/form?tempID='.$val[1]['acc_id']).'"><span class="red"><b>Generate First Invoice</b></span></a>';
+
+
+    if($fees_date > 0){
+
+        $paybutton = '<span class="red"><b>'.$fees_date.' Month Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['id'].'" data-id="'.$val[1]['acc_id'].'" data-month="'.$fees_date.'" data-acc-date="'.$val[1]['day_invoice'].'"><i class="fa fa-money"></i> Pay</button>';
         return $paybutton;
-    }
-    $acc_date_day = date('d',strtotime($val[1]['acc_date']));
-    $your_date = strtotime(date('Y-m',strtotime($fees_date)).'-'.$acc_date_day);
-    $datediff = $now - $your_date;
-    $status = getVal('invoices','status',' where acc_id = "'.$val[1]['acc_id'].'" and status = 1');
-    $month = floor($datediff / (60 * 60 * 24 * 30));
-    if($month !='0' and $status == '1'){
-        $val[1]['invoices_id'] = getVal('invoices','id',' where acc_id = "'.$val[1]['acc_id'].'" and status = 1');
-        $paybutton = '<span class="red"><b>'.$month.' Month Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['invoices_id'].'" data-id="'.$val[1]['acc_id'].'" data-month="'.$month.'" data-acc-date="'.$acc_date_day.'"><i class="fa fa-money"></i> Pay</button>';
-        return $paybutton;
-    }else{
+    }else if($fees_date==="0"){
+
         return '<span class="green"><b>PAID</b></span>';
+    }else{
+        $paybutton = '<a href="'.base_url(ADMIN_DIR.'invoices/form?tempID='.$val[1]['acc_id']).'&firstInvoice=1"><span class="red"><b>Generate First Invoice</b></span></a>';
+        return $paybutton;
     }
+
+}
+function  getSubscriptionStatusResult($val){
+
+
+    if(is_array($val)){
+        $period = $val[0];
+    }else{
+        $period = $val;
+    }
+
+    if($period > 0){
+
+        $paybutton = '<span class="green"><b> Continue</b></span> ';
+        return $paybutton;
+    }else if($period < 0){
+
+        return '<span class="red"><b>Expired</b></span>';
+    }else{
+        return '<span><b>No attendance yet</b></span>';
+
+    }
+
 }
 
 function getSubscriptionStatus($val){

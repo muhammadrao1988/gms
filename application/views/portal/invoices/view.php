@@ -6,6 +6,13 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 ?>
 <link rel="stylesheet" href="<?php echo base_url('assets/css/print_invoice.css') ; ?>">
 <style>
+    .total_div{
+        background: #1fb5ad !important;
+        color: #fff;
+    }
+    .total_div:hover{
+        color: #000;
+    }
     @media print {
         body {
             visibility: hidden;
@@ -110,14 +117,14 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <div class="col-md-4 col-sm-5 inv-label">Invoice #</div>
                                     <div class="col-md-8 col-sm-7"><?php echo ((getUri(4)!='')?getUri(4):getVar('id')); ?></div>
                                 </div>
-                                <br>
+
                                 <div class="row">
-                                    <div class="col-md-4 col-sm-5 inv-label">Member Name #</div>
+                                    <div class="col-md-4 col-sm-5 inv-label">Member Name :</div>
                                     <div class="col-md-8 col-sm-7"><?= $row2->acc_name; ?></div>
                                 </div>
-                                <br>
+
                                 <div class="row">
-                                    <div class="col-md-4 col-sm-5 inv-label">Invoice Type #</div>
+                                    <div class="col-md-4 col-sm-5 inv-label">Invoice Type :</div>
                                     <div class="col-md-8 col-sm-7"><?php
                                         $invoice_types = '';
                                         foreach ($rows as $row) {
@@ -127,11 +134,12 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         echo trim($invoice_types,',');
                                         ?></div>
                                 </div>
-                                <br>
+
                                 <div class="row">
-                                    <div class="col-md-4 col-sm-5 inv-label">Date #</div>
-                                    <div class="col-md-8 col-sm-7"><?= date('d M Y'); ?></div>
+                                    <div class="col-md-4 col-sm-5 inv-label">Generated Date :</div>
+                                    <div class="col-md-8 col-sm-7"><?= date('d M Y',strtotime($row->fees_datetime)); ?></div>
                                 </div>
+
                                 <br>
                                 <!--<div class="row">
                                     <div class="col-md-12 inv-label">
@@ -145,87 +153,152 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                             </div>
                         </div>
-                        <?php
-                        $grand_total = '';
-                        $k = 1;
-                        foreach ($rows as $key2 => $row) {
-                            $now = time();
-                            $fees_date = $val[0];
-                            $your_date = strtotime(date('Y-m', strtotime($row->fees_month)) . '-' . date('d', strtotime($row2->acc_date)));
-                            $datediff = $now - $your_date;
-                            $month = floor($datediff / (60 * 60 * 24 * 30));
-                            if (($month == '0' || $row->status == '2') || count($rows) >1) {
-                                if($k == 1) {
-                                    ?>
+                        <div style="text-align: center; font-size: 20px">
+                            <strong>
+                                STATUS:
+                                <?php
+                                if($row->state==1){
+                                    echo "PAID";
+                                }else if($row->state==2){
+                                    echo "PARTIAL PAID";
+                                }else if($row->state==3){
+                                    echo "CANCELLED";
+                                }
+                                ?>
+                            </strong>
+                        </div>
                                     <table class="table table-invoice">
                                     <thead>
                                     <tr>
                                         <th>#</th>
                                         <th>Fees Description</th>
                                         <th class="text-center">Amount</th>
-                                        <th class="text-center">Fees Date</th>
+
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <?php
-                                }
+
                                     $i = 1;
                                     $amount_details = json_decode($row->amount_details);
                                     $amount_details = object2array($amount_details);
-                                    foreach ($amount_details[0] as $key => $val) {
+                                    $fee_invoice_array =  array();
+                                    $other_invoice =  array();
+                                    $total_array =  array();
+                                    if(is_array($amount_details['fee_invoice'])){
+                                        $fee_invoice_array = $amount_details['fee_invoice'];
+                                    }
+                                    if(is_array($amount_details['other_invoice'])){
+                                        $other_invoice = $amount_details['other_invoice'];
+                                    }
+                                    if(is_array($amount_details['total'])){
+                                        $total_array = $amount_details['total'];
+                                    }
+                                    $i = 1;
+                                    if(count($fee_invoice_array) > 0) {
+                                        foreach ($fee_invoice_array as $val) {
+                                            ?>
+                                            <tr>
+                                                <td><?php echo $i; ?></td>
+                                                <td>
+                                                    <h4>Monthly Fee Charges</h4>
+                                                    <?php
+
+                                                        $duration = explode("|",$val['duration']);
+                                                        $from_date = "From ".date("d MY",strtotime($duration[0]));
+                                                        $to_date = " To ".date("d MY",strtotime($duration[1]));
+                                                        echo "Duration: ".$from_date.$to_date;
+                                                    ?>
+
+                                                </td>
+                                                <td class="text-center"><?php echo number_format($val['amount']); ?></td>
+
+                                                <!--<td class="text-center">Rs. 300</td>-->
+                                            </tr>
+                                            <?php $i++;
+
+                                        }
+                                    }
+                                if(count($other_invoice) > 0) {
+                                    foreach ($other_invoice as $val) {
                                         ?>
                                         <tr>
                                             <td><?php echo $i; ?></td>
                                             <td>
-                                                <h4><?= invoice_for($type[0] = $val); ?></h4>
-                                                <!--<p>Monthly Charges Paid by member.</p>-->
+                                                <h4><?php echo invoice_name($val['type']); ?></h4>
+
+
                                             </td>
-                                            <td class="text-center"><?php echo  $amount_details[1][$key]; ?></td>
-                                            <td class="text-center"><?php echo  date('F', strtotime($row->fees_month)); ?></td>
+                                            <td class="text-center"><?php echo number_format($val['amount']); ?></td>
+
                                             <!--<td class="text-center">Rs. 300</td>-->
                                         </tr>
                                         <?php $i++;
-                                        $grand_total += $amount_details[1][$key];
-                                    }
-                                    if($k == count($rows)) {
-                                        ?>
 
-                                        </tbody>
-                                        </table>
-                                        <?php
                                     }
-                            } else {
+                                }
+
+
+
+
+
+                                    if(count($total_array) > 0) {
+
                                ?>
-                                <table class="table table-invoice">
-                                    <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Fees Description</th>
-                                        <th class="text-center">Amount</th>
-                                        <th class="text-center">Month</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
 
-                                    <tr>
-                                        <td>1</td>
-                                        <td>
-                                            <h4>Montly Fees</h4>
-                                            <!--<p>Monthly Charges Paid by member.</p>-->
+                                    <tr class="grand-total">
+
+                                        <td colspan="2" class="">
+                                            <h4 style="text-align: right">Subtotal: </h4>
+
                                         </td>
-                                        <td class="text-center"><?php echo MONTHLY_FEES; ?></td>
-                                        <td class="text-center"><?php echo $month; ?></td>
-                                        <!--<td class="text-center">Rs. 300</td>-->
+                                        <td class="text-center total_div"><?php echo number_format($total_array['subtotal']); ?></td>
                                     </tr>
+                                        <tr class="grand-total">
+
+                                            <td colspan="2" class="">
+                                                <h4 style="text-align: right">Discount: </h4>
+
+                                            </td>
+                                            <td class="text-center total_div"><?php echo number_format($total_array['discount']); ?></td>
+                                        </tr>
+                                    <?php if($row->state ==2){?>
+                                        <tr class="grand-total">
+
+                                            <td colspan="2" class="">
+                                                <h4 style="text-align: right">Received Amount: </h4>
+
+                                            </td>
+                                            <td class="text-center total_div"><?php echo number_format($total_array['received_amount']); ?></td>
+                                        </tr>
+                                        <?php }?>
+                                    <?php if($row->state > 1){?>
+                                        <tr class="grand-total">
+
+                                            <td colspan="2" class="">
+                                                <h4 style="text-align: right">Remaining Amount: </h4>
+
+                                            </td>
+                                            <td class="text-center total_div"><?php echo number_format($total_array['remaining_amount']); ?></td>
+                                        </tr>
+                                        <?php }?>
+                                        <?php if($row->state==1){?>
+                                        <tr class="grand-total">
+
+                                            <td colspan="2" class="">
+                                                <h4 style="text-align: right">Total: </h4>
+
+                                            </td>
+                                            <td class="text-center total_div"><?php echo number_format($total_array['total']); ?></td>
+                                        </tr>
+                                            <?php }?>
+                                    <?php }?>
 
                                     </tbody>
-                                </table>
-                                <?php
-                                $grand_total = $month * MONTHLY_FEES;
-                            }
-                            $k++;
-                        }
-                        ?>
+                                    </table>
+
+
+
                         <div class="row" style="padding: 15px;">
                             <div class="col-md-8 col-xs-7 payment-method">
                                 <!--<h4>Payment Method</h4>
@@ -236,12 +309,12 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 <h3 class="inv-label itatic">Thank you for the payment.</h3>
                             </div>
                             <div class="col-md-2 col-xs-5 invoice-block pull-right">
-                                <ul class="unstyled amounts">
-                                    <!--<li>Sub - Total amount : $3820</li>
+                                <!--<ul class="unstyled amounts">
+                                    <li>Sub - Total amount : $3820</li>
                                     <li>Discount : 10% </li>
-                                    <li>TAX (15%) ----- </li>-->
-                                    <li class="grand-total text-center">Total : <?= $grand_total; ?></li>
-                                </ul>
+                                    <li>TAX (15%) ----- </li>
+                                    <li class="grand-total text-center">Total : <?/*= $grand_total; */?></li>
+                                </ul>-->
                             </div>
                         </div>
                     </div>
@@ -273,7 +346,7 @@ $css = file_get_contents(base_url('assets/css/style.css') );
 
             link.type = 'text/css';
             link.rel = 'stylesheet';
-            link.href = '<?php echo base_url('assets/bs3/css/bootstrap.min.css') ; ?>';
+            link.href = '';
 
             head.appendChild(link);
 
@@ -284,7 +357,7 @@ $css = file_get_contents(base_url('assets/css/style.css') );
             /*var prtContent = document.getElementById("print_page");
             var mywindow = window.open('', 'Print BodyShape Invoice', 'width=950,height=700');
 
-            $(mywindow.document.head).html( '<title>PressReleases</title><link rel="stylesheet" href="<?php echo base_url('assets/bs3/css/bootstrap.min.css ') ; ?>" type="text/css" /><link rel="stylesheet" href="<?php echo base_url('assets/css/style.css') ; ?>" type="text/css" />');
+            $(mywindow.document.head).html( '<title>PressReleases</title><link rel="stylesheet" href="" type="text/css" /><link rel="stylesheet" href="" type="text/css" />');
             $(mywindow.document.body).html( '<body>' + prtContent.innerHTML + '</body>');
 
             mywindow.document.close();

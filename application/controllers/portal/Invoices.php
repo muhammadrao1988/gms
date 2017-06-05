@@ -59,10 +59,15 @@ class Invoices extends CI_Controller
                               ic.`id`,
                                ic.machine_member_id,
                                ac.acc_name ,
+                               CASE ic.state
+                            WHEN 1 THEN '<span style=\"color:green;font-weight:bold\">PAID</span>'
+                            WHEN 2 THEN '<span style=\"color:red;font-weight:bold\">PARTIAL PAID</span>'
+                            WHEN 3 THEN '<span style=\"color:yellow;font-weight:bold\">CANCELLED</span>'
+                           END AS state,
                               ic.amount,
                               ic.acc_id,
                               date(ic.fees_datetime) as fees_datetime,
-                              CONCAT(MONTHNAME(ic.fees_month),' ',YEAR (ic.fees_month)) as fees_month,
+                              
                               ic.`type`                            
                             FROM
                               invoices AS ic 
@@ -75,83 +80,67 @@ class Invoices extends CI_Controller
         $where = '';
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
-        /*$data['query'] = "SELECT
-                              id,
-                              ac.acc_name AS member_name,
-                              ac.acc_id,
-                              MAX(ic.fees_month) AS fees_month,                              
-                              ic.amount,
-                              DATE(ic.fees_datetime) AS last_paid,
-                              MONTHNAME(ic.fees_month) as last_paid_month,
-                              IF(
-                                (30 - DATEDIFF(
-                                  CURRENT_DATE(),
-                                  CONCAT(
-                                    DATE_FORMAT(ic.`fees_month`, '%Y-%m-'),
-                                    DAY(ac.acc_date)
-                                  )
-                                )) < 4 
-                                AND it.id = 1,
-                                CONCAT(
-                                  IF(
-                                    (30- DATEDIFF(CURRENT_DATE(), CONCAT(
-                                    DATE_FORMAT(ic.`fees_month`, '%Y-%m-'),
-                                    DAY(ac.acc_date)
-                                  ))) > 0,
-                                    CONCAT(
-                                      (30 - DATEDIFF(CURRENT_DATE(), CONCAT(
-                                    DATE_FORMAT(ic.`fees_month`, '%Y-%m-'),
-                                    DAY(ac.acc_date)
-                                  ))),
-                                      ' Days Left '
-                                    ),
-                                    'Unpiad '
-                                  ),
-                                  '<button class=\"btn btn-primary btn-sm payment_pop\" type=\"button\" href=\"javascript:void(0);\" data-invoice=\"',
-                                  ic.id,
-                                  '\"><i class=\"fa fa-money\"></i> Pay</button>'
-                                ),
-                                '<!--<span class=\"green\"><b>Paid</b></span>-->'
-                              ) AS payment_status,
-                              it.name AS invoice_for
-                            FROM
-                              invoices AS ic 
-                              INNER JOIN accounts AS ac 
-                                ON (ic.`acc_id` = ac.`acc_id`) 
-                              INNER JOIN invoice_types AS `it` 
-                                ON (ic.`type` = `it`.`id`) 
-                            WHERE 1 
-                              AND ac.`status` = 1 and ic.type = 1 
-                            GROUP BY ic.acc_id ".$where;*/
-         $data['query'] = "SELECT 
-                              MAX(iv.`id`) AS id,
-                              iv.`acc_id`,
-                              iv.`machine_member_id`,
-                              ac.`acc_name` as member_name,
-                              ac.`acc_date`,
-                              iv.`amount` AS amount,
-                              iv.`fees_month`,
-                              DATE_FORMAT((select ivv.fees_month from invoices as ivv where ivv.id= MAX(iv.`id`)),'%M %Y') AS last_paid_month,
-                              DATE((select ivv.fees_datetime from invoices as ivv where ivv.id = MAX(iv.`id`))) as paid_date,
-                              MAX(iv.`fees_month`) as payment_status,
-                              iv.status
-                            FROM
-                              invoices AS iv 
-                              INNER JOIN accounts AS ac 
-                                ON (ac.`acc_id` = iv.`acc_id`) 
-                            WHERE 1 AND iv.branch_id = '".$this->branch_id."' 
-                            AND ac.`status` = 1 
-                            AND FIND_IN_SET('1', iv.`type`)
-                            AND ac.machine_member_id !=''
-                            AND iv.branch_id = '".$this->branch_id."'
-                            AND (SELECT DATE_ADD(CONCAT(YEAR(ivvv.fees_month),'-',MONTH(ivvv.fees_month),'-',DAY(ac.`acc_date`)),INTERVAL 30 DAY) AS month_interval FROM invoices AS ivvv WHERE ivvv.acc_id = ac.`acc_id` AND ivvv.`status` = 1 ORDER BY ivvv.`id` DESC LIMIT 1) <= CURRENT_DATE() 
-                            group by iv.acc_id " .$where;
+        $data['query'] = "SELECT 
+                          acc.`machine_member_id`,
+                          acc.`acc_name`,
+                          acc.`acc_date`,
+                          
+                          FLOOR(
+                            DATEDIFF(CURDATE(), MAX(inv.fees_month)) / 30
+                          ) * a_type.`monthly_charges` AS Amount,
+                          MAX(inv.`fees_month`) AS last_paid,
+                          DATE_FORMAT(MAX(inv.`fees_month`), '%M %Y') AS last_paid_month,
+                          FLOOR(
+                            DATEDIFF(CURDATE(), MAX(inv.fees_month)) / 30
+                          ) AS fees_month,
+                          DATE_FORMAT( acc.`invoice_generate_date`, '%d') AS day_invoice,
+                          inv.`acc_id`,
+                          inv.`id` 
+                        FROM
+                          invoices inv 
+                          JOIN accounts acc 
+                            ON (inv.`acc_id` = acc.`acc_id`) 
+                          JOIN acc_types a_type 
+                            ON (
+                              a_type.`acc_type_ID` = acc.`acc_types`
+                            ) 
+                        WHERE acc.branch_id =  '".$this->branch_id."' 
+                          AND acc.machine_member_id != '' 
+                          AND FIND_IN_SET(inv.`type`, '1') 
+                          AND inv.`state` IN (1, 2) 
+                          ".$where."
+                        GROUP BY inv.acc_id 
+                        HAVING last_paid < DATE_SUB(CURDATE(), INTERVAL 30 DAY) ";
+
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid_monthly', $data);
     }
 
     public function form()
     {
         $id = intval(getUri(4));
+        $tempId = getVar('tempID');
+        $firstInvoice = getVar('firstInvoice');
+        if($tempId && $tempId > 0){
+
+            $branch_id = getVal("accounts","branch_id","WHERE acc_id='".$tempId."'");
+            if($branch_id==$this->branch_id){
+                $data['tempID'] = $tempId;
+                 $SQL = "SELECT * FROM accounts WHERE  acc_id='" . $tempId . "'";
+                $data['tempRow'] = $this->db->query($SQL)->row();
+
+
+            }else{
+                $data['tempID'] = 0;
+            }
+        }else{
+            $data['tempID'] = 0;
+        }
+
+        if($firstInvoice && $firstInvoice ==1){
+            $data['firstInvoice'] = 1;
+        }else{
+            $data['firstInvoice'] = 0;
+        }
 
         if ($id > 0) {
             $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "'";
@@ -190,74 +179,270 @@ class Invoices extends CI_Controller
         if (!$this->module->validate()) {
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
-        } else {
-            $redirect_id = "";
-            $DbArray = getDbArray($this->table);
-            $DBdata = $DbArray['dbdata'];
-            $DBdata['fees_month'] = date('Y-m-d',strtotime(getVar('fees_month')));
-            $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
-            $amount = getVar('amount');
-            $type = getVar('type');
-            $i = 0 ;
-            $fee_amount = array();//invoice type fees
-            $fee_type = array();//invoice type fees
-            //separating fees invoice type
-            foreach ($type as $t){
+        }
+        else {
 
-                if($t==1){
-                    $fee_type[] = $type[$i];
-                    $fee_amount[] = $amount[$i];
-                    unset($amount[$i]);
-                    unset($type[$i]);
-                }
-                $i++;
-            }
+            $acc_id = getVar('acc_id');
+            $machine_member_id = getVal('accounts','machine_member_id'," WHERE acc_id='".$acc_id."'");
+            $branch_id = getVal('accounts','branch_id'," WHERE acc_id='".$acc_id."'");
+            $is_first_invoice = getVar('firstInvoice');
 
+            if($is_first_invoice==1){
+                $is_register_old = getVar('is_register_old');//if 0 user created today and invoice is current month else user created today but register date before
+                $fees_month = getVar('fees_month');
+                $fees_per_month = getVar('fees_per_month');
+                $discount = getVar('discount');
+                $discount = ($discount=="" ? 0 : $discount);
+                $type = getVar('type');
+                $amount = getVar('amount');
+                $total_month = count($fees_per_month);
+                $invoice_option = getVar('invoice_option');//1=previous month invoices will add. 2 = Current month invoice generate
 
+                if($invoice_option==2){
 
-            $DBdata['amount'] = array_sum($amount);
-            $DBdata['type'] = implode(',',$type);
+                    $from_month = date('Y-m-d');
+                    $currentMonth = date('F');
+                    $currentDay = date('d');
+                    $next_month = date('Y-m',strtotime($currentMonth.' next month'));
+                    $next_month_name = date('M',strtotime($currentMonth.' next month'));
 
-            $DBdata['branch_id'] = $this->branch_id;
-            $type = array_values($type);
-            $amount = array_values($amount);
+                    if (strpos($next_month_name, 'Feb') !== false && $currentDay > 28) {
+                        $register_day_to = 28;
+                    } else if ($currentDay > 30 && (strpos($next_month_name, 'Apr') !== false OR
+                            strpos($next_month_name, 'Jun') !== false OR
+                            strpos($next_month_name, 'Sep') !== false OR
+                            strpos($next_month_name, 'Nov') !== false
+                        )
+                    ) {
+                        $register_day_to = 30;
+                    } else {
+                        $register_day_to = $currentDay;
+                    }
 
-            $amount_details[] =   array_filter($type);
-            $amount_details[] =   array_filter($amount);
-            $DBdata['amount_details'] = json_encode($amount_details);
-            $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
-          
-            if(count($type) > 0) {
-                $id = save($this->table, $DBdata);
-                $redirect_id = $id;
-            }
-
-
-            if(count($fee_type) > 0)
-            {
-
-                $DBdata['type'] = implode(',',$fee_type);
-                $DBdata['amount'] = array_sum($fee_amount);
-                $amount_details_fee[] =   array_filter($fee_type);
-                $amount_details_fee[] =   array_filter($fee_amount);
-                $DBdata['amount_details'] = json_encode($amount_details_fee);
-                $DBdata['status'] = 1;
-                $id_fees = save($this->table, $DBdata);
-
-                if($id_fees > 0){
-
-                        $where =  "id ='" . $id_fees . "'";
-                        save($this->table, array('parent_id' => $id), $where);
-
-                    $where =  "acc_id ='" . $DBdata['acc_id'] . "' AND machine_member_id = '".$DBdata['machine_member_id']."' AND `status`=1 AND id!='".$id_fees."'";
-                    save($this->table, array('status' => 2), $where);
-                    $redirect_id = ($redirect_id=="" ? $id_fees : $id.",".$id_fees );
+                    $to_month = $next_month."-".$register_day_to;
+                    $last_fees = $from_month ;
                 }
 
+                $is_single = 1;
+
+                $firstIndexFessMonth = explode("|",$fees_month[0]);
+
+
+                if( $invoice_option==1){
+                    $lastIndexFeesMonth = explode("|",end($fees_month));
+                    $from_month = $lastIndexFeesMonth[0];
+                    $to_month = $firstIndexFessMonth[1];
+                    $is_single = 0;
+                    $last_fees = $firstIndexFessMonth[0];
+                }
+                $fee_invoice_template_array = array();
+                $i=0;
+                $calculate_amount = 0;
+                if($is_single ==1){
+                    $fee_invoice_template_array[$i]['type'] = 1;
+                    $fee_invoice_template_array[$i]['amount'] = $fees_per_month;
+                    $fee_invoice_template_array[$i]['duration'] = $fees_month[0];
+                    $calculate_amount = $calculate_amount + $fees_per_month;
+                    $i++;
+                }else{
+
+                    foreach ($fees_month as $fee){
+                        $fee_invoice_template_array[$i]['type'] = 1;
+                        $fee_invoice_template_array[$i]['amount'] = $fees_per_month;
+                        $fee_invoice_template_array[$i]['duration'] = $fee;
+                        $calculate_amount = $calculate_amount + $fees_per_month;
+                        $i++;
+
+                    }
+                }
+                if(isset($type) && count($type) > 0){
+                    $other_invoice_template_array = array();
+                    $j = 0;
+                    foreach ($type as $tp){
+                        $other_invoice_template_array[$j]['type'] = $tp;
+                        $other_invoice_template_array[$j]['amount'] = $amount[$j];
+                        $other_invoice_template_array[$j]['duration'] = date('Y-m-d');
+                        $calculate_amount = $calculate_amount + $amount[$j];
+                       $j++;
+
+
+                    }
+
+                }
+                $total_array =  array();
+                $subtotal = $calculate_amount;
+                $total = $calculate_amount - $discount;
+                $state = getVar('state');//1=paid 2=partial paid
+                $received_amount = $calculate_amount - $discount;
+                if($state==2){
+                    $received_amount = getVar('received_amount');
+                }
+                $total_array['subtotal'] = $subtotal;
+                $total_array['discount'] = $discount;
+                $total_array['received_amount'] = $received_amount;
+                $total_array['total'] = $total;
+                $total_array['remaining_amount'] = $total - $received_amount;
+                $type = array_unique($type);
+                $type[] = 1;
+
+                $account_details = array('fee_invoice'=>$fee_invoice_template_array,'other_invoice'=>$other_invoice_template_array,'total'=>$total_array);
+
+                //if user cancel all previous invoice and start from today
+                if($invoice_option==2){
+
+                    $this->db->query("UPDATE accounts SET invoice_generate_date='".date('Y-m-d H:i:s')."' WHERE acc_id='".$acc_id."'");
+                    $last_fees = date('Y-m-d');
+                    $cancel_invoice_template =  array();
+                    $k=0;
+                    $calculate_amount_cancel = 0;
+
+
+                    foreach ($fees_month as $fee){
+
+                        $cancel_invoice_template[$k]['type'] = 1;
+                        $cancel_invoice_template[$k]['amount'] = $fees_per_month;
+                        $cancel_invoice_template[$k]['duration'] = $fee;
+                        $calculate_amount_cancel = $calculate_amount_cancel + $fees_per_month;
+                        $k++;
+
+                    }
+
+                    $firstIndexFessMonthCancel = explode("|",$fees_month[0]);
+                    $lastIndexFessMonthCancel = explode("|",end($fees_month));
+                    $from_month_cancel = $firstIndexFessMonthCancel[0];
+                    $to_month_cancel = $lastIndexFessMonthCancel[1];
+
+                    $total_array_cancel = array();
+                    $total_array_cancel['subtotal'] = $calculate_amount_cancel;
+                    $total_array_cancel['discount'] = 0;
+                    $total_array_cancel['received_amount'] = 0;
+                    $total_array_cancel['total'] = $calculate_amount_cancel;
+                    $total_array_cancel['remaining_amount'] = $calculate_amount_cancel;
+
+                    $account_details_cancel = array("fee_invoice"=>$cancel_invoice_template,'total'=>$total_array_cancel);
+
+                    $cancel_invoice_date = array();
+                    $cancel_invoice_date['acc_id'] = $acc_id;
+                    $cancel_invoice_date['machine_member_id'] = $machine_member_id;
+                    $cancel_invoice_date['state'] = 3;
+                    $cancel_invoice_date['subtotal'] = $calculate_amount_cancel;
+                    $cancel_invoice_date['discount'] = 0;
+                    $cancel_invoice_date['received_amount'] = 0;
+                    $cancel_invoice_date['remaining_amount'] = $calculate_amount_cancel ;
+                    $cancel_invoice_date['amount'] = $calculate_amount_cancel;
+                    $cancel_invoice_date['description'] = "Cancel all previous invoices during first invoice creation";
+                    $cancel_invoice_date['fees_datetime'] = date('Y-m-d H:i:s');
+                    $cancel_invoice_date['fees_month'] = date('Y-m-d');
+                    $cancel_invoice_date['type'] = 1;
+                    $cancel_invoice_date['amount_details'] = json_encode($account_details_cancel);
+                    $cancel_invoice_date['status'] = 3;
+                    $cancel_invoice_date['branch_id'] = $branch_id;
+                    $cancel_invoice_date['created_by'] = $this->session->userdata('user_info')->user_id;
+                    $cancel_invoice_date['from_date'] = $from_month_cancel;
+                    $cancel_invoice_date['to_date'] = $to_month_cancel;
+                    save("invoices",$cancel_invoice_date);
+
+
+
+
+                }
+
+
+               $invoice_table = array();
+               $invoice_table['acc_id'] = $acc_id;
+               $invoice_table['machine_member_id'] = $machine_member_id;
+               $invoice_table['state'] = $state;
+               $invoice_table['subtotal'] = $subtotal;
+               $invoice_table['discount'] = $discount;
+               $invoice_table['received_amount'] = $received_amount;
+               $invoice_table['remaining_amount'] = $total - $received_amount;
+               $invoice_table['amount'] = $total;
+               $invoice_table['description'] = getVar('description');
+               $invoice_table['fees_datetime'] = date('Y-m-d H:i:s');
+               $invoice_table['fees_month'] = $last_fees;
+               $invoice_table['type'] = implode(",",$type);
+               $invoice_table['amount_details'] = json_encode($account_details);
+               $invoice_table['status'] = 2;
+               $invoice_table['branch_id'] = $branch_id;
+               $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
+               $invoice_table['from_date'] = $from_month;
+               $invoice_table['to_date'] = $to_month;
+                $invoice_table['is_first_invoice'] = 1;
+                $invoice_table['first_invoice_option'] = $invoice_option;
+               $redirect_id = save("invoices",$invoice_table);
+
+
+
+
+            }else{
+
+                $discount = getVar('discount');
+                $discount = ($discount=="" ? 0 : $discount);
+                $type = getVar('type');
+                $amount = getVar('amount');
+
+                $invoice_template_array = array();
+                $i=0;
+                $calculate_amount = 0;
+
+                if(isset($type) && count($type) > 0){
+                    $j = 0;
+                    foreach ($type as $tp){
+                        $invoice_template_array[$i]['type'] = $tp;
+                        $invoice_template_array[$i]['amount'] = $amount[$j];
+                        $invoice_template_array[$i]['duration'] = date('Y-m-d');
+                        $calculate_amount = $calculate_amount + $amount[$j];
+                        $j++;
+                        $i++;
+
+                    }
+                    $subtotal = $calculate_amount;
+                    $total = $calculate_amount - $discount;
+                    $state = getVar('state');//1=paid 2=partial paid
+                    $received_amount = $calculate_amount - $discount;
+                    if($state==2){
+                        $received_amount = getVar('received_amount');
+                    }
+                    $total_array =  array();
+                    $total_array['subtotal'] = $subtotal;
+                    $total_array['discount'] = $discount;
+                    $total_array['received_amount'] = $received_amount;
+                    $total_array['total'] = $total;
+                    $total_array['remaining_amount'] = $total - $received_amount;
+
+                    $account_details = array('other_invoice'=>$invoice_template_array,'total'=>$total_array);
+
+                    $type = array_unique($type);
+
+                    $invoice_table = array();
+                    $invoice_table['acc_id'] = $acc_id;
+                    $invoice_table['machine_member_id'] = $machine_member_id;
+                    $invoice_table['state'] = $state;
+                    $invoice_table['subtotal'] = $subtotal;
+                    $invoice_table['discount'] = $discount;
+                    $invoice_table['fees_month'] = date('Y-m-d');
+                    $invoice_table['received_amount'] = $received_amount;
+                    $invoice_table['remaining_amount'] = $total - $received_amount;
+                    $invoice_table['amount'] = $total;
+                    $invoice_table['description'] = getVar('description');
+                    $invoice_table['fees_datetime'] = date('Y-m-d H:i:s');
+                    $invoice_table['amount_details'] = implode(",",$type);
+                    $invoice_table['type'] = implode(",",$type);
+                    $invoice_table['amount_details'] = json_encode($account_details);
+                    $invoice_table['status'] = 2;
+                    $invoice_table['branch_id'] = $branch_id;
+                    $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
+                    $redirect_id = save("invoices",$invoice_table);
+
+
+
+                }
 
             }
-            /*------------------------------------------------------------------------------------------*/
             redirect(ADMIN_DIR . $this->module_name . '/view?id='.$redirect_id);
+
+
+
         }
     }
 
@@ -267,23 +452,92 @@ class Invoices extends CI_Controller
         if (!$this->module->validate()) {
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
-        } else {
-            $DbArray = getDbArray($this->table);
-            $DBdata = $DbArray['dbdata'];
+        }  else {
 
-            $DBdata['fees_month'] = date('Y-m-d',strtotime(getVar('fees_month')));
-            $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
-            $DBdata['amount'] = array_sum(getVar('amount'));
-            $DBdata['type'] = implode(',',getVar('type'));
-            $amount_details[] =   array_filter(getVar('type'));
-            $amount_details[] =   array_filter(getVar('amount'));
-            $DBdata['amount_details'] = json_encode($amount_details);
-            $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
-            $where = $DbArray['where'];
-            save($this->table, $DBdata, $where);
 
-            redirect(ADMIN_DIR . $this->module_name . '/view/'.gerVar('id'));
-            //redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
+            $acc_id = getVar('acc_id');
+            $machine_member_id = getVal('accounts','machine_member_id'," WHERE acc_id='".$acc_id."'");
+            $branch_id = getVal('accounts','branch_id'," WHERE acc_id='".$acc_id."'");
+            $invoice_id = getVar("id");
+            $amount_details = getVal("invoices","amount_details"," WHERE id='".$invoice_id."'");
+            $amount_details = json_decode($amount_details);
+
+
+            if($branch_id==$this->branch_id && count($amount_details) > 0 && $invoice_id){
+                $account_details = array();
+                $fees_month = $amount_details->fee_invoice;
+                $fee_invoice_template_array = array();
+                $type = getVar('type');
+                $amount = getVar('amount');
+                $discount = getVar('discount');
+                $discount = ($discount=="" ? 0 : $discount);
+                $calculate_amount = 0;
+                $i=0;
+                $type_fee = "";
+                foreach ($fees_month as $fee){
+                    $fee_invoice_template_array[$i]['type'] = 1;
+                    $fee_invoice_template_array[$i]['amount'] = $fee->amount;
+                    $fee_invoice_template_array[$i]['duration'] = $fee->duration;
+                    $calculate_amount = $calculate_amount + $fee->amount;
+                    $type_fee = ",1";
+                    $i++;
+                    $account_details['fee_invoice'] = $fee_invoice_template_array;
+
+                }
+                $j = 0;
+                foreach ($type as $tp){
+                    $invoice_template_array[$i]['type'] = $tp;
+                    $invoice_template_array[$i]['amount'] = $amount[$j];
+                    $invoice_template_array[$i]['duration'] = date('Y-m-d');
+                    $calculate_amount = $calculate_amount + $amount[$j];
+                    $j++;
+                    $i++;
+
+                }
+                $total_array =  array();
+                $subtotal = $calculate_amount;
+                $total = $calculate_amount - $discount;
+                $state = getVar('state');//1=paid 2=partial paid
+                $received_amount = $calculate_amount - $discount;
+                if($state==2){
+                    $received_amount = getVar('received_amount');
+                }
+                $total_array['subtotal'] = $subtotal;
+                $total_array['discount'] = $discount;
+                $total_array['received_amount'] = $received_amount;
+                $total_array['total'] = $total;
+                $total_array['remaining_amount'] = $total - $received_amount;
+                $type = array_unique($type);
+                if($type_fee!="") {
+                    $type[] = 1;
+                }
+                $account_details['other_invoice'] = $invoice_template_array;
+                $account_details['total'] = $total_array;
+                $invoice_table = array();
+                $invoice_table['acc_id'] = $acc_id;
+                $invoice_table['machine_member_id'] = $machine_member_id;
+                $invoice_table['state'] = $state;
+                $invoice_table['subtotal'] = $subtotal;
+                $invoice_table['discount'] = $discount;
+                $invoice_table['received_amount'] = $received_amount;
+                $invoice_table['remaining_amount'] = $total - $received_amount;
+                $invoice_table['amount'] = $total;
+                $invoice_table['description'] = getVar('description');
+                $invoice_table['amount_details'] = implode(",",$type);
+                $invoice_table['type'] = implode(",",$type);
+                $invoice_table['amount_details'] = json_encode($account_details);
+                $invoice_table['status'] = 2;
+                $invoice_table['branch_id'] = $branch_id;
+                $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
+
+                $where = "id='".$invoice_id."'";
+
+                $redirect_id = save("invoices",$invoice_table,$where);
+                redirect(ADMIN_DIR . $this->module_name . '/view?id='.$invoice_id);
+            }else{
+                redirect(ADMIN_DIR . $this->module_name . '?error=Invalid record');
+            }
+
         }
     }
 
@@ -327,44 +581,228 @@ class Invoices extends CI_Controller
 
 
     }
+
     public function payPayment()
     {
-        if (!$this->module->validate_payment()) {
-            $this->session->set_flashdata('errors', show_validation_errors());
-            redirect(ADMIN_DIR . $this->module_name . '/monthlyInvoice/?error=Fill all required fields.');
-        } else {
-            $DBdata['amount'] = getVar('fees');
-            $DBdata['description'] = getVar('description');
-            $DBdata['fees_month'] = date('Y-m-d', strtotime(getVar('fees_month')));
-            $invoices_details = getValues('invoices', '*', ' where id = "' . getVar('invoice_id') . '"');
-            $DBdata['acc_id'] = $invoices_details->acc_id;
-            $DBdata['fees_datetime'] = date('Y-m-d H:i:s');
-            $DBdata['type'] = 1;
-            $DBdata['status'] = 1;
-            $DBdata['branch_id'] = $this->branch_id;
-            $amount_details[] = array((string)$DBdata['type']);
-            $amount_details[] = array($DBdata['amount']);
-            $DBdata['amount_details'] = json_encode($amount_details);
-            $DBdata['machine_member_id'] = getVal('accounts','machine_member_id'," WHERE acc_id='".$DBdata['acc_id']."'");
-            $id = save($this->table, $DBdata);
-            $id = save($this->table, array('status'=>2),' id = "'.getVar('invoice_id').'"');
+        $acc_id = getVar('acc_id');
+        $per_month_fee = $fees_per_month = getVar('per_month_fee');
+        $discount = getVar('discount');
+        $discount = ($discount=="" ? 0 : $discount );
+        $fees_month = getVar('fees_month');
+        $total_invoice = count($fees_month);
+        $invoice_option = getVar('invoice_option');//1=previous month invoices will add. 2 = Current month invoice generate
+        $JSON = array();
+        if($acc_id) {
+            $machine_member_id = getVal('accounts','machine_member_id'," WHERE acc_id='".$acc_id."'");
+            $branch_id = getVal('accounts','branch_id'," WHERE acc_id='".$acc_id."'");
+            //$invoice_generate_date = date('d',strtotime($invoice_generate_date));
+            if (($total_invoice > 0 && $fees_month) OR $invoice_option==2) {
 
-            if(getVar('redirect_page')!=""){
-                echo "<script>location.href='".getVar('redirect_page')."'</script>";
-            }else {
-                /*------------------------------------------------------------------------------------------*/
-                redirect(ADMIN_DIR . $this->module_name . '/monthlyInvoice/?msg=Record has been inserted..');
+                if($invoice_option==2){
+                    $fees_month = getVar('fees_month_hidden');
+                    $from_month = date('Y-m-d');
+                    $currentMonth = date('F');
+                    $currentDay = date('d');
+                    $next_month = date('Y-m',strtotime($currentMonth.' next month'));
+                    $next_month_name = date('M',strtotime($currentMonth.' next month'));
+
+                    if (strpos($next_month_name, 'Feb') !== false && $currentDay > 28) {
+                        $register_day_to = 28;
+                    } else if ($currentDay > 30 && (strpos($next_month_name, 'Apr') !== false OR
+                            strpos($next_month_name, 'Jun') !== false OR
+                            strpos($next_month_name, 'Sep') !== false OR
+                            strpos($next_month_name, 'Nov') !== false
+                        )
+                    ) {
+                        $register_day_to = 30;
+                    } else {
+                        $register_day_to = $currentDay;
+                    }
+
+                    $to_month = $next_month."-".$register_day_to;
+                    $last_fees = $from_month ;
+                }
+
+                $firstIndexFessMonth = explode("|",$fees_month[0]);
+
+
+                $is_single = 1;
+                if( $invoice_option==1){
+                    $lastIndexFeesMonth = explode("|",end($fees_month));
+                    $from_month = $lastIndexFeesMonth[0];
+                    $to_month = $firstIndexFessMonth[1];
+                    $is_single = 0;
+                    $last_fees = $firstIndexFessMonth[0];
+                }
+                $fee_invoice_template_array = array();
+                $i=0;
+                $calculate_amount = 0;
+                if($is_single ==1){
+                    $fee_invoice_template_array[$i]['type'] = 1;
+                    $fee_invoice_template_array[$i]['amount'] = $fees_per_month;
+                    $fee_invoice_template_array[$i]['duration'] = $from_month."|".$to_month;
+                    $calculate_amount = $calculate_amount + $fees_per_month;
+                    $i++;
+                }else{
+
+                    foreach ($fees_month as $fee){
+                        $fee_invoice_template_array[$i]['type'] = 1;
+                        $fee_invoice_template_array[$i]['amount'] = $fees_per_month;
+                        $fee_invoice_template_array[$i]['duration'] = $fee;
+                        $calculate_amount = $calculate_amount + $fees_per_month;
+                        $i++;
+
+                    }
+                }
+
+
+                    $total_array =  array();
+                    $subtotal = $calculate_amount;
+                    $total = $calculate_amount - $discount;
+                    $state = getVar('state');//1=paid 2=partial paid
+                    $received_amount = $calculate_amount - $discount;
+                    if($state==2){
+                        $received_amount = getVar('received_amount');
+                    }
+                    $total_array['subtotal'] = $subtotal;
+                    $total_array['discount'] = $discount;
+                    $total_array['received_amount'] = $received_amount;
+                    $total_array['total'] = $total;
+                    $total_array['remaining_amount'] = $total - $received_amount;
+
+                    $type[] = 1;
+
+                    $account_details = array('fee_invoice'=>$fee_invoice_template_array,'total'=>$total_array);
+
+                    //if user cancel all previous invoice and start from today
+                    if($invoice_option==2){
+
+
+
+
+                        $this->db->query("UPDATE accounts SET invoice_generate_date='".date('Y-m-d H:i:s')."' WHERE acc_id='".$acc_id."'");
+                        $last_fees = date('Y-m-d');
+                        $cancel_invoice_template =  array();
+                        $k=0;
+                        $calculate_amount_cancel = 0;
+
+
+                        foreach ($fees_month as $fee){
+
+                            $cancel_invoice_template[$k]['type'] = 1;
+                            $cancel_invoice_template[$k]['amount'] = $fees_per_month;
+                            $cancel_invoice_template[$k]['duration'] = $fee;
+                            $calculate_amount_cancel = $calculate_amount_cancel + $fees_per_month;
+                            $k++;
+
+                        }
+
+                        $firstIndexFessMonthCancel = explode("|",$fees_month[0]);
+                        $lastIndexFessMonthCancel = explode("|",end($fees_month));
+
+                        $from_month_cancel = $lastIndexFessMonthCancel[0];
+                        $to_month_cancel = $firstIndexFessMonthCancel[1];
+
+                        $total_array_cancel = array();
+                        $total_array_cancel['subtotal'] = $calculate_amount_cancel;
+                        $total_array_cancel['discount'] = 0;
+                        $total_array_cancel['received_amount'] = 0;
+                        $total_array_cancel['total'] = $calculate_amount_cancel;
+                        $total_array_cancel['remaining_amount'] = $calculate_amount_cancel;
+
+                        $account_details_cancel = array("fee_invoice"=>$cancel_invoice_template,'total'=>$total_array_cancel);
+
+                        $cancel_invoice_date = array();
+                        $cancel_invoice_date['acc_id'] = $acc_id;
+                        $cancel_invoice_date['machine_member_id'] = $machine_member_id;
+                        $cancel_invoice_date['state'] = 3;
+                        $cancel_invoice_date['subtotal'] = $calculate_amount_cancel;
+                        $cancel_invoice_date['discount'] = 0;
+                        $cancel_invoice_date['received_amount'] = 0;
+                        $cancel_invoice_date['remaining_amount'] = $calculate_amount_cancel ;
+                        $cancel_invoice_date['amount'] = $calculate_amount_cancel;
+                        $cancel_invoice_date['description'] = "Cancel all previous invoices during first invoice creation";
+                        $cancel_invoice_date['fees_datetime'] = date('Y-m-d H:i:s');
+                        $cancel_invoice_date['fees_month'] = date('Y-m-d');
+                        $cancel_invoice_date['type'] = 1;
+                        $cancel_invoice_date['amount_details'] = json_encode($account_details_cancel);
+                        $cancel_invoice_date['status'] = 3;
+                        $cancel_invoice_date['branch_id'] = $branch_id;
+                        $cancel_invoice_date['created_by'] = $this->session->userdata('user_info')->user_id;
+                        $cancel_invoice_date['from_date'] = $from_month_cancel;
+                        $cancel_invoice_date['to_date'] = $to_month_cancel;
+
+                        save("invoices",$cancel_invoice_date);
+
+
+
+
+
+
+
+                    }
+
+
+                    $invoice_table = array();
+                    $invoice_table['acc_id'] = $acc_id;
+                    $invoice_table['machine_member_id'] = $machine_member_id;
+                    $invoice_table['state'] = $state;
+                    $invoice_table['subtotal'] = $subtotal;
+                    $invoice_table['discount'] = $discount;
+                    $invoice_table['received_amount'] = $received_amount;
+                    $invoice_table['remaining_amount'] = $total - $received_amount;
+                    $invoice_table['amount'] = $total;
+                    $invoice_table['description'] = getVar('description');
+                    $invoice_table['fees_datetime'] = date('Y-m-d H:i:s');
+                    $invoice_table['fees_month'] = $last_fees;
+                    $invoice_table['type'] = implode(",",$type);
+                    $invoice_table['amount_details'] = json_encode($account_details);
+                    $invoice_table['status'] = 2;
+                    $invoice_table['branch_id'] = $branch_id;
+                    $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
+                    $invoice_table['from_date'] = $from_month;
+                    $invoice_table['to_date'] = $to_month;
+                    $invoice_table['first_invoice_option'] = $invoice_option;
+
+                    $redirect_id = save("invoices",$invoice_table);
+
+
+
+                $JSON['result'] = 200;
+                $JSON['msg'] = "Invoice added successfully.";
+                $JSON['redirect_url'] = base_url(ADMIN_DIR."invoices/view/".$redirect_id);
+
+
+
+            } else {
+                $JSON['result'] = 400;
+                $JSON['error'] = "Please check fee period checkboxes.";
+
             }
+        }else{
+            $JSON['result'] = 400;
+            $JSON['error'] = "Invalid record found. Please try again.";
+
+
         }
 
+        $_POST = array_merge($_POST, $JSON);
+
+        $JSON['notification'] = show_validation_errors();
+
+        echo json_encode($JSON);
+
+
+
     }
+
     function payNew(){
         $data['last_invoice'] = getVar('last_invoice');
         $data['acc_id'] = getVar('acc_id');
         $data['month_due'] = getVar('month_due');
         $data['register_day'] = getVar('register_day');
         $acc_types = getVal("accounts","acc_types"," WHERE acc_id='".$data['acc_id']."'");
-        $data['one_month_fee'] = getVal("acc_types","service_charges"," WHERE acc_type_ID='".$acc_types."'");
+        $data['one_month_fee'] = getVal("acc_types","monthly_charges"," WHERE acc_type_ID='".$acc_types."'");
         echo $this->load->view(ADMIN_DIR . $this->module_name . '/fees_pay_pop', $data, true);
     }
 }

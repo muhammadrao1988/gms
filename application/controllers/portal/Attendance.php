@@ -31,6 +31,7 @@ class Attendance extends CI_Controller
         $this->iic_user_type = intval(get_option('iic_user_type'));
         date_default_timezone_set('Asia/Karachi');
         $this->pk_date_time = date('d-m-Y H:i');
+        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
     }
 
 
@@ -41,24 +42,20 @@ class Attendance extends CI_Controller
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
         $data['pk_date_time'] = $this->pk_date_time;
-        if($this->session->userdata('user_info')->u_type != '1'){
-            $where .= ' AND ac.branch_id = "'.getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"').'"';
-        }
+
         $search = getVar('search');
         if($search['Name']!=''){
             $where = str_replace('Name','act.`Name`',$where);
         }
+        $having_record = "";
         if($search['subscription_status']!=''){
             $where = str_replace("AND subscription_status LIKE '%continue%'","",$where);
             $where = str_replace("AND subscription_status LIKE '%expired%'","",$where);
-            $where .=' AND DATE(DATE_ADD((SELECT 
-                                  attd.datetime 
-                                FROM
-                                  attendance AS attd 
-                                WHERE attd.account_id = ac.`machine_user_id` 
-                                  AND attd.machine_serial = ac.`serial_number` 
-                                ORDER BY attd.id DESC 
-                                LIMIT 1), INTERVAL sub.`period` DAY)) '.((strtolower($search['subscription_status'])=="continue")?">":"<=").' CURRENT_DATE()' ;
+            if($search['subscription_status']=="continue") {
+                $having_record = " HAVING subscription_status > 0 ";
+            }else if($search['subscription_status']=="expired") {
+                $having_record = " HAVING subscription_status <= 0 ";
+            }
 
         }
         $data['query'] = "SELECT 
@@ -66,20 +63,15 @@ class Attendance extends CI_Controller
                           ac.acc_id,                        
                           ac.machine_member_id,                 
                           ac.acc_name ,
-                          act.`Name` ,                      
+                          act.`Name` ,    
+                          DATE_FORMAT( ac.`invoice_generate_date`, '%d') AS day_invoice,
                           IF(check_type='I','Checked In','Checked Out') as check_type,
                           att.`datetime`,
                           iv.status,
                           iv.id as invoices_id,
-                          IF(DATE(DATE_ADD((SELECT 
-                                  attd.datetime 
-                                FROM
-                                  attendance AS attd 
-                                WHERE attd.account_id = ac.`machine_user_id` 
-                                  AND attd.machine_serial = ac.`serial_number` 
-                                ORDER BY attd.id DESC 
-                                LIMIT 1), INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>','<span class=\"green\">Continue</span>') AS subscription_status,
-                          (select ivv.fees_month from invoices as ivv where ivv.acc_id = ac.acc_id and ivv.status = 1 order by ivv.id desc limit 1) as monthly_status                          
+                          sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att.`datetime`)))   AS subscription_status,
+                          FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month
+                                                    
                         FROM
                           attendance AS att
                           INNER JOIN accounts AS ac 
@@ -91,8 +83,10 @@ class Attendance extends CI_Controller
                             INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = ac.`subscription_id`)
                                 LEFT JOIN invoices as iv 
-                                ON( iv.`acc_id` = ac.acc_id )
-                              where 1 and att.status = 1 ".$where." GROUP by att.id";
+                                ON( iv.`acc_id` = ac.acc_id  AND FIND_IN_SET(iv.`type`, '1') AND iv.`state` IN (1, 2)  )
+                              where 1 and att.status = 1 
+                               AND ac.branch_id='".$this->branch_id."'
+                              ".$where." GROUP by att.id".$having_record;
 
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
