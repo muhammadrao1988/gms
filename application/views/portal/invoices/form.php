@@ -71,10 +71,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 if ($firstInvoice == 1 && $tempID > 0)
                                 {
 
-                                    $subscription_id = $tempRow->subscription_id;
+                                    $subscription_id = $tempRow->acc_types;
                                     $invoice_generate_date = $tempRow->invoice_generate_date;
                                     $machine_member_id = $tempRow->machine_member_id;
                                     $acc_name = $tempRow->acc_name;
+
                                     $fees_per_month = getVal("acc_types", "monthly_charges", " WHERE acc_type_ID='" . $subscription_id . "'");
 
                                     $month_due = floor(dayDifference($invoice_generate_date) / 30);
