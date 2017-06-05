@@ -254,7 +254,7 @@ class Dashboard extends CI_Controller
                                     $json[$i]['monthly_fee'] = "Please create monthly fee invoice of this user.";
 
                                 }
-                           
+
                         } else {
                             //monthly invoice not created
                             $json[$i]['monthly_fee'] = "Please create monthly fee invoice of this user.";

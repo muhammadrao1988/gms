@@ -17,7 +17,7 @@ class M_members_types extends CI_Model
     {
         $this->form_validation->set_rules('Name', 'Member Type Name', 'required');
         $this->form_validation->set_rules('service_period', 'Service Period', 'required');
-        $this->form_validation->set_rules('service_charges', 'Service Charges', 'required');
+        $this->form_validation->set_rules('monthly_charges', 'Monthly Charges', 'required');
         $this->form_validation->set_rules('service_offered', 'Service Offered', 'required');
 
 

@@ -41,7 +41,7 @@ class Members extends CI_Controller
 
         $this->table = $this->module->table;
         $this->id_field = $this->module->id_field;
-
+        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->iic_user_type = intval(get_option('iic_user_type'));
         $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");

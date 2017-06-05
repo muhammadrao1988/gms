@@ -27,8 +27,14 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                   action="<?= site_url(ADMIN_DIR . $this->module_name . '/take_attendance'); ?>">
                 <div class="form-group">
                     <label class="sr-only" for="attendance">Insert Member ID</label>
-                    <input class="form-control" value="<?php echo getVar('account_id'); ?>" id="account_id" name="account_id" placeholder="Insert Member ID"
-                           type="text">
+                    <!--<input class="form-control" value="<?php /*echo getVar('account_id'); */?>" id="account_id" name="account_id" placeholder="Insert Member ID"
+                           type="text">-->
+                    <select name="acc_id" id="acc_id" class="select validate[required]">
+                        <option value="">-Select-</option>
+                        <?php
+                            echo selectBox("select acc_id,CONCAT(machine_member_id,') ',acc_name) AS acc_name from accounts where status = 1 AND machine_member_id!='' AND branch_id='".$this->session->userdata('user_info')->branch_id."' order by acc_id desc", '');
+                        ?>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label class="sr-only" for="attendance">Check Type</label>
