@@ -143,8 +143,11 @@ class Invoices extends CI_Controller
         }
 
         if ($id > 0) {
-            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "'";
+            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' AND branch_id='".$this->branch_id."'";
             $data['row'] = $this->db->query($SQL)->row();
+            if($data['row']->id==""){
+                redirect(ADMIN_DIR . $this->module_name . '/?error=Invalid access');
+            }
         }
 
         $data['title'] = $this->module_title;
@@ -162,8 +165,11 @@ class Invoices extends CI_Controller
         }
 
         if ($id > 0) {
-            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . " IN (" . $id . ")";
+            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . " IN (" . $id . ") AND branch_id='".$this->branch_id."'";
             $data['rows'] = $this->db->query($SQL)->result();
+            if($data['rows'][0]->id==""){
+                redirect(ADMIN_DIR . $this->module_name . '/?error=Invalid access');
+            }
 
             $SQL2 = "SELECT * FROM accounts WHERE acc_id='" . $data['rows'][0]->acc_id . "'";
             $data['row2'] = $this->db->query($SQL2)->row();
@@ -228,7 +234,7 @@ class Invoices extends CI_Controller
                 $firstIndexFessMonth = explode("|",$fees_month[0]);
 
 
-                if( $invoice_option==1){
+                if( $invoice_option==1 OR $invoice_option==""){
                     $lastIndexFeesMonth = explode("|",end($fees_month));
                     $from_month = $lastIndexFeesMonth[0];
                     $to_month = $firstIndexFessMonth[1];
@@ -627,7 +633,7 @@ class Invoices extends CI_Controller
 
 
                 $is_single = 1;
-                if( $invoice_option==1){
+                if( $invoice_option==1 OR $invoice_option==""){
                     $lastIndexFeesMonth = explode("|",end($fees_month));
                     $from_month = $lastIndexFeesMonth[0];
                     $to_month = $firstIndexFessMonth[1];

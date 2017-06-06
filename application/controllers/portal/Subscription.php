@@ -4,7 +4,7 @@
  * @property M_users_admin $module
  * @property M_cpanel $m_cpanel
  */
-class Members_types extends CI_Controller
+class Subscription extends CI_Controller
 {
     var $table;
     var $id_field;
@@ -18,10 +18,11 @@ class Members_types extends CI_Controller
         parent::__construct();
         $this->m_cpanel->checkLogin();
 
+
         //TODO:: Module Name
         $this->module_name = getUri(2);
         $this->module = 'm_' . $this->module_name;
-        ;
+
         $this->load->model(ADMIN_DIR . $this->module);
         $this->module = $this->{$this->module};
 
@@ -30,13 +31,14 @@ class Members_types extends CI_Controller
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         $this->iic_user_type = intval(get_option('iic_user_type'));
+
     }
     public function index()
     {
         $where = '';
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
-        $data['query'] = "Select * from acc_types where 1 AND branch_id='".$this->branch_id."'";
+        $data['query'] = "Select id,name,CONCAT(period,' Days') AS period,charges from subscriptions where 1 AND branch_id='".$this->branch_id."'";
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -48,7 +50,7 @@ class Members_types extends CI_Controller
         if ($id > 0) {
             $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' AND branch_id='".$this->branch_id."'";
             $data['row'] = $this->db->query($SQL)->row();
-            if($data['row']->acc_type_ID==""){
+            if($data['row']->id==""){
                 redirect(ADMIN_DIR . $this->module_name . '/?error=Invalid access');
             }
         }
@@ -82,6 +84,7 @@ class Members_types extends CI_Controller
 
             $DBdata = $DbArray['dbdata'];
             $DBdata['branch_id'] = $this->branch_id;
+            $DBdata['status'] = 1;
 
             $id = save($this->table, $DBdata);
             /*------------------------------------------------------------------------------------------*/
