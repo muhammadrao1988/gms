@@ -106,7 +106,7 @@ class Invoices extends CI_Controller
                             ) 
                         WHERE acc.branch_id =  '".$this->branch_id."' 
                           AND acc.machine_member_id != '' 
-                          AND FIND_IN_SET(inv.`type`, '1') 
+                          AND FIND_IN_SET( '1',inv.`type`) 
                           AND inv.`state` IN (1, 2) 
                           ".$where."
                         GROUP BY inv.acc_id 

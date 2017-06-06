@@ -86,7 +86,7 @@ class Attendance extends CI_Controller
                               INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = ac.`subscription_id`)
                               LEFT JOIN invoices as iv 
-                                ON( iv.`acc_id` = ac.acc_id  AND FIND_IN_SET(iv.`type`, '1') AND iv.`state` IN (1, 2)  )
+                                ON( iv.`acc_id` = ac.acc_id  AND FIND_IN_SET('1',iv.`type`) AND iv.`state` IN (1, 2)  )
                               LEFT JOIN invoices as iv_due 
                                 ON( iv_due.`acc_id` = ac.acc_id  AND iv_due.`state` IN (2)  )
                               where 1 and att.status = 1 

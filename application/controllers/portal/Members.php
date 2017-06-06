@@ -137,7 +137,7 @@ class Members extends CI_Controller
                                 ON (br.`id` = acc.`branch_id`)
                                 INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = acc.`subscription_id`)
-                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id  AND FIND_IN_SET(iv.`type`, '1') AND iv.`state` IN (1, 2)  )  
+                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id  AND FIND_IN_SET( '1',iv.`type`) AND iv.`state` IN (1, 2)  )  
                                 LEFT JOIN attendance att ON (acc.`machine_user_id` = att.`account_id` AND acc.`serial_number` = att.`machine_serial`) 
                                 LEFT JOIN invoices as iv_due ON( iv_due.`acc_id` = acc.acc_id  AND iv_due.`state` IN (2)  ) 
                                WHERE acc.`status` = 1 
