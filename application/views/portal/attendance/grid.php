@@ -78,7 +78,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->order_column = 'id';
             $grid->selectAllCheckbox = false;
             $grid->actionColumn = array('view');
-            $grid->search_fields_html = array('fees_month'=>$monthly_sttaus,'check_type'=>$check_type,'datetime'=>$datetime,'subscription_status'=>$subsction_status);
+            $grid->search_fields_html = array('partial_paid'=>'','fees_month'=>$monthly_sttaus,'check_type'=>$check_type,'datetime'=>$datetime,'subscription_status'=>$subsction_status);
             $grid->custom_func = array('fees_month'=>'getPaymemntStatus','subscription_status'=>'getSubscriptionStatusResult');
             $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'member_type','machine_member_id'=>'member ID');
             $grid->hide_fields = array('id','status','invoices_id','acc_id','day_invoice');

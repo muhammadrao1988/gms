@@ -362,7 +362,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
 
 
-                                            if(count($fees_invoice_array) > 0){?>
+                                            if(count($fees_invoice_array) > 0){ ?>
                                             <div class="form-group">
                                             <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
                                                 Monthly Fee Invoice:</label>
@@ -494,9 +494,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                 tabindex="-1"
                                                 data-placeholder="Select invoice types">
                                             <option value="">Select Status</option>
-                                            <option value="1" <?php echo $row - state == 1 ? "selected" : ""; ?>>Paid
+                                            <option value="1" <?php echo $row->state == 1 ? "selected" : ""; ?>>Paid
                                             </option>
-                                            <option value="2" <?php echo $row - state == 2 ? "selected" : ""; ?>>Partial
+                                            <option value="2" <?php echo $row->state == 2 ? "selected" : ""; ?>>Partial
                                                 Paid
                                             </option>
 

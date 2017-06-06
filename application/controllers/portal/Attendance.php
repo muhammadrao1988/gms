@@ -74,21 +74,21 @@ class Attendance extends CI_Controller
                           iv.status,
                           iv.id as invoices_id,
                           sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att.`datetime`)))   AS subscription_status,
-                          FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month
+                          FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
+                           COUNT(DISTINCT(iv_due.id)) AS partial_paid,
                                                     
                         FROM
                           attendance AS att
-                          INNER JOIN accounts AS ac 
-                            ON (
-                              ac.`machine_user_id` = att.`account_id` 
-                            ) 
-                          INNER JOIN acc_types AS act
-                            ON  (act.`acc_type_ID` = ac.`acc_types`)
-                            INNER JOIN subscriptions AS sub 
+                              INNER JOIN accounts AS ac 
+                                ON (ac.`machine_user_id` = att.`account_id` ) 
+                              INNER JOIN acc_types AS act
+                                ON  (act.`acc_type_ID` = ac.`acc_types`)
+                              INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = ac.`subscription_id`)
-                                LEFT JOIN invoices as iv 
-
+                              LEFT JOIN invoices as iv 
                                 ON( iv.`acc_id` = ac.acc_id  AND FIND_IN_SET(iv.`type`, '1') AND iv.`state` IN (1, 2)  )
+                              LEFT JOIN invoices as iv_due 
+                                ON( iv_due.`acc_id` = ac.acc_id  AND iv_due.`state` IN (2)  )
                               where 1 and att.status = 1 
                                AND ac.branch_id='".$this->branch_id."'
                               ".$where." GROUP by att.id".$having_record;

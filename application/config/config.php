@@ -23,6 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
+date_default_timezone_set('Asia/Karachi');
 define('ADMIN_TITLE', 'BodyShape Admin Panel');
 define('PROJECT_TITLE', 'BodyShape');
 

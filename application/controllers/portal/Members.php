@@ -129,6 +129,7 @@ class Members extends CI_Controller
                              
                              sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att.`datetime`)))   AS subscription_status,
                               FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
+                              COUNT(DISTINCT(iv_due.id)) AS partial_paid,
                               iv.status
                             FROM
                               accounts AS acc 
@@ -138,6 +139,7 @@ class Members extends CI_Controller
                                 ON (sub.`id` = acc.`subscription_id`)
                                 LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id  AND FIND_IN_SET(iv.`type`, '1') AND iv.`state` IN (1, 2)  )  
                                 LEFT JOIN attendance att ON (acc.`machine_user_id` = att.`account_id` AND acc.`serial_number` = att.`machine_serial`) 
+                                LEFT JOIN invoices as iv_due ON( iv_due.`acc_id` = acc.acc_id  AND iv_due.`state` IN (2)  ) 
                                WHERE acc.`status` = 1 
                                AND acc.branch_id='".$this->branch_id."'
                                ".$where."  group by acc.acc_id".$having_record ;
@@ -214,7 +216,7 @@ class Members extends CI_Controller
             $DBdata['acc_manager']      = $user_info->user_id;
 
             $id = save($this->table, $DBdata);
-            $this->module->getMachineUserId(getVar('machine_member_id'),base_url(ADMIN_DIR . 'invoices/form/?tempID='.$id.'&msg=Member has been created. Please generate first inovice.'));
+            $this->module->getMachineUserId(getVar('machine_member_id'),base_url(ADMIN_DIR . 'invoices/form/?tempID='.$id.'&firstInvoice=1&msg=Member has been created. Please generate first inovice.'));
             /*------------------------------------------------------------------------------------------*/
             redirect(ADMIN_DIR . 'invoices/form/?msg=Member has been created. Please generate first inovice.');
         }

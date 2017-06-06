@@ -43,7 +43,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 //$grid->custom_func = array('subscription_status'=>'getSubscriptionStatus');
                 $grid->custom_func = array('fees_month'=>'getPaymemntStatus','subscription_status'=>'getSubscriptionStatusResult');
                 $grid->custom_col_name_fields = array('machine_member_id'=>'Member ID','monthly_status'=>'Membership Status','acc_name'=>'Name','acc_tel'=>'Mobile','name'=>'Subscription','acc_date'=>'Datetime');
-                $grid->search_fields_html = array('fees_month' => '', 'subscription_status' => $subsction_status,'acc_date'=>$datetime);
+                $grid->search_fields_html = array('partial_paid'=>'','fees_month' => '', 'subscription_status' => $subsction_status,'acc_date'=>$datetime);
                 $grid->form_buttons = array('new');
                 $grid->url = '?' . $_SERVER['QUERY_STRING'];
                 //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');
