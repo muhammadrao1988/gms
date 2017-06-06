@@ -78,7 +78,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                                     $fees_per_month = getVal("acc_types", "monthly_charges", " WHERE acc_type_ID='" . $subscription_id . "'");
 
-                                    $month_due = floor(dayDifference($invoice_generate_date) / 30);
+                                    $month_due = ceil(dayDifference($invoice_generate_date)/30 );
+
+
                                     $register_day = date('d', strtotime($invoice_generate_date));
 
                                     ?>

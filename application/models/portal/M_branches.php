@@ -16,7 +16,7 @@ class M_branches extends CI_Model
     function validate()
     {
         $this->form_validation->set_rules('branch_name', 'Branch Name', 'required');
-        
+
 
         if ($this->form_validation->run() == FALSE) {
             return false;

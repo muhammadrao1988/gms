@@ -30,6 +30,7 @@ class Attendance extends CI_Controller
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->iic_user_type = intval(get_option('iic_user_type'));
         $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
+        $this->machine_serial = getVal("users","machine_serial"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         date_default_timezone_set('Asia/Karachi');
         $this->pk_date_time = date('d-m-Y H:i');
     }
@@ -73,7 +74,7 @@ class Attendance extends CI_Controller
                           att.`datetime`,
                           iv.status,
                           iv.id as invoices_id,
-                          sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att.`datetime`)))   AS subscription_status,
+                          sub.`period` - FLOOR(DATEDIFF(CURDATE(), CURDATE()))   AS subscription_status,
                           FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
                            COUNT(DISTINCT(iv_due.id)) AS partial_paid
                                                     
@@ -91,6 +92,7 @@ class Attendance extends CI_Controller
                                 ON( iv_due.`acc_id` = ac.acc_id  AND iv_due.`state` IN (2)  )
                               where 1 and att.status = 1 
                                AND ac.branch_id='".$this->branch_id."'
+                               AND att.machine_serial = '".$this->machine_serial."'
                               ".$where." GROUP by att.id".$having_record;
 
 
