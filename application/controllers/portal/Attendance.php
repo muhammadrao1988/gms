@@ -64,6 +64,18 @@ class Attendance extends CI_Controller
             $where = str_replace(" AND account_id = '".$search['account_id']."'"," AND ac.acc_id = '".$search['account_id']."'",$where);
 
         }
+        $account_join  = "INNER JOIN accounts AS ac 
+                                ON (ac.`acc_id` = att.`acc_id` ) ";
+        $machine_serial_no = " ";
+        $attendance_left_join = "LEFT JOIN attendance AS att_sub
+                                ON (ac.`acc_id` = att_sub.`acc_id`)";
+        if($this->is_machine == 1){
+            $account_join  = "INNER JOIN accounts AS ac 
+                                ON (ac.`machine_member_id` = att.`account_id` ) ";
+            $machine_serial_no = "AND att.machine_serial = '".$this->machine_serial."'";
+            $attendance_left_join = "LEFT JOIN attendance AS att_sub
+                                ON (ac.`machine_user_id` = att_sub.`account_id` AND ac.`serial_number` = att_sub.`machine_serial`)";
+        }
         $data['query'] = "SELECT 
                           att.id as id,
                           ac.acc_id,                        
@@ -81,8 +93,7 @@ class Attendance extends CI_Controller
 
                         FROM
                           attendance AS att
-                              INNER JOIN accounts AS ac 
-                                ON (ac.`acc_id` = att.`acc_id` ) 
+                              ".$account_join."
                               INNER JOIN acc_types AS act
                                 ON  (act.`acc_type_ID` = ac.`acc_types`)
                               INNER JOIN subscriptions AS sub 
@@ -91,11 +102,10 @@ class Attendance extends CI_Controller
                                 ON( iv.`acc_id` = ac.acc_id  AND FIND_IN_SET('1',iv.`type`) AND iv.`state` IN (1, 2)  )
                               LEFT JOIN invoices as iv_due 
                                 ON( iv_due.`acc_id` = ac.acc_id  AND iv_due.`state` IN (2)  )
-                              LEFT JOIN attendance AS att_sub
-                                ON (ac.`machine_user_id` = att_sub.`account_id` AND ac.`serial_number` = att_sub.`machine_serial`)
+                              ".$attendance_left_join."
                               where 1 and att.status = 1 
                                AND ac.branch_id='".$this->branch_id."'
-                               AND att.machine_serial = '".$this->machine_serial."'
+                               ".$machine_serial_no."                               
                               ".$where." GROUP by att.id".$having_record;
         /*echo $data['query'];
         die('Call');*/

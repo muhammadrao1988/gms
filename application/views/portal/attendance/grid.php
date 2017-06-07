@@ -11,7 +11,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             <div class="col-lg-12">
 
                 <ul class="breadcrumb">
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "members"); ?>>">Members</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "members"); ?>">Members</a></li>
                     <li class="active">All Attendance</li>
                 </ul>
                 <!--breadcrumbs end -->
@@ -62,10 +62,10 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             <?php
             $search = getVar('search');
             $monthly_status = '<span  style="overflow: hidden;background: #616365;"></span>';
-            $check_type = '<select name="search[check_type]" class="form-control select-default">
+            $check_type = '<select name="search[att:check_type]" class="form-control select-default">
                                     <option value="">-select-</option>
-                                    <option value="I" '.(($search['check_type']=='I')?"selected":"").'>Checked In</option>
-                                    <option value="O" '.(($search['check_type']=='O')?"selected":"").'>Checked Out</option>
+                                    <option value="I" '.(($search['att:check_type']=='I')?"selected":"").'>Checked In</option>
+                                    <option value="O" '.(($search['att:check_type']=='O')?"selected":"").'>Checked Out</option>
                                     </select>';
             $datetime = '<input type="text" class="form-control datepicker-sql" name="search[att:datetime]" value="'.$search['att:datetime'].'"/>';
             $subsction_status = '<select name="search[subscription_status]" class="form-control select-default">
