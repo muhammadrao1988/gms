@@ -32,3 +32,4 @@ application/config/config.php
 local_files/gmsDATA.ldb
 local_files/gmsDATA.mdb
 
+local_files.zip

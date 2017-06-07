@@ -51,11 +51,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->limit = 25;
             $grid->search_box = true;
             $grid->selectAllCheckbox = false;
-            $grid->hide_fields = array('acc_id','id','day_invoice','invoices_id','last_paid');
+            $grid->hide_fields = array((($this->session->userdata('user_info')->is_machine == 1)?'acc_id':'machine_member_id'),'id','day_invoice','invoices_id','last_paid');
             $grid->order_column = 'id';
             $grid->record_not_found = 'No monthly invoice';
             $grid->custom_func = array('fees_month'=>'getPaymemntStatus','amount'=>'getTotalfeesAmount');
-            $grid->custom_col_name_fields = array('acc_date'=>'Registration Date','machine_member_id'=>'Member Id','fees_month'=>'Payment Status','acc_name'=>'Member Name');
+            $grid->custom_col_name_fields = array('acc_date'=>'Registration Date','machine_member_id'=>'Member Id','fees_month'=>'Payment Status','acc_name'=>'Member Name','acc_id'=>'account_ID');
             $grid->search_fields_html = array('machine_member_id'=>$machine_member,'acc_date'=>'','Amount'=>'','fees_month'=>'','last_paid_month'=>'','payment_status'=>'');
             //$grid->form_buttons = array('new');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
@@ -84,7 +84,7 @@ include dirname(__FILE__) . "/../includes/invoice_popup_js.php";
 <script type="text/javascript">
     $(document).ready(function () {
         $('.sub li.active a:contains("Invoices")').parent('li').removeClass('active');
-        $('.sub li a:contains("Monthly Invoice")').parent('li').addClass('active');
+        $('.sub li a:contains("Monthly Due Invoice")').parent('li').addClass('active');
     });
 
 </script>

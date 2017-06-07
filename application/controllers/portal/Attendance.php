@@ -31,6 +31,7 @@ class Attendance extends CI_Controller
         $this->iic_user_type = intval(get_option('iic_user_type'));
         $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         date_default_timezone_set('Asia/Karachi');
+        $this->is_machine = $this->session->userdata('user_info')->is_machine;
         $this->pk_date_time = date('d-m-Y H:i');
     }
 
@@ -75,12 +76,11 @@ class Attendance extends CI_Controller
                           iv.id as invoices_id,
                           sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att.`datetime`)))   AS subscription_status,
                           FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
-                           COUNT(DISTINCT(iv_due.id)) AS partial_paid,
-                                                    
+                           COUNT(DISTINCT(iv_due.id)) AS partial_paid                                                    
                         FROM
                           attendance AS att
                               INNER JOIN accounts AS ac 
-                                ON (ac.`machine_user_id` = att.`account_id` ) 
+                                ON (ac.`acc_id` = att.`acc_id` ) 
                               INNER JOIN acc_types AS act
                                 ON  (act.`acc_type_ID` = ac.`acc_types`)
                               INNER JOIN subscriptions AS sub 
@@ -92,9 +92,8 @@ class Attendance extends CI_Controller
                               where 1 and att.status = 1 
                                AND ac.branch_id='".$this->branch_id."'
                               ".$where." GROUP by att.id".$having_record;
-
-
-
+        /*echo $data['query'];
+        die('Call');*/
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -118,6 +117,11 @@ class Attendance extends CI_Controller
             $DBdata['machine_serial'] = $user_info->machine_serial;
             $DBdata['sensored_id'] = 1;
             $DBdata['status'] = 1;
+            $DBdata['is_machine'] = $this->is_machine;
+            $DBdata['acc_id'] = getVar('acc_id');
+            if($this->is_machine!=1){
+                $DBdata['account_id']="";
+            }
             $id = save($this->table, $DBdata);
 
             /*------------------------------------------------------------------------------------------*/
@@ -131,9 +135,16 @@ class Attendance extends CI_Controller
             //check machine member id
             if(getVal('accounts','acc_id',' where acc_id = "'.$str.'"') > 0) {
                 //check attendance
-                if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
-                    $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
-                    return FALSE;
+                if($this->is_machine ==1){
+                    if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
+                        $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
+                        return FALSE;
+                    }
+                }else{
+                    if(getVal('attendance','id',' where 1 and acc_id = "'.$str.'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
+                        $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
+                        return FALSE;
+                    }
                 }
                 return true;
             }

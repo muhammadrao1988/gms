@@ -44,6 +44,7 @@ class Members extends CI_Controller
         $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->iic_user_type = intval(get_option('iic_user_type'));
+        $this->is_machine = $this->session->userdata('user_info')->is_machine;
         $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
 
     }
@@ -113,6 +114,10 @@ class Members extends CI_Controller
             /*22-05-2017 Expire according to last attendance date.*/
 //echo "<a href=\"\""
 //<a href=""
+        $machine_sql = " LEFT JOIN attendance att ON (acc.`acc_id` = att.`acc_id`) ";
+        if($this->is_machine==1){
+            $machine_sql = " LEFT JOIN attendance att ON (acc.`machine_user_id` = att.`account_id` AND acc.`serial_number` = att.`machine_serial`) ";
+        }
         $data['query'] = "SELECT 
                               acc.acc_id,
                               IF(acc.machine_member_id > 0 , acc.machine_member_id ,
@@ -138,13 +143,14 @@ class Members extends CI_Controller
                                 INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = acc.`subscription_id`)
                                 LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id  AND FIND_IN_SET( '1',iv.`type`) AND iv.`state` IN (1, 2)  )  
-                                LEFT JOIN attendance att ON (acc.`machine_user_id` = att.`account_id` AND acc.`serial_number` = att.`machine_serial`) 
+                                ".$machine_sql."
                                 LEFT JOIN invoices as iv_due ON( iv_due.`acc_id` = acc.acc_id  AND iv_due.`state` IN (2)  ) 
                                WHERE acc.`status` = 1 
                                AND acc.branch_id='".$this->branch_id."'
                                ".$where."  group by acc.acc_id".$having_record ;
 
-
+        /*echo htmlentities($data['query']);
+        die('Call');*/
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -216,9 +222,11 @@ class Members extends CI_Controller
             $DBdata['acc_manager']      = $user_info->user_id;
 
             $id = save($this->table, $DBdata);
-            $this->module->getMachineUserId(getVar('machine_member_id'),base_url(ADMIN_DIR . 'invoices/form/?tempID='.$id.'&firstInvoice=1&msg=Member has been created. Please generate first inovice.'));
+            if($this->is_machine==1){
+                $this->module->getMachineUserId(getVar('machine_member_id'),base_url(ADMIN_DIR . 'invoices/form/?tempID='.$id.'&firstInvoice=1&msg=Member has been created. Please generate first invoice.'));
+            }
             /*------------------------------------------------------------------------------------------*/
-            redirect(ADMIN_DIR . 'invoices/form/?msg=Member has been created. Please generate first inovice.');
+            redirect(ADMIN_DIR . 'invoices/form/?tempID='.$id.'&firstInvoice=1&msg=Member has been created. Please generate first invoice.');
         }
     }
 
@@ -241,7 +249,9 @@ class Members extends CI_Controller
 
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
-            $this->module->getMachineUserId($_REQUEST['machine_member_id'],base_url(ADMIN_DIR . $this->module_name.'/?msg=Member has been updated.'));
+            if($this->is_machine==1) {
+                $this->module->getMachineUserId($_REQUEST['machine_member_id'], base_url(ADMIN_DIR . $this->module_name . '/?msg=Member has been updated.'));
+            }
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
 
         }

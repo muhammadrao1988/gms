@@ -20,9 +20,13 @@ class M_users_admin extends CI_Model
         $this->form_validation->set_rules('surname', 'Surname', 'required');
         $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
         $this->form_validation->set_rules('mob_phone', 'Mobile number', 'required');
-        $this->form_validation->set_rules('machine_serial', 'Machine Serial Number', 'required');
-       /* $this->form_validation->set_rules('password', 'Password', 'required');
-        $this->form_validation->set_rules('retype_new_pwd', 'Retype Password', 'required');*/
+        if(getVar('is_machine')=='1'){
+            $this->form_validation->set_rules('machine_serial', 'Machine Serial Number', 'required');
+        }
+        if(getVar('user_id')=="") {
+            $this->form_validation->set_rules('password', 'Password', 'required');
+            $this->form_validation->set_rules('retype_new_pwd', 'Retype Password', 'required');
+        }
 
         if ($this->form_validation->run() == FALSE) {
             return false;

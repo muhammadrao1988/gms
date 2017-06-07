@@ -68,8 +68,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                             <div class="col-md-12">
 
                                 <?php
-                                if ($firstInvoice == 1 && $tempID > 0)
-                                {
+                                if ($firstInvoice == 1 && $tempID > 0) {
 
                                     $subscription_id = $tempRow->acc_types;
                                     $invoice_generate_date = $tempRow->invoice_generate_date;
@@ -90,7 +89,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                            value='<?php echo $invoice_generate_date ?>'>
                                     <div class="form-group">
                                         <label for="Name" class="col-lg-3 col-sm-3 control-label">Member Name:</label>
-                                        <label class="col-lg-6" style="margin-top: 7px"><?php echo $machine_member_id . ") " . $acc_name; ?></label>
+                                        <label class="col-lg-6"
+                                               style="margin-top: 7px"><?php echo(($machine_member_id!='')? $machine_member_id . ") ":"" ). $acc_name; ?></label>
 
                                     </div>
                                     <div class="form-group" style="border-top:3px  dotted;padding-top: 10px">
@@ -198,15 +198,14 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                                             </div>
                                         </div>
-                                        <div class="form-group" >
+                                        <div class="form-group">
                                             <label for="Name" class="col-lg-3 col-sm-3 control-label">Monthly Invoice
                                                 Total </label>
                                             <div class="col-lg-6 fee_total_amount" style="margin-top: 8px"> 0
                                             </div>
                                         </div>
                                         <input type='hidden' name='is_register_old' value='1'>
-                                    <?php }
-                                    else {
+                                    <?php } else {
                                         ?>
                                         <input type='hidden' name='is_register_old' value='0'>
                                         <div class="form-group">
@@ -239,33 +238,34 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                                     <?php }
                                     ?>
-                                <div class="form-group" style="border-top:3px  dotted;padding-top: 10px">
-                                    <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">Other Invoice
-                                        Entry:</label>
-                                    <div class="form-inline col-md-9" id="invoice_entries">
-                                        <div class="default-row">
-                                            <div class="form-group" style="margin: 0;">
-                                                <select name="type[]" id="type" class="select validate[required]"
-                                                        tabindex="-1"
-                                                        data-placeholder="Select invoice types">
-                                                    <option value="">- select -</option>
-                                                    <?php
-                                                    echo selectBox("select `id`,`name` from `invoice_types` WHERE id!=1", $val);
-                                                    ?>
-                                                </select>
-                                            </div>
-                                            <div class="form-group" style="margin: 0;">
-                                                <input type="text"
-                                                       class="form-control validate[required,custom[integer]] col-md-12"
-                                                       id="amount" name="amount[]" placeholder="amount e.g 1500"
-                                                       value="<?= $row->amount; ?>">
+                                    <div class="form-group" style="border-top:3px  dotted;padding-top: 10px">
+                                        <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">Other
+                                            Invoice
+                                            Entry:</label>
+                                        <div class="form-inline col-md-9" id="invoice_entries">
+                                            <div class="default-row">
+                                                <div class="form-group" style="margin: 0;">
+                                                    <select name="type[]" id="type" class="select validate[required]"
+                                                            tabindex="-1"
+                                                            data-placeholder="Select invoice types">
+                                                        <option value="">- select -</option>
+                                                        <?php
+                                                        echo selectBox("select `id`,`name` from `invoice_types` WHERE id!=1", $val);
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="form-group" style="margin: 0;">
+                                                    <input type="text"
+                                                           class="form-control validate[required,custom[integer]] col-md-12"
+                                                           id="amount" name="amount[]" placeholder="amount e.g 1500"
+                                                           value="<?= $row->amount; ?>">
+                                                </div>
+
                                             </div>
 
                                         </div>
 
                                     </div>
-
-                                </div>
                                     <div class="form-group">
                                         <label for="addmorebtn" class="col-lg-3 col-sm-3 control-label">&nbsp;</label>
                                         <div class="col-lg-6">
@@ -282,9 +282,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                     tabindex="-1"
                                                     data-placeholder="Select invoice types">
                                                 <option value="">Select Status:</option>
-                                                <option value="1" <?php echo $row - state == 1 ? "selected" : ""; ?>>Paid
+                                                <option value="1" <?php echo $row - state == 1 ? "selected" : ""; ?>>
+                                                    Paid
                                                 </option>
-                                                <option value="2" <?php echo $row - state == 2 ? "selected" : ""; ?>>Partial
+                                                <option value="2" <?php echo $row - state == 2 ? "selected" : ""; ?>>
+                                                    Partial
                                                     Paid
                                                 </option>
 
@@ -304,7 +306,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Discount:</label>
+                                        <label for="fees_month"
+                                               class="col-lg-3 col-sm-3 control-label">Discount:</label>
                                         <div class="col-lg-6">
                                             <input type="text" id="discount" placeholder=""
                                                    style="padding: 0 10px;"
@@ -314,123 +317,124 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="description" class="col-lg-3 col-sm-3 control-label">Description:</label>
+                                        <label for="description"
+                                               class="col-lg-3 col-sm-3 control-label">Description:</label>
                                         <div class="col-lg-6">
                                         <textarea class="form-control" name="description" id="description" cols="30"
                                                   rows="5"><?= $row->description;; ?></textarea>
                                         </div>
                                     </div>
 
-                                <?php
+                                    <?php
 
 
-                                }else{?>
+                                } else {
+                                    ?>
 
 
-                                <div class="form-group">
-                                    <label for="Name" class="col-lg-3 col-sm-3 control-label">Member Name:</label>
+                                    <div class="form-group">
+                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Member Name:</label>
 
-                                    <div class="col-lg-6" <?php echo(($row->id > 0 ) ? "style='margin-top:7px'" : ""); ?>>
-                                        <?php
-                                                if($row->id > 0){
-                                                    $machine_id = getVal("accounts", "machine_member_id"," WHERE acc_id='".$row->acc_id."'");
-                                                    $acc_name = getVal("accounts", "acc_name"," WHERE acc_id='".$row->acc_id."'");
-                                                    echo $machine_id.") ".$acc_name;
-                                                    echo "<input type='hidden' name='acc_id' value='".$row->acc_id."'>";
-                                                }else{
+                                        <div class="col-lg-6" <?php echo(($row->id > 0) ? "style='margin-top:7px'" : ""); ?>>
+                                            <?php
+                                            if ($row->id > 0) {
+                                                $machine_id = getVal("accounts", "machine_member_id", " WHERE acc_id='" . $row->acc_id . "'");
+                                                $acc_name = getVal("accounts", "acc_name", " WHERE acc_id='" . $row->acc_id . "'");
+                                                echo $machine_id . ") " . $acc_name;
+                                                echo "<input type='hidden' name='acc_id' value='" . $row->acc_id . "'>";
+                                            } else {
 
-                                            ?>
-
-
-                                            <select name="acc_id" id="acc_id" class="select validate[required]">
-                                                <option value="">-Select-</option>
-                                                <?php
-                                                echo selectBox("select acc_id,CONCAT(machine_member_id,') ',acc_name) AS acc_name from accounts where status = 1 AND machine_member_id!='' AND branch_id='" . $this->session->userdata('user_info')->branch_id . "' order by acc_id desc", $row->acc_id);
                                                 ?>
-                                            </select>
-                                        <?php  } ?>
 
+
+                                                <select name="acc_id" id="acc_id" class="select validate[required]">
+                                                    <option value="">-Select-</option>
+                                                    <?php
+                                                    if($this->session->userdata('user_info')->is_machine==1){
+                                                        echo selectBox("select acc_id,CONCAT(machine_member_id,') ',acc_name) AS acc_name from accounts where status = 1 AND machine_member_id!=''  AND branch_id='" . $this->session->userdata('user_info')->branch_id . "' order by acc_id desc", $row->acc_id);
+                                                    }else{
+                                                        echo selectBox("select acc_id,CONCAT(acc_id,') ',acc_name) AS acc_name from accounts where status = 1  AND branch_id='" . $this->session->userdata('user_info')->branch_id . "' order by acc_id desc", $row->acc_id);
+                                                    }
+
+                                                    ?>
+                                                </select>
+                                            <?php } ?>
+
+                                        </div>
                                     </div>
-                                </div>
-                                    <?php if($row->id!=""){
+                                    <?php if ($row->id != "") {
                                         $fees_invoice_array = array();
                                         $amount_details = json_decode($row->amount_details);
                                         $fees_invoice_array = $amount_details->fee_invoice;
 
 
-
-
-
-
-                                            if(count($fees_invoice_array) > 0){ ?>
+                                        if (count($fees_invoice_array) > 0) { ?>
                                             <div class="form-group">
-                                            <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
-                                                Monthly Fee Invoice:</label>
-                                            <div class="col-lg-6">
-                                                <?php $amount = 0;
-                                                    foreach ($fees_invoice_array as $fee){
-                                                    $duration = explode("|",$fee->duration);
-                                                    $from_date = "From ".date("d MY",strtotime($duration[0]));
-                                                    $to_date = " To ".date("d MY",strtotime($duration[1]));
-                                                    echo $from_date.$to_date;
-                                                    echo "<br>";
-                                                    $amount = $amount + $fee->amount;
+                                                <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
+                                                    Monthly Fee Invoice:</label>
+                                                <div class="col-lg-6">
+                                                    <?php $amount = 0;
+                                                    foreach ($fees_invoice_array as $fee) {
+                                                        $duration = explode("|", $fee->duration);
+                                                        $from_date = "From " . date("d MY", strtotime($duration[0]));
+                                                        $to_date = " To " . date("d MY", strtotime($duration[1]));
+                                                        echo $from_date . $to_date;
+                                                        echo "<br>";
+                                                        $amount = $amount + $fee->amount;
 
-                                                }?>
-                                            </div>
-                                        </div>
-                                <div class="form-group">
-                                    <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
-                                       Total Monthly Fee Amount:</label>
-                                    <div class="col-lg-6" style="margin-top: 7px">
-                                        <?php echo number_format($amount);?>
-                                    </div>
-                                </div>
-
-                                            <?php }
-
-
-                                         }?>
-
-                                <div class="form-group">
-                                    <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
-                                         Invoice Entry:</label>
-                                    <div class="form-inline col-md-9" id="invoice_entries">
-                                        <?php
-                                        $hideAddmore = 0;
-                                        if ($row->id == "") { ?>
-                                            <div class="default-row">
-                                                <div class="form-group" style="margin: 0;">
-                                                    <select name="type[]" id="type" class="select validate[required]"
-                                                            tabindex="-1"
-                                                            data-placeholder="Select invoice types">
-                                                        <option value="">- select -</option>
-                                                        <?php
-                                                        echo selectBox("select `id`,`name` from `invoice_types` WHERE id!=1", $val);
-                                                        ?>
-                                                    </select>
-                                                </div>
-                                                <div class="form-group" style="margin: 0;">
-                                                    <input type="text"
-                                                           class="form-control validate[required,custom[integer]] col-md-12"
-                                                           id="amount" name="amount[]" placeholder="amount e.g 1500"
-                                                           value="<?= $row->amount; ?>">
+                                                    } ?>
                                                 </div>
                                             </div>
-                                        <?php } else {
-                                            $type = explode(",", $row->type);
+                                            <div class="form-group">
+                                                <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
+                                                    Total Monthly Fee Amount:</label>
+                                                <div class="col-lg-6" style="margin-top: 7px">
+                                                    <?php echo number_format($amount); ?>
+                                                </div>
+                                            </div>
+
+                                        <?php }
 
 
-                                            $other_invoice_array = $amount_details->other_invoice;
+                                    } ?>
+
+                                    <div class="form-group">
+                                        <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
+                                            Invoice Entry:</label>
+                                        <div class="form-inline col-md-9" id="invoice_entries">
+                                            <?php
+                                            $hideAddmore = 0;
+                                            if ($row->id == "") { ?>
+                                                <div class="default-row">
+                                                    <div class="form-group" style="margin: 0;">
+                                                        <select name="type[]" id="type"
+                                                                class="select validate[required]"
+                                                                tabindex="-1"
+                                                                data-placeholder="Select invoice types">
+                                                            <option value="">- select -</option>
+                                                            <?php
+                                                            echo selectBox("select `id`,`name` from `invoice_types` WHERE id!=1", $val);
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group" style="margin: 0;">
+                                                        <input type="text"
+                                                               class="form-control validate[required,custom[integer]] col-md-12"
+                                                               id="amount" name="amount[]" placeholder="amount e.g 1500"
+                                                               value="<?= $row->amount; ?>">
+                                                    </div>
+                                                </div>
+                                            <?php } else {
+                                                $type = explode(",", $row->type);
 
 
-                                            $j = 0;
+                                                $other_invoice_array = $amount_details->other_invoice;
 
 
+                                                $j = 0;
 
 
-
-                                            foreach ($other_invoice_array as $ad) {?>
+                                                foreach ($other_invoice_array as $ad) { ?>
 
 
                                                     <div class="<?php echo(($j > 0) ? 'append_row' : 'default-row'); ?>">
@@ -465,74 +469,77 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                         <?php }
                                                         ?>
                                                     </div>
-                                                <?php
-                                                $j++;
+                                                    <?php
+                                                    $j++;
+                                                }
+
+
+                                                $j = 0;
+
                                             }
-
-
-                                            $j = 0;
-
-                                        }
-                                        ?>
+                                            ?>
+                                        </div>
                                     </div>
-                                </div>
-                                <?php if ($hideAddmore == 0) { ?>
+                                    <?php if ($hideAddmore == 0) { ?>
+                                        <div class="form-group">
+                                            <label for="addmorebtn"
+                                                   class="col-lg-3 col-sm-3 control-label">&nbsp;</label>
+                                            <div class="col-lg-6">
+                                                <button class="btn btn-green" type="button" id="add-more-btn">Add More
+                                                    Invoice Entry
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <?php } ?>
                                     <div class="form-group">
-                                        <label for="addmorebtn" class="col-lg-3 col-sm-3 control-label">&nbsp;</label>
+                                        <label for="description" class="col-lg-3 col-sm-3 control-label">Invoice
+                                            Status</label>
                                         <div class="col-lg-6">
-                                            <button class="btn btn-green" type="button" id="add-more-btn">Add More
-                                                Invoice Entry
-                                            </button>
+                                            <select name="state" id="state" class="select validate[required]"
+                                                    tabindex="-1"
+                                                    data-placeholder="Select invoice types">
+                                                <option value="">Select Status</option>
+                                                <option value="1" <?php echo $row->state == 1 ? "selected" : ""; ?>>Paid
+                                                </option>
+                                                <option value="2" <?php echo $row->state == 2 ? "selected" : ""; ?>>
+                                                    Partial
+                                                    Paid
+                                                </option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group partial_paid_div"
+                                         style="<?php echo(($row - state == 1 OR $row - state == "") ? "display: none;" : ""); ?>">
+                                        <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Received
+                                            Amount</label>
+                                        <div class="col-lg-6">
+                                            <input type="text" id="received_amount" placeholder=""
+                                                   style="padding: 0 10px;"
+                                                   class="form-control  validate[required,custom[integer]]"
+                                                   name="received_amount"
+                                                   value="<?php echo($row->state == 2 ? $row->received_amount : ""); ?>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Discount</label>
+                                        <div class="col-lg-6">
+                                            <input type="text" id="discount" placeholder=""
+                                                   style="padding: 0 10px;"
+                                                   class="form-control  validate[custom[integer]]"
+                                                   name="discount"
+                                                   value="<?php echo $row->discount; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="description"
+                                               class="col-lg-3 col-sm-3 control-label">Description</label>
+                                        <div class="col-lg-6">
+                                        <textarea class="form-control" name="description" id="description" cols="30"
+                                                  rows="5"><?= $row->description;; ?></textarea>
                                         </div>
                                     </div>
                                 <?php } ?>
-                                <div class="form-group">
-                                    <label for="description" class="col-lg-3 col-sm-3 control-label">Invoice
-                                        Status</label>
-                                    <div class="col-lg-6">
-                                        <select name="state" id="state" class="select validate[required]"
-                                                tabindex="-1"
-                                                data-placeholder="Select invoice types">
-                                            <option value="">Select Status</option>
-                                            <option value="1" <?php echo $row->state == 1 ? "selected" : ""; ?>>Paid
-                                            </option>
-                                            <option value="2" <?php echo $row->state == 2 ? "selected" : ""; ?>>Partial
-                                                Paid
-                                            </option>
-
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group partial_paid_div"
-                                     style="<?php echo(($row - state == 1 OR $row - state == "") ? "display: none;" : ""); ?>">
-                                    <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Received
-                                        Amount</label>
-                                    <div class="col-lg-6">
-                                        <input type="text" id="received_amount" placeholder=""
-                                               style="padding: 0 10px;"
-                                               class="form-control  validate[required,custom[integer]]"
-                                               name="received_amount"
-                                               value="<?php echo ($row->state==2 ? $row->received_amount : ""); ?>">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Discount</label>
-                                    <div class="col-lg-6">
-                                        <input type="text" id="discount" placeholder=""
-                                               style="padding: 0 10px;"
-                                               class="form-control  validate[custom[integer]]"
-                                               name="discount"
-                                               value="<?php echo $row->discount; ?>">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="description" class="col-lg-3 col-sm-3 control-label">Description</label>
-                                    <div class="col-lg-6">
-                                        <textarea class="form-control" name="description" id="description" cols="30"
-                                                  rows="5"><?= $row->description;; ?></textarea>
-                                    </div>
-                                </div>
-                                <?php }?>
 
                             </div>
                         </div>
@@ -557,9 +564,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 <button type="reset" class="btn btn-black " onclick="window.history.back()">
                                     Cancel
                                 </button>
-                                <?php if($row->state!="3"){?>
-                                <button type="submit" class="btn btn-green "> Submit</button>
-                                <?php }?>
+                                <?php if ($row->state != "3") { ?>
+                                    <button type="submit" class="btn btn-green "> Submit</button>
+                                <?php } ?>
                             </div>
                         </div>
                 </div>

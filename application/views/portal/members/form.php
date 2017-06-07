@@ -1,5 +1,4 @@
 <?php
-
 include dirname(__FILE__) . "/../includes/head.php";
 include dirname(__FILE__) . "/../includes/header.php";
 include dirname(__FILE__) . "/../includes/left_side_bar.php";
@@ -15,7 +14,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 <!--breadcrumbs start -->
                 <ul class="breadcrumb">
                     <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">Members</a></li>
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">All <?php echo $title ; ?></a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "users_admin"); ?>">All <?php echo $title; ?></a></li>
                     <li class="active"><?php echo(!empty($row->acc_id) ? 'Edit' : 'Add'); ?></li>
                 </ul>
                 <!--breadcrumbs end -->
@@ -31,7 +30,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 class="fa fa-chevron-left"></i> Back
                     </button>
                     <span class="vert-sep"></span>
-                    <button class="btn btn-white active" type="button">All <?php echo $title ; ?></button>
+                    <button class="btn btn-white active" type="button">All <?php echo $title; ?></button>
                     <span class="vert-sep"></span>
                 </div>
             </div>
@@ -49,7 +48,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
         <div class="clearfix">&nbsp;</div>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <section class="panel">
-                <header class="panel-heading theme-panel-heading"><strong><?php echo $title ; ?> - Form</strong></header>
+                <header class="panel-heading theme-panel-heading"><strong><?php echo $title; ?> - Form</strong></header>
                 <div class="panel-body">
                     <form id="validate" class="form-horizontal theme-form-horizontal" role="form" method="post"
                           action="<?= site_url(ADMIN_DIR . $this->module_name . (!empty($row->acc_id) ? '/update' : '/add')); ?>"
@@ -59,7 +58,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Full Name:</label>
+                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Full
+                                        Name:</label>
                                     <div class="col-lg-6">
                                         <input type="text" id="acc_name" name="acc_name"
                                                value="<?= $row->acc_name; ?>" placeholder="Full Name"
@@ -75,9 +75,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Date of Birth: </label>
+                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Date of
+                                        Birth: </label>
                                     <div class="col-lg-6">
-                                        <input type="text" id="date_of_birth" name="date_of_birth" value="<?=(($row->date_of_birth!='' and $row->date_of_birth!='0000-00-00')?date('d/m/Y',strtotime($row->date_of_birth)):'') ; ?>"
+                                        <input type="text" id="date_of_birth" name="date_of_birth"
+                                               value="<?= (($row->date_of_birth != '' and $row->date_of_birth != '0000-00-00') ? date('d/m/Y', strtotime($row->date_of_birth)) : ''); ?>"
                                                placeholder="DD-MM-YYYY"
                                                class="form-control validate[required] datepicker-format">
                                     </div>
@@ -86,10 +88,14 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Gender: </label>
                                     <div class="col-lg-6">
                                         <label>
-                                            <input type="radio" name="gender" value="male" <?php echo (($row->gender == 'male')?'checked':'') ; ?>> Male
+                                            <input type="radio" name="gender"
+                                                   value="male" <?php echo(($row->gender == 'male') ? 'checked' : ''); ?>>
+                                            Male
                                         </label>
                                         <label>
-                                            <input type="radio" name="gender" value="female" <?php echo (($row->gender == 'female')?'checked':'') ; ?>> Female
+                                            <input type="radio" name="gender"
+                                                   value="female" <?php echo(($row->gender == 'female') ? 'checked' : ''); ?>>
+                                            Female
                                         </label>
                                     </div>
                                 </div>
@@ -103,7 +109,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Address: </label>
+                                    <label for="inputPassword1"
+                                           class="col-lg-3 col-sm-3 control-label">Address: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="address" name="address"
                                                value="<?= $row->address; ?>" placeholder="Address"
@@ -119,7 +126,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Country: </label>
+                                    <label for="inputPassword1"
+                                           class="col-lg-3 col-sm-3 control-label">Country: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="country" name="country"
                                                value="<?= $row->country; ?>" placeholder="Country"
@@ -127,31 +135,43 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Registration Date: </label>
+                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Registration
+                                        Date: </label>
                                     <div class="col-lg-6">
-                                        <input type="text" id="acc_date" name="acc_date" value="<?=(($row->acc_date!='' and $row->acc_date!='0000-00-00')?date('d-m-Y',strtotime($row->acc_date)):'') ; ?>"
+                                        <input type="text" id="acc_date" name="acc_date"
+                                               value="<?= (($row->acc_date != '' and $row->acc_date != '0000-00-00') ? date('d-m-Y', strtotime($row->acc_date)) : ''); ?>"
                                                placeholder="DD-MM-YYYY"
                                                class="form-control validate[required] datepicker-format">
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">User ID: </label>
-                                    <div class="col-lg-6">
-                                        <input type="text"
-                                               value="<?= $row->machine_member_id; ?>" placeholder="User ID"
-                                               class="form-control validate[required,custom[integer]]">
+                                <?php
+                                if ($this->session->userdata('user_info')->is_machine == 1) {
+                                    ?>
+                                    <div class="form-group">
+                                        <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">User
+                                            ID: </label>
+                                        <div class="col-lg-6">
+                                            <input type="text"
+                                                   value="<?= $row->machine_member_id; ?>" placeholder="User ID"
+                                                   class="form-control validate[required,custom[integer]]">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Machine Member ID: </label>
-                                    <div class="col-lg-6">
-                                        <input type="text" id="machine_member_id" name="machine_member_id"
-                                               value="<?= $row->machine_member_id; ?>" placeholder="Machine Member ID"
-                                               class="form-control validate[required,custom[integer]]">
+                                    <div class="form-group">
+                                        <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Machine
+                                            Member ID: </label>
+                                        <div class="col-lg-6">
+                                            <input type="text" id="machine_member_id" name="machine_member_id"
+                                                   value="<?= $row->machine_member_id; ?>"
+                                                   placeholder="Machine Member ID"
+                                                   class="form-control validate[required,custom[integer]]">
+                                        </div>
                                     </div>
-                                </div>
+                                    <?php
+                                }
+                                ?>
                                 <div class="form-group">
-                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Member Type: </label>
+                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Member
+                                        Type: </label>
                                     <div class="col-lg-6">
                                         <label class="styled_select">
                                             <select name="acc_types" id="acc_types" class="styled validate[required]">
@@ -162,10 +182,12 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Subscription: </label>
+                                    <label for="inputEmail1"
+                                           class="col-lg-3 col-sm-3 control-label">Subscription: </label>
                                     <div class="col-lg-6">
                                         <label class="styled_select">
-                                            <select name="subscription_id" id="subscription_id" class="styled validate[required]">
+                                            <select name="subscription_id" id="subscription_id"
+                                                    class="styled validate[required]">
                                                 <option value=""> - Select -</option>
                                                 <?= selectBox("SELECT id,CONCAT(`name`,' - ',period_duration) AS subsribe_name FROM `subscriptions` WHERE `status` = 1", $row->subscription_id); ?>
                                             </select>
@@ -203,17 +225,17 @@ include dirname(__FILE__) . "/../includes/footer.php";
 
             $('#subscriptin_id').on('change', function () {
                 var id = $(this).val();
-                if(id !='') {
+                if (id != '') {
                     $.ajax({
                         type: "POST",
                         url: '<?= site_url(ADMIN_DIR . $this->module_name . '/ajax/getSubscriptionCharges'); ?>',
                         data: "&id=" + id,
                         complete: function (data) {
                             //alert(data.responseText);
-                            $('#subscriptin_id').closest('.styled_select').find('.help-block').html(data.responseText+' rupess charges for this subscription.');
+                            $('#subscriptin_id').closest('.styled_select').find('.help-block').html(data.responseText + ' rupess charges for this subscription.');
                         }
                     });
-                }else{
+                } else {
                     $('#subscriptin_id').closest('.styled_select').find('.help-block').html('');
                 }
             });

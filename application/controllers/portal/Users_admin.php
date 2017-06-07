@@ -144,7 +144,7 @@ class Users_admin extends CI_Controller
             $DbArray = getDbArray($this->table);
 
             $DBdata = $DbArray['dbdata'];
-		
+            $DBdata['is_machine'] = ((getVar('is_machine')=="")?0:getVar('is_machine'));
             $id = save($this->table, $DBdata);
 
             /*--------------------------------------EmailTemplate--------------------------------------*/
@@ -173,8 +173,8 @@ class Users_admin extends CI_Controller
 
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
-			
-			
+
+            $DBdata['is_machine'] = ((getVar('is_machine')=="")?0:getVar('is_machine'));
 
             $where = $DbArray['where'];
 
