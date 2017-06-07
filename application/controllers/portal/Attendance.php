@@ -70,11 +70,11 @@ class Attendance extends CI_Controller
                           ac.acc_name ,
                           act.`Name` ,    
                           DATE_FORMAT( ac.`invoice_generate_date`, '%d') AS day_invoice,
-                          IF(check_type='I','Checked In','Checked Out') as check_type,
+                          IF(att.check_type='I','Checked In','Checked Out') as check_type,
                           att.`datetime`,
                           iv.status,
                           iv.id as invoices_id,
-                          sub.`period` - FLOOR(DATEDIFF(CURDATE(), CURDATE()))   AS subscription_status,
+                          sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att_sub.`datetime`)))   AS subscription_status,
                           FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
                            COUNT(DISTINCT(iv_due.id)) AS partial_paid
                                                     
@@ -90,6 +90,8 @@ class Attendance extends CI_Controller
                                 ON( iv.`acc_id` = ac.acc_id  AND FIND_IN_SET('1',iv.`type`) AND iv.`state` IN (1, 2)  )
                               LEFT JOIN invoices as iv_due 
                                 ON( iv_due.`acc_id` = ac.acc_id  AND iv_due.`state` IN (2)  )
+                              LEFT JOIN attendance AS att_sub
+                                ON (ac.`machine_user_id` = att_sub.`account_id` AND ac.`serial_number` = att_sub.`machine_serial`)
                               where 1 and att.status = 1 
                                AND ac.branch_id='".$this->branch_id."'
                                AND att.machine_serial = '".$this->machine_serial."'
