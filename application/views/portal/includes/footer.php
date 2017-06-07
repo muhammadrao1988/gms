@@ -143,6 +143,9 @@
 
     });
 </script>-->
+<?php
+if($this->session->userdata('user_info')->is_machine==1){
+?>
 <script type="text/javascript">
     function onBlur() {
         document.body.className = 'blurred';
@@ -224,6 +227,9 @@
 
     });
 </script>
+<?php
+}
+?>
 <!--<script type="text/javascript">
     $(document).ready(function () {
         setInterval(function () {

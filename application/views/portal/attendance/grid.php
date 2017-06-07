@@ -102,7 +102,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
-include dirname(__FILE__) . "/../includes/fees_pay_pop.php";
+include dirname(__FILE__) . "/../includes/invoice_popup_js.php";
 
 ?>
 <script type="text/javascript">

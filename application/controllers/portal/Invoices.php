@@ -65,11 +65,9 @@ class Invoices extends CI_Controller
                             WHEN 1 THEN '<span style=\"color:green;font-weight:bold\">PAID</span>'
                             WHEN 2 THEN '<span style=\"color:red;font-weight:bold\">PARTIAL PAID</span>'
                             WHEN 3 THEN '<span style=\"color:yellow;font-weight:bold\">CANCELLED</span>'
-                           END AS state,
-                              ic.amount,
-                              
-                              date(ic.fees_datetime) as fees_datetime,
-                              
+                           END AS state,                                                       
+                              IF(ic.state=2,CONCAT('Total: ',ic.amount,'<br>Received: ',ic.received_amount,'<br>Remain: ',ic.amount - ic.received_amount),ic.received_amount) AS amount,
+                              date(ic.fees_datetime) as fees_datetime,                              
                               ic.`type`                            
                             FROM
                               invoices AS ic 
@@ -146,13 +144,12 @@ class Invoices extends CI_Controller
         }
 
         if ($id > 0) {
-            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' AND branch_id='".$this->branch_id."'";
+            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' AND branch_id='" . $this->branch_id . "'";
             $data['row'] = $this->db->query($SQL)->row();
-            if($data['row']->id==""){
+            if ($data['row']->id == "") {
                 redirect(ADMIN_DIR . $this->module_name . '/?error=Invalid access');
             }
-    }
-
+        }
         $data['title'] = $this->module_title;
         $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
     }
@@ -168,7 +165,7 @@ class Invoices extends CI_Controller
         }
 
         if ($id > 0) {
-            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . " IN (" . $id . ") AND branch_id = '".$this->branch_id."'";
+            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . " IN (" . $id . ") AND branch_id='".$this->branch_id."'";
             $data['rows'] = $this->db->query($SQL)->result();
             if($data['rows'][0]->id==""){
                 redirect(ADMIN_DIR . $this->module_name . '/?error=Invalid access');
@@ -317,8 +314,8 @@ class Invoices extends CI_Controller
 
                     $firstIndexFessMonthCancel = explode("|",$fees_month[0]);
                     $lastIndexFessMonthCancel = explode("|",end($fees_month));
-                    $from_month_cancel = $firstIndexFessMonthCancel[0];
-                    $to_month_cancel = $lastIndexFessMonthCancel[1];
+                    $from_month_cancel = $lastIndexFessMonthCancel[0];
+                    $to_month_cancel = $firstIndexFessMonthCancel[1];
 
                     $total_array_cancel = array();
                     $total_array_cancel['subtotal'] = $calculate_amount_cancel;
@@ -348,6 +345,7 @@ class Invoices extends CI_Controller
                     $cancel_invoice_date['created_by'] = $this->session->userdata('user_info')->user_id;
                     $cancel_invoice_date['from_date'] = $from_month_cancel;
                     $cancel_invoice_date['to_date'] = $to_month_cancel;
+
                     save("invoices",$cancel_invoice_date);
 
 

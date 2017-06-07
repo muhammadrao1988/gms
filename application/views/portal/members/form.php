@@ -176,7 +176,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         <label class="styled_select">
                                             <select name="acc_types" id="acc_types" class="styled validate[required]">
                                                 <option value=""> - Select -</option>
-                                                <?= selectBox("SELECT `acc_type_ID`, `Name` FROM `acc_types`", $row->acc_types); ?>
+                                                <?= selectBox("SELECT `acc_type_ID`, `Name` FROM `acc_types` WHERE branch_id='".$this->branch_id."'", $row->acc_types); ?>
                                             </select>
                                         </label>
                                     </div>
@@ -189,7 +189,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                             <select name="subscription_id" id="subscription_id"
                                                     class="styled validate[required]">
                                                 <option value=""> - Select -</option>
-                                                <?= selectBox("SELECT id,CONCAT(`name`,' - ',period_duration) AS subsribe_name FROM `subscriptions` WHERE `status` = 1", $row->subscription_id); ?>
+                                                <?= selectBox("SELECT id,CONCAT(`name`,' - ',period,' Days') AS subsribe_name FROM `subscriptions` WHERE `status` = 1 AND branch_id='".$this->branch_id."'", $row->subscription_id); ?>
                                             </select>
                                             <span class="help-block"></span>
                                         </label>

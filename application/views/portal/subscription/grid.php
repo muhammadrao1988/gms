@@ -36,7 +36,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->limit = 25;
             $grid->search_box = false;
             $grid->selectAllCheckbox = false;
-            $grid->hide_fields = array('branch_id','service_charges','acc_type_ID');
+            $grid->hide_fields = array('branch_id','period_duration','id','status','datetime');
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new');

@@ -896,17 +896,23 @@ function  getSubscriptionStatusResult($val){
 
     if(is_array($val)){
         $period = $val[0];
+        $acc_id = $val[1]['acc_id'];
+        $check_invoice_pending = getVal('invoices','id'," WHERE acc_id='".$acc_id."' AND `type`=3 AND `state`=2");
     }else{
         $period = $val;
+        $check_invoice_pending = "";
     }
 
-    if($period > 0){
+
+    if($period > 0 && $check_invoice_pending==""){
 
         $paybutton = '<span class="green"><b> Continue</b></span> ';
         return $paybutton;
     }else if($period < 0){
-
         return '<span class="red"><b>Expired</b></span>';
+    }else if($check_invoice_pending!=""){
+        $paybutton = '<a href="'.base_url(ADMIN_DIR."invoices/form/".$check_invoice_pending).'" <span class="red"><b> Invoice Pending</b></span></a>';
+        return $paybutton;
     }else{
         return '<span><b>No attendance yet</b></span>';
 

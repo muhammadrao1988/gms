@@ -55,8 +55,14 @@ class Revenue extends CI_Controller
                               amount,                              
                               description,
                               fees_datetime,
-                              fees_month,
-                              SUM(amount) as total_amount_summary,
+                              
+                              
+                                CASE state
+                            WHEN 1 THEN '<span style=\"color:green;font-weight:bold\">PAID</span>'
+                            WHEN 2 THEN '<span style=\"color:red;font-weight:bold\">PARTIAL PAID</span>'
+                            WHEN 3 THEN '<span style=\"color:yellow;font-weight:bold\">CANCELLED</span>'
+                             END AS state,
+                             IF(state=2,CONCAT('Total:',amount,'<br> Received:',received_amount), received_amount)as total_amount_summary,
                                `type` as invoice_for from invoices where 1 AND branch_id = '".$this->branch_id."' ".$filter.$where." GROUP BY id " ;
 
         $chart = str_replace("GROUP BY id","",$data['query']);
@@ -70,10 +76,10 @@ class Revenue extends CI_Controller
         $data['report_days'] = $report_days;
 
         $data['summary_total'] = $this->db->query('SELECT 
-                                              SUM(amount) AS summary_total
+                                              SUM(received_amount) AS summary_total
                                             FROM
                                               invoices                                             
-                                            WHERE 1'.$filter.$where)->row()->summary_total;
+                                            WHERE 1 AND branch_id = "'.$this->branch_id.'"'.$filter.$where)->row()->summary_total;
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }

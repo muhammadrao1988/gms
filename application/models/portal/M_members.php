@@ -70,17 +70,17 @@ class M_members extends CI_Model
                                         var json_string_valuedd = client.responseText;
                                         window.location.href = "<?php echo $redirect_url;?>";
                                     } else {
-                                        window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=iiiError in synchronizing please edit member and try again.');?>";
+                                        window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=Error in synchronizing please edit member and try again.');?>";
                                     }
                                 };
                                 ajax.send();
                             } else {
                                 console.log('user id not found');
-                                window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=tttError in synchronizing please edit member and try again.');?>";
+                                window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=Error in synchronizing please edit member and try again.');?>";
                             }
                         } else {
                             console.log('script has error');
-                            window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=kkkError in synchronizing please edit member and try again.');?>";
+                            window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=Error in synchronizing please edit member and try again.');?>";
                         }
                     }
                     j++;
