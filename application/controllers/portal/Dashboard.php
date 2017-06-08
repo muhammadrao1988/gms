@@ -340,8 +340,8 @@ class Dashboard extends CI_Controller
                         /***********************END*********************************/
 
 
-
-                        $this->db->query("INSERT INTO `attendance` SET `account_id` = '" . $attendance->USERID . "', `status` = '1', `datetime` = '" . $attendance->CHECKTIME . "', `check_type` = '" . $attendance->CHECKTYPE . "', `machine_serial` = '" . $attendance->sn . "', `sensored_id` = '" . $attendance->SENSORID . "'");
+                        $acc_id = getVal('accounts','acc_id',' WHERE machine_user_id = "'.$attendance->USERID.'" and serial_number="'.$attendance->sn.'"');
+                        $this->db->query("INSERT INTO `attendance` SET `account_id` = '" . $attendance->USERID . "', `status` = '1', `datetime` = '" . $attendance->CHECKTIME . "', `check_type` = '" . $attendance->CHECKTYPE . "', `machine_serial` = '" . $attendance->sn . "', `sensored_id` = '" . $attendance->SENSORID . "' ,`acc_id` = '".$acc_id."'");
 
                         $json[$i]['account_id'] = $getAccountDetail->machine_member_id;
                         $json[$i]['datetime'] = $attendance->CHECKTIME;

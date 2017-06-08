@@ -61,7 +61,8 @@ class M_members extends CI_Model
                         if (client.status == "200") {
                             console.log('<?=USERID_DATA_URL;?>?member_id=<?php echo $id; ?>');
                             //document.getElementById("att_data_html").innerHTML = client.responseText;
-                            var json_string_value = client.responseText;
+                            var json_string_value = JSON.parse(client.responseText);
+                            console.log(json_string_value);
                             if (parseInt(json_string_value)>0) {
                                 var ajax = new XMLHttpRequest();
                                 ajax.open('GET', '<?=base_url(ADMIN_DIR . '/members/insertuserid');?>?member_id=<?php echo $id; ?>&userID=' + json_string_value);
@@ -70,17 +71,17 @@ class M_members extends CI_Model
                                         var json_string_valuedd = client.responseText;
                                         window.location.href = "<?php echo $redirect_url;?>";
                                     } else {
-                                        window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=Error in synchronizing please edit member and try again.');?>";
+                                        //window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=llError in synchronizing please edit member and try again.');?>";
                                     }
                                 };
                                 ajax.send();
                             } else {
                                 console.log('user id not found');
-                                window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=Error in synchronizing please edit member and try again.');?>";
+                                //window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=pppError in synchronizing please edit member and try again.');?>";
                             }
                         } else {
                             console.log('script has error');
-                            window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=Error in synchronizing please edit member and try again.');?>";
+                            //window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=kkError in synchronizing please edit member and try again.');?>";
                         }
                     }
                     j++;

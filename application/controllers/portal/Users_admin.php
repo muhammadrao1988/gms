@@ -177,6 +177,12 @@ class Users_admin extends CI_Controller
             $DBdata['is_machine'] = ((getVar('is_machine')=="")?0:getVar('is_machine'));
 
             $where = $DbArray['where'];
+            $old_serial  = getVal('users','machine_serial',' where user_id="'.getVar('user_id').'"');
+            if(getVar('machine_serial') !=$old_serial){
+                $this->db->query("UPDATE `accounts` SET `serial_number` = '".getVar('machine_serial')."' WHERE `acc_manager` = '".getVar('user_id')."' and `serial_number`='".$old_serial."'");
+
+                $this->db->query("UPDATE `attendance` SET  `machine_serial` = '".getVar('machine_serial')."' WHERE `machine_serial`='".$old_serial."'");
+            }
 
             save($this->table, $DBdata, $where);
 

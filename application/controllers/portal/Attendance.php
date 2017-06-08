@@ -71,10 +71,10 @@ class Attendance extends CI_Controller
                                 ON (ac.`acc_id` = att_sub.`acc_id`)";
         if($this->is_machine == 1){
             $account_join  = "INNER JOIN accounts AS ac 
-                                ON (ac.`machine_member_id` = att.`account_id` ) ";
+                                ON (ac.`acc_id` = att.`acc_id` ) ";
             $machine_serial_no = "AND att.machine_serial = '".$this->machine_serial."'";
             $attendance_left_join = "LEFT JOIN attendance AS att_sub
-                                ON (ac.`machine_user_id` = att_sub.`account_id` AND ac.`serial_number` = att_sub.`machine_serial`)";
+                                ON (ac.`acc_id` = att_sub.`acc_id` AND ac.`serial_number` = att_sub.`machine_serial`)";
         }
         $data['query'] = "SELECT 
                           att.id as id,

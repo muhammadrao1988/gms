@@ -50,11 +50,11 @@ class Revenue extends CI_Controller
         }
         $filter = " AND fees_datetime BETWEEN '".$from."' AND '".$to."' ";
         $data['query'] = "Select id,
-                              acc_id as account_id,
-                              machine_member_id,
-                              amount,                              
-                              description,
-                              fees_datetime,
+                              inv.acc_id as account_id,
+                              inv.machine_member_id,
+                              inv.amount,                              
+                              inv.description,
+                              inv.fees_datetime,
                               
                               
                                 CASE state
@@ -62,11 +62,16 @@ class Revenue extends CI_Controller
                             WHEN 2 THEN '<span style=\"color:red;font-weight:bold\">PARTIAL PAID</span>'
                             WHEN 3 THEN '<span style=\"color:yellow;font-weight:bold\">CANCELLED</span>'
                              END AS state,
-                             IF(state=2,CONCAT('Total:',amount,'<br> Received:',received_amount), received_amount)as total_amount_summary,
-                               `type` as invoice_for from invoices where 1 AND branch_id = '".$this->branch_id."' ".$filter.$where." GROUP BY id " ;
+                             IF(inv.state=2,CONCAT('Total:',inv.amount,'<br> Received:',inv.received_amount), inv.received_amount)as total_amount_summary,
+                               `type` as invoice_for from invoices as inv
+                                INNER JOIN accounts AS ac 
+                                ON (ac.acc_id = inv.acc_id)
+                                where 1 AND inv.branch_id = '".$this->branch_id."' ".$filter.$where." GROUP BY inv.id " ;
+        /*echo htmlentities($data['query']);
+        die('Call');*/
 
-        $chart = str_replace("GROUP BY id","",$data['query']);
-        $chart = $chart." GROUP BY DATE(`fees_datetime`)";
+        $chart = str_replace("GROUP BY inv.id","",$data['query']);
+        $chart = $chart." GROUP BY DATE(inv.`fees_datetime`)";
         $data['chart_total'] = $this->db->query($chart)->result();
         foreach ($data['chart_total'] as $ct) {
             $total_amount[] = ($ct->total_amount_summary=="" ? 0 : $ct->total_amount_summary);
@@ -76,10 +81,12 @@ class Revenue extends CI_Controller
         $data['report_days'] = $report_days;
 
         $data['summary_total'] = $this->db->query('SELECT 
-                                              SUM(received_amount) AS summary_total
+                                              SUM(inv.received_amount) AS summary_total
                                             FROM
-                                              invoices                                             
-                                            WHERE 1 AND branch_id = "'.$this->branch_id.'"'.$filter.$where)->row()->summary_total;
+                                              invoices  as inv
+                                            INNER JOIN accounts AS ac 
+                                            ON (ac.acc_id = inv.acc_id)
+                                            WHERE 1 AND inv.branch_id = "'.$this->branch_id.'"'.$filter.$where)->row()->summary_total;
 
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
