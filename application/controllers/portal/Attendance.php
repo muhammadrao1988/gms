@@ -151,12 +151,12 @@ class Attendance extends CI_Controller
             if(getVal('accounts','acc_id',' where acc_id = "'.$str.'"') > 0) {
                 //check attendance
                 if($this->is_machine ==1){
-                    if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
+                    if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($_REQUEST['datetime'])).'" and check_type = "'.getVar('check_type').'"')>0){
                         $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
                         return FALSE;
                     }
                 }else{
-                    if(getVal('attendance','id',' where 1 and acc_id = "'.$str.'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
+                    if(getVal('attendance','id',' where 1 and acc_id = "'.$str.'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($_REQUEST['datetime'])).'" and check_type = "'.getVar('check_type').'"')>0){
                         $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
                         return FALSE;
                     }

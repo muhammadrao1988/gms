@@ -71,21 +71,22 @@ class M_members extends CI_Model
                                         var json_string_valuedd = client.responseText;
                                         window.location.href = "<?php echo $redirect_url;?>";
                                     } else {
-                                        //window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=llError in synchronizing please edit member and try again.');?>";
+                                        window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=llError in synchronizing please edit member and try again.');?>";
                                     }
                                 };
                                 ajax.send();
                             } else {
                                 console.log('user id not found');
-                                //window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=pppError in synchronizing please edit member and try again.');?>";
+                                window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=pppError in synchronizing please edit member and try again.');?>";
                             }
                         } else {
                             console.log('script has error');
-                            //window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=kkError in synchronizing please edit member and try again.');?>";
+                            window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=kkError in synchronizing please edit member and try again.');?>";
                         }
                     }
                     j++;
                 };
+                //client.setRequestHeader("Content-type","application/x-www-form-urlencoded");
                 client.send();
             },1000);
         </script>

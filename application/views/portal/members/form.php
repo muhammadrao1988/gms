@@ -57,6 +57,19 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                         <div class="row">
 
                             <div class="col-md-12">
+                                <?php
+                                if ($this->session->userdata('user_info')->is_machine != 1) {
+                                ?>
+                                <div class="form-group">
+                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label"> Member ID: </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" id="machine_member_id" name="machine_member_id"
+                                               value="<?= $row->machine_member_id; ?>"
+                                               placeholder="Member ID"
+                                               class="form-control validate[required,custom[integer]]">
+                                    </div>
+                                </div>
+                                <?php } ?>
                                 <div class="form-group">
                                     <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Full
                                         Name:</label>
@@ -170,7 +183,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 }
                                 ?>
                                 <div class="form-group">
-                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Member
+                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Membership
                                         Type: </label>
                                     <div class="col-lg-6">
                                         <label class="styled_select">

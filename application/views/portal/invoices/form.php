@@ -195,7 +195,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                 <label>
                                                     <input name="invoice_option" value="2"
                                                            class="invoice_option validate[required]" type="radio">
-                                                    Cancel all invoices and create invoice from today date
+                                                    Cancel all invoices and create invoice from today
                                                 </label>
 
                                             </div>
@@ -504,7 +504,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                 <option value="1" <?php echo $row->state == 1 ? "selected" : ""; ?>>Paid
                                                 </option>
                                                 <option value="2" <?php echo $row->state == 2 ? "selected" : ""; ?>>
-                                                    Partial
+                                                    Partially
                                                     Paid
                                                 </option>
 

@@ -68,7 +68,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="service_period" class="col-lg-3 col-sm-3 control-label"> Period</label>
+                                    <label for="service_period" class="col-lg-3 col-sm-3 control-label"> Days</label>
                                     <div class="col-lg-6">
                                         <input type="text" id="period" name="period" value="<?= (($row->period=='')?'30':$row->period); ?>"
                                                placeholder="Enter days number e.g 30 for 30 days "
@@ -87,7 +87,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <label for="monthly_charges" class="col-lg-3 col-sm-3 control-label"> Charges</label>
                                     <div class="col-lg-6">
                                         <input type="text" id="charges" name="charges" value="<?= $row->charges; ?>"
-                                               placeholder="Monthly Charges"
+                                               placeholder="Charges"
                                                class="form-control validate[required,custom[integer]]">
                                     </div>
                                 </div>
