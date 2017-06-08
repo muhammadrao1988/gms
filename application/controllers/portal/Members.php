@@ -162,7 +162,7 @@ class Members extends CI_Controller
         if ($id > 0) {
             $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' AND branch_id='".$this->branch_id."'";
             $data['row'] = $this->db->query($SQL)->row();
-            if($data['row']->id==""){
+            if($data['row']->acc_id==""){
                 redirect(ADMIN_DIR . $this->module_name . '/?error=Invalid access');
             }
             $data['row']->user_type = strtolower(getVal('user_types', 'user_type', "WHERE id='" . $data['row']->u_type . "'"));

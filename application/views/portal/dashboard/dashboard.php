@@ -15,9 +15,9 @@ $date_range2 = date('Y-m-d 23:59:59');
 $filter = " AND expense_date BETWEEN '" . $date_range . "' AND '" . $date_range2 . "' AND  branch_id = '" . $branch_id . "' ";
 $expense_current_month = $this->db->query("SELECT SUM(total_amount) AS total_expense FROM expenses WHERE 1" . $filter)->row()->total_expense;
 $expense_today = $this->db->query("SELECT SUM(total_amount) AS today_expense FROM expenses WHERE 1 AND DATE(expense_date)='" . date('Y-m-d') . "' AND  branch_id = '" . $branch_id . "'")->row()->today_expense;
-$revenue_month = $this->db->query("Select SUM(received_amount) as month_revenue from invoices where 1 AND branch_id = '" . $branch_id . "' AND fees_datetime BETWEEN '" . $date_range . "' AND '" . $date_range2 . "'")->row()->month_revenue;
-$revenue_today = $this->db->query("Select SUM(received_amount) as month_revenue from invoices where 1 AND branch_id = '" . $branch_id . "' AND DATE(fees_datetime) = '" . date('Y-m-d') . "'")->row()->month_revenue;
-$total_invoices = $this->db->query("SELECT COUNT(id) AS total_invoices FROM invoices WHERE branch_id = '" . $branch_id . "'")->row()->total_invoices;
+$revenue_month = $this->db->query("Select SUM(inv.received_amount) as month_revenue from invoices inv JOIN accounts acc ON (inv.acc_id = acc.acc_id) where 1 AND inv.branch_id = '" . $branch_id . "' AND inv.fees_datetime BETWEEN '" . $date_range . "' AND '" . $date_range2 . "'")->row()->month_revenue;
+$revenue_today = $this->db->query("Select SUM(inv.received_amount) as month_revenue from invoices inv JOIN accounts acc ON (inv.acc_id = acc.acc_id) where 1 AND inv.branch_id = '" . $branch_id . "' AND DATE(inv.fees_datetime) = '" . date('Y-m-d') . "'")->row()->month_revenue;
+$total_invoices = $this->db->query("SELECT COUNT(inv.id) AS total_invoices FROM invoices inv JOIN accounts acc ON (inv.acc_id = acc.acc_id) WHERE inv.branch_id = '" . $branch_id . "'")->row()->total_invoices;
 $monthly_invoices = $this->db->query("SELECT 
                          
                           MAX(inv.`fees_month`) AS last_paid,
