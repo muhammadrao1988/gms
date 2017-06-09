@@ -35,7 +35,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                         if($this->session->userdata('user_info')->is_machine==1){
                             echo selectBox("select acc_id,CONCAT(machine_member_id,') ',acc_name) AS acc_name from accounts where status = 1 AND machine_member_id!='' AND branch_id='".$this->session->userdata('user_info')->branch_id."' order by acc_id desc", '');
                         }else{
-                            echo selectBox("select acc_id,CONCAT(acc_id,') ',acc_name) AS acc_name from accounts where status = 1 AND branch_id='".$this->session->userdata('user_info')->branch_id."' order by acc_id desc", '');
+                            echo selectBox("select acc_id,CONCAT(machine_member_id,') ',acc_name) AS acc_name from accounts where status = 1 AND branch_id='".$this->session->userdata('user_info')->branch_id."' order by acc_id desc", '');
                         }
                         ?>
                     </select>
@@ -84,8 +84,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->actionColumn = array('view');
             $grid->search_fields_html = array('partial_paid'=>'','fees_month'=>$monthly_sttaus,'check_type'=>$check_type,'datetime'=>$datetime,'subscription_status'=>$subsction_status);
             $grid->custom_func = array('fees_month'=>'getPaymemntStatus','subscription_status'=>'getSubscriptionStatusResult');
-            $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'member_type','machine_member_id'=>'member ID','acc_id'=>'account_id');
-            $grid->hide_fields = array('id','status','invoices_id',(($this->session->userdata('user_info')->is_machine == 1)?'acc_id':'machine_member_id'),'day_invoice');
+            $grid->custom_col_name_fields = array('acc_name'=>'member_name','Name'=>'membership_type','machine_member_id'=>'member ID','acc_id'=>'account_id','datetime'=>'Date');
+            $grid->hide_fields = array('id','status','invoices_id','acc_id','day_invoice');
             $grid->url = '?' . $_SERVER['QUERY_STRING'];
             $grid->grid_buttons = array();
             echo $grid->showGrid();

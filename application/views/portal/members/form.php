@@ -134,7 +134,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">City: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="city" name="city"
-                                               value="<?= $row->city; ?>" placeholder="City"
+                                               value="<?= (($row->city=="")?'Karachi':$row->city); ?>" placeholder="City"
                                                class="form-control">
                                     </div>
                                 </div>
@@ -143,7 +143,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                            class="col-lg-3 col-sm-3 control-label">Country: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="country" name="country"
-                                               value="<?= $row->country; ?>" placeholder="Country"
+                                               value="<?= (($row->country=="")?'Pakistan':$row->country); ?>" placeholder="Country"
                                                class="form-control">
                                     </div>
                                 </div>

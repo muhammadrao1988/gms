@@ -51,7 +51,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->limit = 25;
             $grid->search_box = true;
             $grid->selectAllCheckbox = false;
-            $grid->hide_fields = array((($this->session->userdata('user_info')->is_machine == 1)?'acc_id':'machine_member_id'),'id','day_invoice','invoices_id','last_paid');
+            $grid->hide_fields = array('acc_id','id','day_invoice','invoices_id','last_paid');
             $grid->order_column = 'id';
             $grid->record_not_found = 'No monthly invoice';
             $grid->custom_func = array('fees_month'=>'getPaymemntStatus','amount'=>'getTotalfeesAmount');

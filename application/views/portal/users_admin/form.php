@@ -148,7 +148,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                                             <select name="branch_id" id="branch_id" class="select validate[required]">
                                                 <option value=""> - Select -</option>
-                                                <?= selectBox("SELECT id,branch_name FROM `branches`", $row->branch_id); ?>
+                                                <?= selectBox("SELECT id,branch_name FROM `branches` where 1 and (branch_user = '' or branch_user  is null)", $row->branch_id); ?>
                                             </select>
 
                                     </div>

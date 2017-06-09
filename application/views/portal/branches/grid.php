@@ -37,6 +37,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->search_box = false;
             $grid->selectAllCheckbox = false;
             $grid->hide_fields = array('id');
+            $grid->order_column = 'id';
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new');
