@@ -117,9 +117,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <div class="col-lg-6">
                                         <input type="text" id="fees_month" placeholder=""
                                                style="padding: 0 10px;"
-                                               class="form-control datepicker-custom validate[required]"
+                                               class="form-control datepicker-format validate[required]"
                                                name="expense_date"
-                                               value="<?= (($row->expense_date != '') ? date('Y-m-d', strtotime($row->expense_date)) : ''); ?>">
+                                               value="<?= (($row->expense_date != '') ? date('d-M-Y', strtotime($row->expense_date)) : ''); ?>">
                                     </div>
                                 </div>
                                 <div class="form-group">

@@ -19,6 +19,7 @@ class M_members extends CI_Model
         $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
         $this->form_validation->set_rules('acc_tel', 'Mobile number', 'required');
         $this->form_validation->set_rules('acc_types', 'Member Type', 'required');
+        $this->form_validation->set_rules('machine_member_id', 'Member ID', 'callback_member_id_exist');
         if ($this->form_validation->run() == FALSE) {
             return false;
         } else {

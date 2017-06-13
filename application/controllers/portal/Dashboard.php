@@ -231,7 +231,7 @@ class Dashboard extends CI_Controller
             $i = 0;
 
             foreach ($attendance_arr as $key => $attendance) {
-                $getAccountDetail = $this->db->query("SELECT acc_id,acc_date,subscription_id,acc_name,machine_member_id,branch_id,invoice_generate_date FROM accounts WHERE `serial_number`='" . $attendance->sn . "' AND machine_user_id='" . $attendance->USERID . "' LIMIT 1")->row();
+                $getAccountDetail = $this->db->query("SELECT acc_id,acc_date,subscription_id,acc_name,machine_member_id,branch_id,invoice_generate_date FROM accounts WHERE `serial_number`='" . $attendance->sn . "' AND machine_user_id='" . $attendance->USERID . "' AND status = 1 LIMIT 1")->row();
                 if ($getAccountDetail->acc_id != "") {
 
                     if (!getVal("attendance", "id", "WHERE `account_id` = '" . $attendance->USERID . "' AND `check_type` = '" . $attendance->CHECKTYPE . "' AND `machine_serial` = '" . $attendance->sn . "' AND DATE_FORMAT(`datetime`,'%Y-%m-%d') = '" . date('Y-m-d', strtotime($attendance->CHECKTIME)) . "'")) {

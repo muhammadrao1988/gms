@@ -88,9 +88,9 @@ class Attendance extends CI_Controller
                           iv.status,
                           iv.id as invoices_id,
                           sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att_sub.`datetime`)))   AS subscription_status,
-                          FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
-                           COUNT(DISTINCT(iv_due.id)) AS partial_paid                                                    
 
+                           COUNT(DISTINCT(iv_due.id)) AS partial_paid  ,
+FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month
                         FROM
                           attendance AS att
                               ".$account_join."

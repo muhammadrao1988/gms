@@ -65,7 +65,7 @@ padding: 3px;
 color:green;	
 }
 
-.th-eye:hover{
+.th-eye:hover,.fa-eye:hover{
 color:#00d2ff;	
 }
 .th-tasks:hover{
@@ -78,6 +78,9 @@ color:#74c043;
 .th-delete:hover{
 color:#F00;
 	
+}
+.fa-file-text-o:hover{
+    color: #e7d10b;
 }
 .delete-all{
 color:#c3c3c3;

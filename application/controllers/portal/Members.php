@@ -1,4 +1,5 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+
 /**
  * Class Banned_users
  * @property M_members $module
@@ -41,11 +42,11 @@ class Members extends CI_Controller
 
         $this->table = $this->module->table;
         $this->id_field = $this->module->id_field;
-        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
+        $this->branch_id = getVal("users", "branch_id", " WHERE user_id='" . $this->session->userdata('user_info')->user_id . "'");
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->iic_user_type = intval(get_option('iic_user_type'));
         $this->is_machine = $this->session->userdata('user_info')->is_machine;
-        $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
+        $this->branch_id = getVal("users", "branch_id", " WHERE user_id='" . $this->session->userdata('user_info')->user_id . "'");
 
     }
 
@@ -53,6 +54,7 @@ class Members extends CI_Controller
     public function index()
     {
         $where = '';
+
         $where .= getFindQuery();
 
         $data['title'] = $this->module_title;
@@ -75,54 +77,56 @@ class Members extends CI_Controller
         WHERE 1 ". $where;*/
 
         $search = getVar('search');
+        if($search['acc:acc_date']!=""){
+            $where = str_replace(" AND acc.acc_date LIKE '%".$search['acc:acc_date']."%'","AND acc.acc_date LIKE '%".date('Y-m-d',strtotime($search['acc:acc_date']))."%'",$where);
+        }
         $having_record = "";
-        if($search['subscription_status']!=''){
-            $where = str_replace("AND subscription_status LIKE '%continue%'","",$where);
-            $where = str_replace("AND subscription_status LIKE '%expired%'","",$where);
-            $where = str_replace("AND subscription_status LIKE '%no_attendance%'","",$where);
-            if($search['subscription_status']=="continue") {
+        if ($search['subscription_status'] != '') {
+            $where = str_replace("AND subscription_status LIKE '%continue%'", "", $where);
+            $where = str_replace("AND subscription_status LIKE '%expired%'", "", $where);
+            $where = str_replace("AND subscription_status LIKE '%no_attendance%'", "", $where);
+            if ($search['subscription_status'] == "continue") {
                 $having_record = " HAVING subscription_status > 0 ";
-            }else if($search['subscription_status']=="expired") {
+            } else if ($search['subscription_status'] == "expired") {
                 $having_record = " HAVING subscription_status <= 0 ";
             }
-
-
         }
-            /*22-05-2017 According to subscription period*/
-            /*$data['query'] = "SELECT
-                                  acc.acc_id,
-                                  acc.machine_member_id as machine_id,
-                                  acc.acc_name,
-                                  acc.acc_tel,
-                                  acc.email,
-                                  br.`branch_name`,
-                                  acc.acc_date,
-                                  acc.serial_number as machine_serial,
-                                  sub.`name`,
-                                  IF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>',CONCAT('<span class=\"green\">',
-                                    DATEDIFF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY)),CURRENT_DATE())-1,' Days left </span>')) AS subscription_status,
-                                   iv.`fees_month` as monthly_status,
-                                  iv.status
-                                FROM
-                                  accounts AS acc
-                                  INNER JOIN branches AS br
-                                    ON (br.`id` = acc.`branch_id`)
-                                    INNER JOIN subscriptions AS sub
-                                    ON (sub.`id` = acc.`subscription_id`)
-                                    LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )
-                                   WHERE acc.`status` = 1 GROUP BY acc.acc_id ".$branch_id." ".$where;*/
-            /*22-05-2017 Expire according to last attendance date.*/
+
+        /*22-05-2017 According to subscription period*/
+        /*$data['query'] = "SELECT
+                              acc.acc_id,
+                              acc.machine_member_id as machine_id,
+                              acc.acc_name,
+                              acc.acc_tel,
+                              acc.email,
+                              br.`branch_name`,
+                              acc.acc_date,
+                              acc.serial_number as machine_serial,
+                              sub.`name`,
+                              IF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY))<=CURRENT_DATE(),'<span class=\"red\">Expired</span>',CONCAT('<span class=\"green\">',
+                                DATEDIFF(DATE(DATE_ADD(acc.acc_date, INTERVAL sub.`period` DAY)),CURRENT_DATE())-1,' Days left </span>')) AS subscription_status,
+                               iv.`fees_month` as monthly_status,
+                              iv.status
+                            FROM
+                              accounts AS acc
+                              INNER JOIN branches AS br
+                                ON (br.`id` = acc.`branch_id`)
+                                INNER JOIN subscriptions AS sub
+                                ON (sub.`id` = acc.`subscription_id`)
+                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id )
+                               WHERE acc.`status` = 1 GROUP BY acc.acc_id ".$branch_id." ".$where;*/
+        /*22-05-2017 Expire according to last attendance date.*/
 //echo "<a href=\"\""
 //<a href=""
         $machine_sql = " LEFT JOIN attendance att ON (acc.`acc_id` = att.`acc_id`) ";
-        if($this->is_machine==1){
+        if ($this->is_machine == 1) {
             $machine_sql = " LEFT JOIN attendance att ON (acc.`machine_user_id` = att.`account_id` AND acc.`serial_number` = att.`machine_serial`) ";
         }
         $data['query'] = "SELECT 
                               acc.acc_id,
                               IF(acc.machine_member_id > 0 , acc.machine_member_id ,
                            
-                              CONCAT('<a  style=\"font-weight:bold;color:red\" href=\"".site_url(ADMIN_DIR.'members/form/\',acc.acc_id,\'')."\">Create Machine Id</a>')
+                              CONCAT('<a  style=\"font-weight:bold;color:red\" href=\"" . site_url(ADMIN_DIR . 'members/form/\',acc.acc_id,\'') . "\">Create Machine Id</a>')
                               ) AS machine_member_id,
                               acc.acc_name,
                               acc.acc_tel,                          
@@ -132,6 +136,7 @@ class Members extends CI_Controller
                               DATE_FORMAT( acc.`invoice_generate_date`, '%d') AS day_invoice,
                               acc.serial_number as machine_serial,
                               sub.`name`,
+                              act.`Name`,
                              
                              sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att.`datetime`)))   AS subscription_status,
                               FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
@@ -143,13 +148,14 @@ class Members extends CI_Controller
                                 ON (br.`id` = acc.`branch_id`)
                                 INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = acc.`subscription_id`)
+                                INNER JOIN acc_types as act
+                                ON(act.acc_type_ID = acc.acc_types)
                                 LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id  AND FIND_IN_SET( '1',iv.`type`) AND iv.`state` IN (1, 2)  )  
-                                ".$machine_sql."
+                                " . $machine_sql . "
                                 LEFT JOIN invoices as iv_due ON( iv_due.`acc_id` = acc.acc_id  AND iv_due.`state` IN (2)  ) 
                                WHERE acc.`status` = 1 
-                               AND acc.branch_id='".$this->branch_id."'
-                               ".$where."  group by acc.acc_id".$having_record ;
-
+                               AND acc.branch_id='" . $this->branch_id . "'
+                               " . $where . "  group by acc.acc_id" . $having_record;
         /*echo htmlentities($data['query']);
         die('Call');*/
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
@@ -161,9 +167,9 @@ class Members extends CI_Controller
         $id = intval(getUri(4));
 
         if ($id > 0) {
-            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' AND branch_id='".$this->branch_id."'";
+            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' AND branch_id='" . $this->branch_id . "'";
             $data['row'] = $this->db->query($SQL)->row();
-            if($data['row']->acc_id==""){
+            if ($data['row']->acc_id == "") {
                 redirect(ADMIN_DIR . $this->module_name . '/?error=Invalid access');
             }
             $data['row']->user_type = strtolower(getVal('user_types', 'user_type', "WHERE id='" . $data['row']->u_type . "'"));
@@ -201,11 +207,11 @@ class Members extends CI_Controller
             /*-----------------------------------------$_POST-------------------------------------------------*/
             #for log
             $user_log_array = array(
-                'date'			=> date('Y-m-d H:i:s'),
-                'user_id'		=> $this->session->userdata('user_info')->acc_id,
-                'type_id'		=> 15,
-                'display_state'	=> 2,
-                'ip_addr'		=> user_ip()
+                'date' => date('Y-m-d H:i:s'),
+                'user_id' => $this->session->userdata('user_info')->acc_id,
+                'type_id' => 15,
+                'display_state' => 2,
+                'ip_addr' => user_ip()
             );
             //save('audit_log', $user_log_array, $where = '');
             #end
@@ -214,23 +220,23 @@ class Members extends CI_Controller
             $user_info = $this->session->userdata('user_info');
 
             $DBdata = $DbArray['dbdata'];
-            $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
-            $DBdata['acc_date'] = $DBdata['invoice_generate_date']   = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
-            $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
+            $DBdata['date_of_birth'] = date('Y-m-d', strtotime(getVar('date_of_birth')));
+            $DBdata['acc_date'] = $DBdata['invoice_generate_date'] = date('Y-m-d H:i:s', strtotime(getVar('acc_date')));
+            $DBdata['acc_manager'] = $this->session->userdata('user_info')->user_id;
 
             //$DBdata['machine_user_id']  = $this->module->getMachineUserId(getVar('machine_member_id'));
             /*$DBdata['branch_id']        = getVal('accounts','branch_id',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');
             $DBdata['serial_number']    = getVal('accounts','serial_number',' where acc_id = "'.$this->session->userdata('user_info')->acc_id.'"');*/
-            $DBdata['branch_id']        = $user_info->branch_id;
-            $DBdata['serial_number']    = $user_info->machine_serial;
-            $DBdata['acc_manager']      = $user_info->user_id;
+            $DBdata['branch_id'] = $user_info->branch_id;
+            $DBdata['serial_number'] = $user_info->machine_serial;
+            $DBdata['acc_manager'] = $user_info->user_id;
 
             $id = save($this->table, $DBdata);
-            if($this->is_machine==1){
-                $this->module->getMachineUserId(getVar('machine_member_id'),base_url(ADMIN_DIR . 'invoices/form/?tempID='.$id.'&firstInvoice=1&msg=Member has been created. Please generate first invoice.'));
+            if ($this->is_machine == 1) {
+                $this->module->getMachineUserId(getVar('machine_member_id'), base_url(ADMIN_DIR . 'invoices/form/?tempID=' . $id . '&firstInvoice=1&msg=Member has been created. Please generate first invoice.'));
             }
             /*------------------------------------------------------------------------------------------*/
-            redirect(ADMIN_DIR . 'invoices/form/?tempID='.$id.'&firstInvoice=1&msg=Member has been created. Please generate first invoice.');
+            redirect(ADMIN_DIR . 'invoices/form/?tempID=' . $id . '&firstInvoice=1&msg=Member has been created. Please generate first invoice.');
         }
     }
 
@@ -244,16 +250,16 @@ class Members extends CI_Controller
         } else {
             $DbArray = getDbArray($this->table);
             $DBdata = $DbArray['dbdata'];
-            $DBdata['date_of_birth']    = date('Y-m-d',strtotime(getVar('date_of_birth')));
-            $DBdata['acc_manager']      = $this->session->userdata('user_info')->user_id;
-            $DBdata['acc_date']     = date('Y-m-d H:i:s',strtotime(getVar('acc_date')));
+            $DBdata['date_of_birth'] = date('Y-m-d', strtotime(getVar('date_of_birth')));
+            $DBdata['acc_manager'] = $this->session->userdata('user_info')->user_id;
+            $DBdata['acc_date'] = date('Y-m-d H:i:s', strtotime(getVar('acc_date')));
             //$DBdata['machine_user_id']  = $this->module->getMachineUserId($_REQUEST['machine_member_id']);;
-            $DBdata['branch_id']        = getVal('users','branch_id',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
-            $DBdata['serial_number']    = getVal('users','machine_serial',' where user_id = "'.$this->session->userdata('user_info')->user_id.'"');
+            $DBdata['branch_id'] = getVal('users', 'branch_id', ' where user_id = "' . $this->session->userdata('user_info')->user_id . '"');
+            $DBdata['serial_number'] = getVal('users', 'machine_serial', ' where user_id = "' . $this->session->userdata('user_info')->user_id . '"');
 
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
-            if($this->is_machine==1) {
+            if ($this->is_machine == 1) {
                 $this->module->getMachineUserId($_REQUEST['machine_member_id'], base_url(ADMIN_DIR . $this->module_name . '/?msg=Member has been updated.'));
             }
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been updated..');
@@ -266,19 +272,19 @@ class Members extends CI_Controller
         $JSON = array();
         $id = getVar('status-id');
         $login_status_val = getVal('accounts', 'status', 'WHERE acc_id ="' . $id . '"');
-        if($login_status_val==0 ||  $login_status_val==2 || $login_status_val==3 ){
-            $status=1;
-        }else if($login_status_val==1){
-            $status=0;
-        }else{
-            $status=3;
+        if ($login_status_val == 0 || $login_status_val == 2 || $login_status_val == 3) {
+            $status = 1;
+        } else if ($login_status_val == 1) {
+            $status = 0;
+        } else {
+            $status = 3;
         }
 
         $where = $this->id_field . "='" . $id . "' ";
         save($this->table, array('status' => $status), $where);
         $JSON['notification'] = '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>Status has been changed...</div>';
-        $redirct_url 		  =  '?msg=Status has been changed..' ;
-        $JSON['redirect_url'] =  $redirct_url;
+        $redirct_url = '?msg=Status has been changed..';
+        $JSON['redirect_url'] = $redirct_url;
         echo json_encode($JSON);
 
 
@@ -287,17 +293,17 @@ class Members extends CI_Controller
     public function delete()
     {
         $JSON = array();
-        if(getVar('action')==""){
+        if (getVar('action') == "") {
             $id = getVar('del-id');
-        }else{
+        } else {
             $id = getVar('del-all');
         }
         //$SQL = "DELETE FROM " . $this->table . " WHERE `" . $this->id_field . "` IN(" . $id . ")";
         $SQL = "UPDATE " . $this->table . " SET `status` ='0' WHERE `" . $this->id_field . "` IN(" . $id . ")";
         $this->db->query($SQL);
         $JSON['notification'] = '<div class="alert alert-success "><button type="button" class="close" data-dismiss="alert">×</button>Record has been deleted..</div>';
-        $redirct_url 		  =  '?msg=Record has been deleted..' ;
-        $JSON['redirect_url'] =  $redirct_url;
+        $redirct_url = '?msg=Record has been deleted..';
+        $JSON['redirect_url'] = $redirct_url;
         echo json_encode($JSON);
     }
 
@@ -307,7 +313,7 @@ class Members extends CI_Controller
         //$JSON['data'] = '';
         switch ($action) {
             case 'getSubscriptionCharges':
-                if(getVar('id')!='') {
+                if (getVar('id') != '') {
                     echo getVal('subscriptions', 'charges', ' where id = "' . getVar('id') . '"');
                 }
                 break;
@@ -315,14 +321,40 @@ class Members extends CI_Controller
 
         //echo json_encode($JSON);
     }
-    public function insertuserid(){
-        save('accounts',array('machine_user_id'=>getVar('userID')),' machine_member_id="'.getVar('member_id').'"');
+
+    public function insertuserid()
+    {
+        save('accounts', array('machine_user_id' => getVar('userID')), ' machine_member_id="' . getVar('member_id') . '"');
     }
 
-    public function invoice(){
+    public function invoice()
+    {
 
 
-        $this->load->view(ADMIN_DIR . $this->module_name . '/aa', $data);
+        $this->load->view(ADMIN_DIR . $this->module_name . '/aa');
+    }
+
+    function member_id_exist($str)
+    {
+        if ($str > 0) {
+            //check machine member id
+            if (getVar('acc_id') == "") {
+                if (getVal('accounts', 'acc_id', ' WHERE machine_member_id = "' . $str . '" AND branch_id = "' . $this->branch_id . '" AND status =1') == "") {
+                    return true;
+                }
+            } else {
+                //if (getVal('accounts', 'machine_member_id', ' WHERE acc_id = "' . getVar('acc_id') . '" AND branch_id = "' . $this->branch_id . '" AND status =1') != $str) {
+                    if (getVal('accounts', 'acc_id', ' WHERE machine_member_id = "' . $str . '" AND branch_id = "' . $this->branch_id . '" AND status =1 AND acc_id != "'.getVar('acc_id').'"')=="") {
+                        return true;
+                    }
+                //}
+            }
+            $this->form_validation->set_message('member_id_exist', 'This member id is already exist.');
+            return FALSE;
+        } else {
+            $this->form_validation->set_message('member_id_exist', 'Please insert member id');
+            return FALSE;
+        }
     }
 }
 

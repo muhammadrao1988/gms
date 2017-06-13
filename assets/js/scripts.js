@@ -221,7 +221,8 @@
   
 	 $('.datepicker2').datepicker();
 	 $('.datepicker-default').datepicker({ dateFormat: 'dd/mm/yy' });
-	 $('.datepicker-format').datepicker({ dateFormat: 'dd-mm-yy' });
+	 $('.datepicker-format').datepicker({ dateFormat: 'dd-M-yy',maxDate: "0" });
+	 $('.datepicker-dob').datepicker({ dateFormat: 'dd-M-yy',maxDate: "0",defaultDate: "-18y", }).prop('readonly',true);
 
  $('#checkRow').click(function(event) {  //on click 
         if(this.checked) { // check select status

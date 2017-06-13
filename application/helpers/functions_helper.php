@@ -661,7 +661,7 @@ function show_validation_errors_login()
                                <h4 style="color:#616365">Incorrect Username and /or email</h4>
                                <p>
                                    ' . (is_array($pass_forget) ? $pass_forget : $pass_forget) . '<br>
-								   Please try again, if you are still difficulties, please contact your account manager or email <a href="mailto:help@telebox.co.uk" style="text-decoration:underline;">help@telebox.co.uk</a>
+								   Please try again, if you are still difficulties, please contact your account manager or email <a href="mailto:bodyshape@bodyshape.pk" style="text-decoration:underline;">bodyshape@bodyshape.pk</a>
                                </p>
                            </div>
                        </div>
@@ -688,7 +688,7 @@ function show_validation_errors_login()
                                <br>
                                <p>
                                    ' . (is_array($msg) ? $msg : $msg) . '<br><br>
-								   If you do not receive an email, please contact your account manager or email the Telebox Team via <a href="mailto:help@telebox.co.uk" style="text-decoration:underline;">help@telebox.co.uk</a>
+								   If you do not receive an email, please contact your account manager or email the Telebox Team via <a href="mailto:bodyshape@bodyshape.pk" style="text-decoration:underline;">bodyshape@bodyshape.pk</a>
                                </p>
 							   <br>
                                <a href="' . site_url(ADMIN_DIR) . '" class="btn btn-green" style="float:right;">Return to login</a>
@@ -744,7 +744,7 @@ function show_validation_errors_login()
                                <br>
                                <p>
                                    ' . (is_array($info) ? $info : $info) . '<br><br>
-								   If you do not receive an email, please contact your account manager or email the Telebox Team via <a href="mailto:help@telebox.co.uk" style="text-decoration:underline;">help@telebox.co.uk</a>
+								   If you do not receive an email, please contact your account manager or email the Telebox Team via <a href="mailto:bodyshape@bodyshape.pk" style="text-decoration:underline;">bodyshape@bodyshape.pk</a>
                                </p>
                               
                            </div>
@@ -978,5 +978,12 @@ function dayDifference($lastDate){
     $datediff = $now - $lastDate;
 
     return floor($datediff / (60 * 60 * 24));
-
+}
+function grid_dateTimeFormat($date){
+    $strTime = strtotime($date[0]);
+    return date('d-M-Y H:i',$strTime);
+}
+function grid_dateFormat($date){
+    $strTime = strtotime($date[0]);
+    return date('d-M-Y',$strTime);
 }

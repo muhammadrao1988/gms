@@ -54,7 +54,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->custom_col_name_fields = array('acc_name'=>'Member Name','fees_datetime'=>'Paid Date','type'=>'Invoice For','fees_month'=>'last_paid_month','machine_member_id'=>'Member Id','id'=>'invoice_No.','acc_id'=>'Account ID');
             $grid->search_fields_html = array('state'=>$invoice_state,'machine_member_id'=>$machine_member,'fees_datetime'=>$fees_datetime,'type'=>$invoice_type,'fees_month'=>$last_paid);
             //$grid->custom_func = array('amount'=>'getTotalfeesAmount');
-            $grid->custom_func = array('type'=>'invoice_for');
+            $grid->custom_func = array('type'=>'invoice_for','fees_datetime'=>'grid_dateFormat');
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new');

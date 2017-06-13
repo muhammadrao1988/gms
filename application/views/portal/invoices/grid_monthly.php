@@ -54,7 +54,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->hide_fields = array('acc_id','id','day_invoice','invoices_id','last_paid');
             $grid->order_column = 'id';
             $grid->record_not_found = 'No monthly invoice';
-            $grid->custom_func = array('fees_month'=>'getPaymemntStatus','amount'=>'getTotalfeesAmount');
+            $grid->custom_func = array('fees_month'=>'getPaymemntStatus','amount'=>'getTotalfeesAmount','acc_date'=>'grid_dateFormat');
             $grid->custom_col_name_fields = array('acc_date'=>'Registration Date','machine_member_id'=>'Member Id','fees_month'=>'Payment Status','acc_name'=>'Member Name','acc_id'=>'account_ID');
             $grid->search_fields_html = array('machine_member_id'=>$machine_member,'acc_date'=>'','Amount'=>'','fees_month'=>'','last_paid_month'=>'','payment_status'=>'');
             //$grid->form_buttons = array('new');

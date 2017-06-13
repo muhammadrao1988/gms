@@ -92,9 +92,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         Birth: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="date_of_birth" name="date_of_birth"
-                                               value="<?= (($row->date_of_birth != '' and $row->date_of_birth != '0000-00-00') ? date('d/m/Y', strtotime($row->date_of_birth)) : ''); ?>"
+                                               value="<?= (($row->date_of_birth != '' and $row->date_of_birth != '0000-00-00') ? date('d-M-Y', strtotime($row->date_of_birth)) : ''); ?>"
                                                placeholder="DD-MM-YYYY"
-                                               class="form-control validate[required] datepicker-format">
+                                               class="form-control validate[required] datepicker-dob">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -152,7 +152,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         Date: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="acc_date" name="acc_date"
-                                               value="<?= (($row->acc_date != '' and $row->acc_date != '0000-00-00') ? date('d-m-Y', strtotime($row->acc_date)) : ''); ?>"
+                                               value="<?= (($row->acc_date != '' and $row->acc_date != '0000-00-00') ? date('d-M-Y', strtotime($row->acc_date)) : ''); ?>"
                                                placeholder="DD-MM-YYYY"
                                                class="form-control validate[required] datepicker-format">
                                     </div>
