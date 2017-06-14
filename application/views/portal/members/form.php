@@ -57,6 +57,19 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                         <div class="row">
 
                             <div class="col-md-12">
+                                <?php
+                                if ($this->session->userdata('user_info')->is_machine != 1) {
+                                ?>
+                                <div class="form-group">
+                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label"> Member ID: </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" id="machine_member_id" name="machine_member_id"
+                                               value="<?= $row->machine_member_id; ?>"
+                                               placeholder="Member ID"
+                                               class="form-control validate[required,custom[integer]]">
+                                    </div>
+                                </div>
+                                <?php } ?>
                                 <div class="form-group">
                                     <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Full
                                         Name:</label>
@@ -79,9 +92,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         Birth: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="date_of_birth" name="date_of_birth"
-                                               value="<?= (($row->date_of_birth != '' and $row->date_of_birth != '0000-00-00') ? date('d/m/Y', strtotime($row->date_of_birth)) : ''); ?>"
+                                               value="<?= (($row->date_of_birth != '' and $row->date_of_birth != '0000-00-00') ? date('d-M-Y', strtotime($row->date_of_birth)) : ''); ?>"
                                                placeholder="DD-MM-YYYY"
-                                               class="form-control validate[required] datepicker-format">
+                                               class="form-control validate[required] datepicker-dob">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -121,7 +134,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">City: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="city" name="city"
-                                               value="<?= $row->city; ?>" placeholder="City"
+                                               value="<?= (($row->city=="")?'Karachi':$row->city); ?>" placeholder="City"
                                                class="form-control">
                                     </div>
                                 </div>
@@ -130,7 +143,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                            class="col-lg-3 col-sm-3 control-label">Country: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="country" name="country"
-                                               value="<?= $row->country; ?>" placeholder="Country"
+                                               value="<?= (($row->country=="")?'Pakistan':$row->country); ?>" placeholder="Country"
                                                class="form-control">
                                     </div>
                                 </div>
@@ -139,7 +152,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         Date: </label>
                                     <div class="col-lg-6">
                                         <input type="text" id="acc_date" name="acc_date"
-                                               value="<?= (($row->acc_date != '' and $row->acc_date != '0000-00-00') ? date('d-m-Y', strtotime($row->acc_date)) : ''); ?>"
+                                               value="<?= (($row->acc_date != '' and $row->acc_date != '0000-00-00') ? date('d-M-Y', strtotime($row->acc_date)) : ''); ?>"
                                                placeholder="DD-MM-YYYY"
                                                class="form-control validate[required] datepicker-format">
                                     </div>
@@ -170,7 +183,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 }
                                 ?>
                                 <div class="form-group">
-                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Member
+                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Membership
                                         Type: </label>
                                     <div class="col-lg-6">
                                         <label class="styled_select">

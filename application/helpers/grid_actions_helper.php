@@ -26,7 +26,7 @@ if (!function_exists('get_grid_actions')) {
          // $user_actions = $CI->db->query("SELECT um.actions FROM users AS u INNER JOIN user_type_module_rel AS um ON (u.user_type = um.user_type_id) INNER JOIN modules AS m ON (m.id = um.module_id) WHERE um.user_type_id = '" . intval($CI->session->userdata('user_type')) . "' AND m.`module`='" . addslashes($module) . "'")->row()->actions;
 		$user_actions = $CI->db->query("SELECT um.actions FROM users AS u INNER JOIN ".$table_temp." AS um ON (u.user_template_id = um.user_type_id) INNER JOIN modules AS m ON (m.id = um.module_id) WHERE um.user_type_id = '" . intval($user_template_id) . "' ".$and_condition." AND m.`module`='" . addslashes($module) . "'")->row()->actions;
        //todo::remove
-        $user_actions .='|view_number_manager|edit_numbers|view_attendance';
+        $user_actions .='|view_number_manager|edit_numbers|view_attendance|view_invoice';
         $user_actions = array_unique(explode('|', str_replace(array('update'), array('edit'), $user_actions))); //$user_actions[$module]
 
         $actions = array();
@@ -114,6 +114,14 @@ if (!function_exists('get_grid_actions')) {
                             action="view_attendance"
                             href="' . site_url(ADMIN_DIR . '/attendance?search[account_id]=' . $rows[$id_field] . '' . $qstring['view']) . '"
                             data-toggle="tooltip" class="tooltips" data-original-title="View Attendance"><i class="fa fa-eye"></i>
+                         </a>';
+
+        }
+        if (in_array('view_invoice', $actions)) {
+            $view_invoice = '<a
+                            action="view_invoice"
+                            href="' . site_url(ADMIN_DIR . '/invoices?search[ic:machine_member_id]=' . $rows['machine_member_id'] . '' . $qstring['view']) . '"
+                            data-toggle="tooltip" class="tooltips" data-original-title="View Invoice"><i class="fa fa-file-text-o"></i>
                          </a>';
 
         }

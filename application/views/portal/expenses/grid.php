@@ -143,6 +143,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 $grid->custom_col_name_fields = array();
                 $grid->search_fields_html = array('status' => $status, );
                 $grid->form_buttons = array('');
+                $grid->custom_func = array('expense_date'=>'grid_dateFormat');
                 $grid->url = '?' . $_SERVER['QUERY_STRING'];
                 //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');
                 $grid->grid_buttons = array('edit', 'delete');

@@ -71,10 +71,10 @@ class Attendance extends CI_Controller
                                 ON (ac.`acc_id` = att_sub.`acc_id`)";
         if($this->is_machine == 1){
             $account_join  = "INNER JOIN accounts AS ac 
-                                ON (ac.`machine_member_id` = att.`account_id` ) ";
+                                ON (ac.`acc_id` = att.`acc_id` ) ";
             $machine_serial_no = "AND att.machine_serial = '".$this->machine_serial."'";
             $attendance_left_join = "LEFT JOIN attendance AS att_sub
-                                ON (ac.`machine_user_id` = att_sub.`account_id` AND ac.`serial_number` = att_sub.`machine_serial`)";
+                                ON (ac.`acc_id` = att_sub.`acc_id` AND ac.`serial_number` = att_sub.`machine_serial`)";
         }
         $data['query'] = "SELECT 
                           att.id as id,
@@ -88,9 +88,9 @@ class Attendance extends CI_Controller
                           iv.status,
                           iv.id as invoices_id,
                           sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att_sub.`datetime`)))   AS subscription_status,
-                          FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
-                           COUNT(DISTINCT(iv_due.id)) AS partial_paid                                                    
 
+                           COUNT(DISTINCT(iv_due.id)) AS partial_paid  ,
+FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month
                         FROM
                           attendance AS att
                               ".$account_join."
@@ -151,12 +151,12 @@ class Attendance extends CI_Controller
             if(getVal('accounts','acc_id',' where acc_id = "'.$str.'"') > 0) {
                 //check attendance
                 if($this->is_machine ==1){
-                    if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
+                    if(getVal('attendance','id',' where account_id = "'.getVal('accounts','machine_user_id',' where acc_id = "'.$str.'"').'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($_REQUEST['datetime'])).'" and check_type = "'.getVar('check_type').'"')>0){
                         $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
                         return FALSE;
                     }
                 }else{
-                    if(getVal('attendance','id',' where 1 and acc_id = "'.$str.'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($this->pk_date_time)).'" and check_type = "'.getVar('check_type').'"')>0){
+                    if(getVal('attendance','id',' where 1 and acc_id = "'.$str.'" and DATE(`datetime`) = "'.date('Y-m-d',strtotime($_REQUEST['datetime'])).'" and check_type = "'.getVar('check_type').'"')>0){
                         $this->form_validation->set_message('account_exist', 'Attendance already has taken.');
                         return FALSE;
                     }

@@ -35,7 +35,7 @@ class Branches extends CI_Controller
         $where = '';
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
-        $data['query'] = "Select id,branch_name,datetime from ".$this->table." where 1";
+        $data['query'] = "Select id,branch_name,datetime from ".$this->table." where 1 and (branch_user = '".$this->session->userdata('user_info')->user_id."' OR branch_user = '' or branch_user  is null)";
         $this->load->view(ADMIN_DIR . $this->module_name . '/grid', $data);
     }
 
@@ -45,7 +45,7 @@ class Branches extends CI_Controller
         $id = intval(getUri(4));
 
         if ($id > 0) {
-            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "'";
+            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' and branch_user = '".$this->session->userdata('user_info')->user_id."'";
             $data['row'] = $this->db->query($SQL)->row();
         }
 
@@ -58,7 +58,7 @@ class Branches extends CI_Controller
         $id = intval(getUri(4));
 
         if ($id > 0) {
-            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "'";
+            $SQL = "SELECT * FROM " . $this->table . " WHERE " . $this->id_field . "='" . $id . "' and branch_user = '".$this->session->userdata('user_info')->user_id."'";
             $data['row'] = $this->db->query($SQL)->row();
         }
         $data['buttons'] = array();
@@ -77,7 +77,7 @@ class Branches extends CI_Controller
             $DbArray = getDbArray($this->table);
 
             $DBdata = $DbArray['dbdata'];
-
+            //$DBdata['branch_user'] = $this->session->userdata('user_info')->user_id;
             $id = save($this->table, $DBdata);
             /*------------------------------------------------------------------------------------------*/
             redirect(ADMIN_DIR . $this->module_name . '/?msg=Record has been inserted..');

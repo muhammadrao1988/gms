@@ -26,7 +26,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
         #print_page {
             visibility: visible;
-            background-color: red;
+            position: absolute;
+            width: 100%;
+            top:-180px;
         }
 
         #print_page * {
