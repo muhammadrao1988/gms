@@ -980,10 +980,18 @@ function dayDifference($lastDate){
     return floor($datediff / (60 * 60 * 24));
 }
 function grid_dateTimeFormat($date){
-    $strTime = strtotime($date[0]);
+    if(is_array($date)){
+        $strTime = strtotime($date[0]);
+    }else{
+        $strTime = strtotime($date);
+    }
     return date('d-M-Y H:i',$strTime);
 }
 function grid_dateFormat($date){
-    $strTime = strtotime($date[0]);
+    if(is_array($date)){
+        $strTime = strtotime($date[0]);
+    }else{
+        $strTime = strtotime($date);
+    }
     return date('d-M-Y',$strTime);
 }

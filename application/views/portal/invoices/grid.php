@@ -30,7 +30,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
             $search_ar = getVar('search');
             $machine_member = '<input class="form-control" type="text" name="search[ic:machine_member_id]" id="search_machine_member_ids" value="'.$search_ar['ic:machine_member_id'].'">';
-            $fees_datetime = '<input type="text" class="form-control datepicker-sql" name="search[ic:fees_datetime]" value="'.$search_ar['ic:fees_datetime'].'"/>';
+            $fees_datetime = '<input type="text" class="form-control datepicker-format" name="search[ic:fees_datetime]" value="'.$search_ar['ic:fees_datetime'].'"/>';
             $last_paid = '<input type="text" class="form-control date-picker" name="search[ic:fees_month]" value="'.$search_ar['ic:fees_month'].'"/>';
             $invoice_type = '<select class="select" name="search[ic:type]" id="ic:type" style="width: 100%">
                         <option value=""> - Select Invoice Type - </option>
