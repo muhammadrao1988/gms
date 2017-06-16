@@ -18,7 +18,8 @@
 
                 $('#payment_pop_modal2').html(data.responseText);
                 $('.ajax_form').AJAX_Form();
-                $('.select').uniform();
+                $('.datepicker-default-ajax').datepicker({ dateFormat: 'dd-M-yy' });
+                $('.select_ajax').uniform();
 
                 // $("#payment_pop_modal2 .validation_html").validationEngine();
 

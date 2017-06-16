@@ -438,7 +438,15 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 
                                 } else {
                                     ?>
-
+                                    <div class="form-group">
+                                        <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Invoice Date: </label>
+                                        <div class="col-lg-6">
+                                            <input type="text" id="invoice_date" name="invoice_date"
+                                                   value="<?php echo ($row->id!=""? grid_dateFormat($row->fees_datetime) : "");?>"
+                                                   placeholder="DD-MM-YYYY"
+                                                   class="form-control validate[required] datepicker-format">
+                                        </div>
+                                    </div>
 
                                     <div class="form-group">
                                         <label for="Name" class="col-lg-3 col-sm-3 control-label">Member Name:</label>
@@ -599,46 +607,10 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                             </div>
                                         </div>
                                     <?php } ?>
-                                    <div class="form-group">
-                                        <label for="description" class="col-lg-3 col-sm-3 control-label">Invoice
-                                            Status</label>
-                                        <div class="col-lg-6">
-                                            <select name="state" id="state" class="select validate[required]"
-                                                    tabindex="-1"
-                                                    data-placeholder="Select invoice types">
-                                                <option value="">Select Status</option>
-                                                <option value="1" <?php echo $row->state == 1 ? "selected" : ""; ?>>Paid
-                                                </option>
-                                                <option value="2" <?php echo $row->state == 2 ? "selected" : ""; ?>>
-                                                    Partially
-                                                    Paid
-                                                </option>
+                                    <input type="hidden" name="state" id="state" value="<?php echo ($row->state=="" ? 4 :$row->state) ; ?>">
 
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group partial_paid_div"
-                                         style="<?php echo(($row - state == 1 OR $row - state == "") ? "display: none;" : ""); ?>">
-                                        <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Received
-                                            Amount</label>
-                                        <div class="col-lg-6">
-                                            <input type="text" id="received_amount" placeholder=""
-                                                   style="padding: 0 10px;"
-                                                   class="form-control  validate[required,custom[integer]]"
-                                                   name="received_amount"
-                                                   value="<?php echo($row->state == 2 ? $row->received_amount : ""); ?>">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Discount</label>
-                                        <div class="col-lg-6">
-                                            <input type="text" id="discount" placeholder=""
-                                                   style="padding: 0 10px;"
-                                                   class="form-control  validate[custom[integer]]"
-                                                   name="discount"
-                                                   value="<?php echo $row->discount; ?>">
-                                        </div>
-                                    </div>
+
+
                                     <div class="form-group">
                                         <label for="description"
                                                class="col-lg-3 col-sm-3 control-label">Description</label>

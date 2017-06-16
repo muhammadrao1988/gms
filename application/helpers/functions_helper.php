@@ -873,6 +873,36 @@ function invoice_name($val){
     return $CI->db->query($sql)->row()->name;
     //getVal('invoice_types','group_concat(name)',' where id in ('.(($val[0]=='')?0:$val[0]).')');
 }
+function  getInvoiceStatus($val){
+
+    $invoice_state = $val[0];
+    if($invoice_state==1){
+        $state = '<div style="color:green;font-weight:bold;text-align: center">PAID</div>';
+    }else if($invoice_state==2){
+        $state = '<div style="color:#6d1d1d;font-weight:bold;text-align: center">PARTIALLY PAID</div>';
+        $state.='<div style="text-align: center"><button style="padding:3px 10px;" class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['id'].'" data-id="'.$val[1]['acc_id'].'" data-month="'.$val[1]['fees_month'].'" data-acc-date="'.$val[1]['day_invoice'].'"><i class="fa fa-money"></i> Pay</button>';
+    }else if($invoice_state==3){
+        $state = '<div style="color:#f28c2e;font-weight:bold;text-align: center">CANCELLED</div>';
+    }else if($invoice_state==4){
+        $state = '<div style="color:#ff0000;font-weight:bold;text-align: center">UNPAID</div>';
+        $state.='<div style="text-align: center"><button style="padding:3px 10px;" class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['id'].'" data-id="'.$val[1]['acc_id'].'" data-month="'.$val[1]['fees_month'].'" data-acc-date="'.$val[1]['day_invoice'].'"><i class="fa fa-money"></i> Pay</button>';
+        $state.='<a style="margin-left:5px" class="btn btn-black btn-sm cancel_invoice" type="button" href="#cancel_invoice_modal" data-invoice="'.$val[1]['id'].'" data-id="'.$val[1]['acc_id'].'" data-toggle="modal"><i class="fa fa-times"></i> Cancel</button></div>';
+    }
+    return $state;
+
+    if($fees_date > 0){
+
+        $paybutton = '<span class="red"><b>'.$fees_date.' Month Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['id'].'" data-id="'.$val[1]['acc_id'].'" data-month="'.$fees_date.'" data-acc-date="'.$val[1]['day_invoice'].'"><i class="fa fa-money"></i> Pay</button>';
+        return $paybutton;
+    }else if($fees_date==="0"){
+
+        return '<span class="green"><b>PAID</b></span>';
+    }else{
+        $paybutton = '<a href="'.base_url(ADMIN_DIR.'invoices/form?tempID='.$val[1]['acc_id']).'&firstInvoice=1"><span class="red"><b>Generate First Invoice</b></span></a>';
+        return $paybutton;
+    }
+
+}
 function  getPaymemntStatus($val){
 
     $fees_date = $val[0];
