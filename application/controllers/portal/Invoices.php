@@ -54,7 +54,13 @@ class Invoices extends CI_Controller
                 $where);
 
         }
+        if($search['ic:fees_datetime']!=""){
+            $where = str_replace(
+                "AND ic.fees_datetime LIKE '%".$search['ic:fees_datetime']."%'",
+                " AND ic.fees_datetime LIKE '%".date('Y-m-d',strtotime($search['ic:fees_datetime']))."%'",
+                $where);
 
+        }
         //AND FIND_IN_SET('1', iv.`type`)
 
         $data['query'] = "SELECT                               

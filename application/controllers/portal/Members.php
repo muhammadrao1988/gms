@@ -234,9 +234,11 @@ class Members extends CI_Controller
             $id = save($this->table, $DBdata);
             if ($this->is_machine == 1) {
                 $this->module->getMachineUserId(getVar('machine_member_id'), base_url(ADMIN_DIR . 'invoices/form/?tempID=' . $id . '&firstInvoice=1&msg=Member has been created. Please generate first invoice.'));
+            }else{
+                /*------------------------------------------------------------------------------------------*/
+                redirect(ADMIN_DIR . 'invoices/form/?tempID=' . $id . '&firstInvoice=1&msg=Member has been created. Please generate first invoice.');
             }
-            /*------------------------------------------------------------------------------------------*/
-            redirect(ADMIN_DIR . 'invoices/form/?tempID=' . $id . '&firstInvoice=1&msg=Member has been created. Please generate first invoice.');
+
         }
     }
 

@@ -55,24 +55,28 @@ class M_members extends CI_Model
             document.write('Please wait user synchronizing with machine......');
             setTimeout(function () {
                 var j = 1;
-                var client = new XMLHttpRequest();
-                client.open('GET', '<?=USERID_DATA_URL;?>?member_id=<?php echo $id; ?>');
+                var client=null;
+                 client = new XMLHttpRequest();
+                client.open('GET', '<?=USERID_DATA_URL;?>?member_id=<?php echo $id; ?>',true);
                 client.onreadystatechange = function () {
                     if(j == 1) {
-                        if (client.status == "200") {
+                        if (client.status == 200) {
                             console.log('<?=USERID_DATA_URL;?>?member_id=<?php echo $id; ?>');
                             //document.getElementById("att_data_html").innerHTML = client.responseText;
                             var json_string_value = JSON.parse(client.responseText);
                             console.log(json_string_value);
                             if (parseInt(json_string_value)>0) {
-                                var ajax = new XMLHttpRequest();
+                                var ajax=null;
+                                ajax = new XMLHttpRequest();
                                 ajax.open('GET', '<?=base_url(ADMIN_DIR . '/members/insertuserid');?>?member_id=<?php echo $id; ?>&userID=' + json_string_value);
                                 ajax.onreadystatechange = function () {
-                                    if (ajax.status == "200") {
+                                    if (ajax.status == 200) {
                                         var json_string_valuedd = client.responseText;
                                         window.location.href = "<?php echo $redirect_url;?>";
+                                        return false;
                                     } else {
-                                        window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=llError in synchronizing please edit member and try again.');?>";
+                                        //window.location.href = "<?php echo base_url(ADMIN_DIR . 'members/?error=llError in synchronizing please edit member and try again.');?>";
+                                        return false;
                                     }
                                 };
                                 ajax.send();
@@ -87,7 +91,7 @@ class M_members extends CI_Model
                     }
                     j++;
                 };
-                //client.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+                client.setRequestHeader("Content-type","application/x-www-form-urlencoded");
                 client.send();
             },1000);
         </script>
