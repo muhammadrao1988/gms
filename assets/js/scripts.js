@@ -221,10 +221,34 @@
   
 	 $('.datepicker2').datepicker();
 	 $('.datepicker-default').datepicker({ dateFormat: 'dd/mm/yy' });
-	 $('.datepicker-format').datepicker({ dateFormat: 'dd-M-yy',maxDate: "0" });
+	 $('.datepicker-format').datepicker({ dateFormat: 'dd-M-yy',maxDate: "0",yearRange : '1980:c',changeYear: true,changeMonth:true }).prop('readonly',true);
 	 $('.datepicker-dob').datepicker({ dateFormat: 'dd-M-yy',maxDate: "0",defaultDate: "-18y", }).prop('readonly',true);
 
- $('#checkRow').click(function(event) {  //on click 
+
+    $("#date2").datepicker({ dateFormat: 'dd-M-yy'}).prop('readonly',true);
+    $("#date1").datepicker({
+        dateFormat: 'dd-M-yy',
+        yearRange : '1980:c',
+        changeYear: true,
+        changeMonth:true,
+        onSelect: function(){
+
+
+            var date = $(this).datepicker('getDate'),
+                //dateFormat = inst.settings.dateFormat || $.datepicker._defaults.dateFormat;
+            startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() - date.getDay()+1);
+            endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 30);
+
+
+            var fecha = $(this).datepicker('getDate');
+
+
+            $("#date2").datepicker("setDate", endDate);
+            //$("#date2").datepicker("setDate", "+15d");
+        }
+    }).prop('readonly',true);
+
+    $('#checkRow').click(function(event) {  //on click
         if(this.checked) { // check select status
             $('.chk_box').each(function() { //loop through each checkbox
                 this.checked = true;  //select all checkboxes with class "checkbox1"               
