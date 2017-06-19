@@ -209,13 +209,13 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
-<<<<<<< HEAD
+
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Member Picture: </label>
                                     <div class="col-lg-6">
                                         <label class="styled_select">
                                             <input type="file" name="member_image" id="member_image" class="form-control">
                                         </label>
-=======
+
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Membership Monthly Fee Discount: </label>
                                     <div class="col-lg-6">
                                         <label>
