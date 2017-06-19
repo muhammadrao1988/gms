@@ -215,6 +215,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         <label class="styled_select">
                                             <input type="file" name="member_image" id="member_image" class="form-control">
                                         </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
 
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Membership Monthly Fee Discount: </label>
                                     <div class="col-lg-6">
@@ -241,7 +244,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         <input type="text" id="discount_value" name="discount_value"
                                                value="<?= $row->discount_value; ?>" placeholder=""
                                                class="form-control validate[required,custom[integer]]">
->>>>>>> 86a8e690dc287cdc50fad26a80308e9754a97bf5
+
                                     </div>
                                 </div>
                                 <div class="form-group">
