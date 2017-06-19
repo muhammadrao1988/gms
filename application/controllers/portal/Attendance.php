@@ -32,13 +32,14 @@ class Attendance extends CI_Controller
         $this->branch_id = getVal("users","branch_id"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         $this->machine_serial = getVal("users","machine_serial"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         date_default_timezone_set('Asia/Karachi');
-        $this->is_machine = $this->session->userdata('user_info')->is_machine;
+        $this->is_machine =  getVal("users","is_machine"," WHERE user_id='".$this->session->userdata('user_info')->user_id."'");
         $this->pk_date_time = date('d-m-Y H:i');
     }
 
 
     public function index()
     {
+        $this->module->generateSubscriptionInvoices($this->branch_id);
 
         $where = '';
         $where .= getFindQuery();
@@ -76,7 +77,7 @@ class Attendance extends CI_Controller
             $attendance_left_join = "LEFT JOIN attendance AS att_sub
                                 ON (ac.`acc_id` = att_sub.`acc_id` AND ac.`serial_number` = att_sub.`machine_serial`)";
         }
-        $data['query'] = "SELECT 
+        $data['query'] = "SELECT
                           att.id as id,
                           ac.acc_id,                        
                           ac.machine_member_id,                 
@@ -85,12 +86,12 @@ class Attendance extends CI_Controller
                           DATE_FORMAT( ac.`invoice_generate_date`, '%d') AS day_invoice,
                           IF(att.check_type='I','Checked In','Checked Out') as check_type,
                           att.`datetime`,
-                          iv.status,
-                          iv.id as invoices_id,
+
+
                           sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att_sub.`datetime`)))   AS subscription_status,
 
-                           COUNT(DISTINCT(iv_due.id)) AS partial_paid  ,
-FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month
+
+                            iv.id AS unpaid_invoice
                         FROM
                           attendance AS att
                               ".$account_join."
@@ -98,10 +99,9 @@ FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month
                                 ON  (act.`acc_type_ID` = ac.`acc_types`)
                               INNER JOIN subscriptions AS sub 
                                 ON (sub.`id` = ac.`subscription_id`)
-                              LEFT JOIN invoices as iv 
-                                ON( iv.`acc_id` = ac.acc_id  AND FIND_IN_SET('1',iv.`type`) AND iv.`state` IN (1, 2)  )
-                              LEFT JOIN invoices as iv_due 
-                                ON( iv_due.`acc_id` = ac.acc_id  AND iv_due.`state` IN (2)  )
+                              LEFT JOIN invoices as iv
+                                ON( iv.`acc_id` = ac.acc_id  AND iv.state IN(2,4))
+
                               ".$attendance_left_join."
                               where 1 and att.status = 1 
                                AND ac.branch_id='".$this->branch_id."'

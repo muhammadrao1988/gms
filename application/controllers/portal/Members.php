@@ -45,7 +45,7 @@ class Members extends CI_Controller
         $this->branch_id = getVal("users", "branch_id", " WHERE user_id='" . $this->session->userdata('user_info')->user_id . "'");
         $this->module_title = ucwords(str_replace('_', ' ', $this->module_name));
         $this->iic_user_type = intval(get_option('iic_user_type'));
-        $this->is_machine = $this->session->userdata('user_info')->is_machine;
+        $this->is_machine = getVal("users", "is_machine", " WHERE user_id='" . $this->session->userdata('user_info')->user_id . "'");
         $this->branch_id = getVal("users", "branch_id", " WHERE user_id='" . $this->session->userdata('user_info')->user_id . "'");
 
     }
@@ -122,7 +122,8 @@ class Members extends CI_Controller
         if ($this->is_machine == 1) {
             $machine_sql = " LEFT JOIN attendance att ON (acc.`machine_user_id` = att.`account_id` AND acc.`serial_number` = att.`machine_serial`) ";
         }
-        $data['query'] = "SELECT 
+        //FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
+         $data['query'] = "SELECT
                               acc.acc_id,
                               IF(acc.machine_member_id > 0 , acc.machine_member_id ,
                            
@@ -138,10 +139,8 @@ class Members extends CI_Controller
                               sub.`name`,
                               act.`Name`,
                              
-                             sub.`period` - FLOOR(DATEDIFF(CURDATE(), MAX(att.`datetime`)))   AS subscription_status,
-                              FLOOR(DATEDIFF(CURDATE(), MAX(iv.fees_month)) / 30) AS fees_month,
-                              COUNT(DISTINCT(iv_due.id)) AS partial_paid,
-                              iv.status
+
+                              iv.id AS unpaid_invoice
                             FROM
                               accounts AS acc 
                               INNER JOIN branches AS br 
@@ -150,9 +149,9 @@ class Members extends CI_Controller
                                 ON (sub.`id` = acc.`subscription_id`)
                                 INNER JOIN acc_types as act
                                 ON(act.acc_type_ID = acc.acc_types)
-                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id  AND FIND_IN_SET( '1',iv.`type`) AND iv.`state` IN (1, 2)  )  
-                                " . $machine_sql . "
-                                LEFT JOIN invoices as iv_due ON( iv_due.`acc_id` = acc.acc_id  AND iv_due.`state` IN (2)  ) 
+                                LEFT JOIN invoices as iv ON( iv.`acc_id` = acc.acc_id  AND iv.state IN(2,4))
+
+
                                WHERE acc.`status` = 1 
                                AND acc.branch_id='" . $this->branch_id . "'
                                " . $where . "  group by acc.acc_id" . $having_record;

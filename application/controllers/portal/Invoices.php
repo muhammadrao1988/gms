@@ -61,9 +61,16 @@ class Invoices extends CI_Controller
                 $where);
 
         }
+        if($search['ic:state']==5){
+            $where = str_replace(
+                "AND ic.state = '5'",
+                " AND ic.state IN (2,4)",
+                $where);
+
+        }
         //AND FIND_IN_SET('1', iv.`type`)
 
-        $data['query'] = "SELECT                               
+        $data['query'] = "SELECT
                               ic.`id`,
                               ic.acc_id,
                                ic.machine_member_id,
@@ -95,7 +102,7 @@ class Invoices extends CI_Controller
         $where = '';
         $where .= getFindQuery();
         $data['title'] = $this->module_title;
-        $data['query'] = "SELECT 
+         $data['query'] = "SELECT
                           acc.`machine_member_id`,
                           inv.`acc_id`,
                           acc.`acc_name`,
@@ -179,6 +186,19 @@ class Invoices extends CI_Controller
             if($data['row']->state!=4){ //only unpaid invoices can be edit.
                 redirect(ADMIN_DIR . $this->module_name . '/?error=Invoice number '.$data['row']->id.' can not be edit. Only unpaid invoices can be edit.');
             }
+            $SQL = "SELECT accounts.acc_id,accounts.parent,accounts.acc_types,
+                        accounts.status,accounts.acc_name,accounts.acc_description,
+                        accounts.acc_date,accounts.invoice_generate_date,accounts.branch_id,
+                        accounts.subscription_id,accounts.serial_number,accounts.machine_member_id,
+                         accounts.machine_user_id,accounts.discount,accounts.discount_value,
+                         acc_types.Name AS membership_name,acc_types.monthly_charges,
+                         subscriptions.period AS subscription_days,subscriptions.name AS subscription_name,subscriptions.charges AS subscription_fee
+                         
+                        FROM accounts 
+                        JOIN acc_types ON (acc_types.acc_type_ID = accounts.acc_types)
+                        JOIN subscriptions ON (subscriptions.id = accounts.subscription_id)
+                        WHERE  acc_id='" . $data['row']->acc_id . "'";
+            $data['acc_row'] = $this->db->query($SQL)->row();
         }
         $data['title'] = $this->module_title;
         $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
@@ -271,6 +291,8 @@ class Invoices extends CI_Controller
                     $general_date_end = date('Y-m-d', strtotime($general_date . ' +30 days'));
 
                     $fee_invoice_template_array[0]['duration'] = $all_invoice_generate_date . "|" . $general_date_end;
+                    $fee_invoice_template_array[0]['type'] = 1;
+                    $fee_invoice_template_array[0]['amount'] = $fees_per_month;
 
 
                     //Subscription invoice
@@ -474,90 +496,91 @@ class Invoices extends CI_Controller
             $data['row'] = array2object($this->input->post());
             $this->load->view(ADMIN_DIR . $this->module_name . '/form', $data);
         } else {
-
-
             $acc_id = getVar('acc_id');
             $machine_member_id = getVal('accounts', 'machine_member_id', " WHERE acc_id='" . $acc_id . "'");
             $branch_id = getVal('accounts', 'branch_id', " WHERE acc_id='" . $acc_id . "'");
             $invoice_id = getVar("id");
-            $amount_details = getVal("invoices", "amount_details", " WHERE id='" . $invoice_id . "'");
-            $amount_details = json_decode($amount_details);
+
+            $types = getVar('types');
+            $explode_type = explode(",",$types);
+            if ($branch_id == $this->branch_id  && $invoice_id) {
+                if (in_array(1, $explode_type) OR in_array(3, $explode_type)) {
+                    $invoice_date = date('Y-m-d',strtotime(getVar('invoice_date')));
+                    $description = getVar('description');
+                    $invoice_table = array();
 
 
-            if ($branch_id == $this->branch_id && count($amount_details) > 0 && $invoice_id) {
-                $account_details = array();
-                $fees_month = $amount_details->fee_invoice;
-                $fee_invoice_template_array = array();
-                $type = getVar('type');
-                $amount = getVar('amount');
-                $discount = getVar('discount');
-                $discount = ($discount == "" ? 0 : $discount);
-                $calculate_amount = 0;
-                $i = 0;
-                $type_fee = "";
-                foreach ($fees_month as $fee) {
-                    $fee_invoice_template_array[$i]['type'] = 1;
-                    $fee_invoice_template_array[$i]['amount'] = $fee->amount;
-                    $fee_invoice_template_array[$i]['duration'] = $fee->duration;
-                    $calculate_amount = $calculate_amount + $fee->amount;
-                    $type_fee = ",1";
-                    $i++;
-                    $account_details['fee_invoice'] = $fee_invoice_template_array;
+                    $invoice_table['description'] = $description;
+                    $invoice_table['fees_datetime'] = $invoice_date;
+                    $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
+
+                    $where = "id='" . $invoice_id . "'";
+
+                    $redirect_id = save("invoices", $invoice_table, $where);
+                    redirect(ADMIN_DIR . $this->module_name . '/view?id=' . $invoice_id);
+
 
                 }
-                $j = 0;
-                foreach ($type as $tp) {
-                    $invoice_template_array[$i]['type'] = $tp;
-                    $invoice_template_array[$i]['amount'] = $amount[$j];
-                    $invoice_template_array[$i]['duration'] = date('Y-m-d');
-                    $calculate_amount = $calculate_amount + $amount[$j];
-                    $j++;
-                    $i++;
+                else {
+                    $invoice_date = date('Y-m-d',strtotime(getVar('invoice_date')));
+                    $description = getVar('description');
+                    $type = getVar('type');
+                    $amount = getVar('amount');
+                    $calculate_amount = 0;
+                    $i = 0;
+                    $type_fee = "";
+                    foreach ($type as $tp) {
+                        $other_invoice_template_array[$i]['type'] = $tp;
+                        $other_invoice_template_array[$i]['amount'] = $amount[$i];
+                        $other_invoice_template_array[$i]['duration'] = date('Y-m-d');
+                        $other_invoice_template_array[$i]['description'] = "";
+                        $calculate_amount = $calculate_amount + $amount[$i];
+
+                        $i++;
+
+                    }
+                    $total_array = array();
+                    $subtotal = $calculate_amount;
+                    $total = $calculate_amount;
+
+                    $received_amount = 0;
+
+
+                    $total_array['subtotal'] = $subtotal;
+                    $total_array['discount'] = 0;
+                    $total_array['received_amount'] = $received_amount;
+                    $total_array['total'] = $total;
+                    $total_array['remaining_amount'] = $total;
+                    $account_details = array('other_invoice' => $other_invoice_template_array, 'total' => $total_array);
+                    $type = array_unique($type);
+
+
+                    $invoice_table = array();
+
+                    $invoice_table['subtotal'] = $subtotal;
+                    $invoice_table['discount'] = 0;
+                    $invoice_table['received_amount'] = $received_amount;
+                    $invoice_table['remaining_amount'] = $total;
+                    $invoice_table['amount'] = $total;
+                    $invoice_table['description'] = $description;
+                    $invoice_table['type'] = implode(",", $type);
+                    $invoice_table['amount_details'] = json_encode($account_details);
+                    $invoice_table['fees_datetime'] = $invoice_date;
+
+                    $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
+
+                    $where = "id='" . $invoice_id . "'";
+
+                    $redirect_id = save("invoices", $invoice_table, $where);
+                    redirect(ADMIN_DIR . $this->module_name . '/view?id=' . $invoice_id);
 
                 }
-                $total_array = array();
-                $subtotal = $calculate_amount;
-                $total = $calculate_amount - $discount;
-                $state = getVar('state');//1=paid 2=partial paid
-                $received_amount = $calculate_amount - $discount;
-                if ($state == 2) {
-                    $received_amount = getVar('received_amount');
-                }
-                $total_array['subtotal'] = $subtotal;
-                $total_array['discount'] = $discount;
-                $total_array['received_amount'] = $received_amount;
-                $total_array['total'] = $total;
-                $total_array['remaining_amount'] = $total - $received_amount;
-                $type = array_unique($type);
-                if ($type_fee != "") {
-                    $type[] = 1;
-                }
-                $account_details['other_invoice'] = $invoice_template_array;
-                $account_details['total'] = $total_array;
-                $invoice_table = array();
-                $invoice_table['acc_id'] = $acc_id;
-                $invoice_table['machine_member_id'] = $machine_member_id;
-                $invoice_table['state'] = $state;
-                $invoice_table['subtotal'] = $subtotal;
-                $invoice_table['discount'] = $discount;
-                $invoice_table['received_amount'] = $received_amount;
-                $invoice_table['remaining_amount'] = $total - $received_amount;
-                $invoice_table['amount'] = $total;
-                $invoice_table['description'] = getVar('description');
-                $invoice_table['amount_details'] = implode(",", $type);
-                $invoice_table['type'] = implode(",", $type);
-                $invoice_table['amount_details'] = json_encode($account_details);
-                $invoice_table['status'] = 2;
-                $invoice_table['branch_id'] = $branch_id;
-                $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
-
-                $where = "id='" . $invoice_id . "'";
-
-                $redirect_id = save("invoices", $invoice_table, $where);
-                redirect(ADMIN_DIR . $this->module_name . '/view?id=' . $invoice_id);
-            } else {
+            }else {
                 redirect(ADMIN_DIR . $this->module_name . '?error=Invalid record');
             }
+
+
+
 
         }
     }
@@ -659,10 +682,10 @@ class Invoices extends CI_Controller
                $receipt_table['receipt_date'] = date('Y-m-d',strtotime($receipt_date));
                $receipt_table['created_at'] = date('Y-m-d H:i:s');
                $receipt_table['created_by'] = $this->session->userdata('user_info')->user_id;
-               $receipt_table['subtotal'] = $received_amount;
+               $receipt_table['subtotal'] = $received_discount;
                $receipt_table['discount'] = $discount;
                $receipt_table['received_amount'] = $received_amount;
-               $receipt_table['total'] = $received_discount;
+               $receipt_table['total'] = $received_amount;
                $receipt_table['status'] = $status;
                $receipt_table['description'] = $description;
 
@@ -671,7 +694,7 @@ class Invoices extends CI_Controller
 
                $JSON['result'] = 200;
                $JSON['msg'] = "Receipt created successfully. Receipt id is ".$id;
-               $JSON['redirect_url'] = base_url(ADMIN_DIR . "invoices" );
+               $JSON['redirect_url'] = base_url(ADMIN_DIR . "receipt/view/".$id );
            }
         }else{
             $JSON['result'] = 400;

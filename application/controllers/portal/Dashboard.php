@@ -242,7 +242,7 @@ class Dashboard extends CI_Controller
                         $invoiceCheck = $this->db->query("SELECT COUNT(id) AS tot_rec FROM  invoices where acc_id = '" . $getAccountDetail->acc_id . "' AND  FIND_IN_SET('1',`type`) <> 0 LIMIT 1")->row();
                         if ($invoiceCheck > 0) {
                             $getInvoice = $this->db->query("SELECT  FLOOR(DATEDIFF(CURDATE(), MAX(invoices.fees_month)) / 30) AS month_remain FROM invoices 
-                                  WHERE 1 AND acc_id='" . $getAccountDetail->acc_id . "' AND   FIND_IN_SET(invoices.`type`, '1')
+                                  WHERE 1 AND acc_id='" . $getAccountDetail->acc_id . "' AND   FIND_IN_SET( '1',invoices.`type`)
                                   AND invoices.`state` IN (1, 2) LIMIT 1")->row();
 
                                 $tot_month = $getInvoice->month_remain;
@@ -264,7 +264,7 @@ class Dashboard extends CI_Controller
                         /***********************END*********************************/
                         /***********************Subscription Checking**************/
 
-                        $getLastAttendance = $this->db->query("SELECT `datetime` AS last_attendance, id FROM attendance WHERE machine_serial = '" . $attendance->sn . "' AND account_id = '" . $attendance->USERID . "' ORDER BY id DESC LIMIT 1")->row();
+                        $getLastAttendance = $this->db->query("SELECT `datetime` AS last_attendance, id FROM attendance WHERE machine_serial = '" . $attendance->sn . "' AND account_id = '" . $attendance->USERID . "' ORDER BY `datetime` DESC LIMIT 1")->row();
 
                         if ($getLastAttendance->id > 0) {
                             $getSubscriptionDay = $this->db->query("SELECT `period`,`charges` FROM subscriptions WHERE id='" . $getAccountDetail->subscription_id . "'")->row();
@@ -276,46 +276,54 @@ class Dashboard extends CI_Controller
                                 $lastAttendance = $getLastAttendance->last_attendance;
                                 $totDay = dayDifference($lastAttendance);
                                 if ($totDay > $subscriptionDay) {
-                                    //generate subscription invoice///////////////////
-                                    $other_invoice_template_array = array();
-                                    $other_invoice_template_array[0]['type'] = 3;
-                                    $other_invoice_template_array[0]['amount'] = $getSubscriptionDay->charges;
-                                    $other_invoice_template_array[0]['duration'] = date('Y-m-d');
-                                    $calculate_amount = $getSubscriptionDay->charges;
+                                    //check already created invoice or not
+                                    $isAlreadyCreated =  getVal("invoices","id"," WHERE FIND_IN_SET(3,`type`) AND state=4 AND fees_month='".date('Y-m-d',strtotime($lastAttendance))."' AND acc_id='".$getAccountDetail->acc_id."'");
+                                    if($isAlreadyCreated=="") {
 
-                                    $total_array =  array();
-                                    $subtotal = $calculate_amount;
-                                    $total = $calculate_amount;
-                                    $state = 2;//1=paid 2=partial paid
-                                    $received_amount = 0;
-                                    $total_array['subtotal'] = $subtotal;
-                                    $total_array['discount'] = 0;
-                                    $total_array['received_amount'] = $received_amount;
-                                    $total_array['total'] = $total;
-                                    $total_array['remaining_amount'] = $total - $received_amount;
-                                    $type = array();
-                                    $type[] = 3;
+                                        //generate subscription invoice///////////////////
+                                        $other_invoice_template_array = array();
+                                        $other_invoice_template_array[0]['type'] = 3;
+                                        $other_invoice_template_array[0]['amount'] = $getSubscriptionDay->charges;
+                                        $other_invoice_template_array[0]['duration'] = $lastAttendance;
+                                        $fee_invoice_template_array[0]['description'] = "Subscription expired on ".$lastAttendance.". Invoice generated on the following date ".date('d-M-Y');
+                                        $calculate_amount = $getSubscriptionDay->charges;
 
-                                    $account_details = array('other_invoice'=>$other_invoice_template_array,'total'=>$total_array);
-                                    $invoice_table = array();
-                                    $invoice_table['acc_id'] = $getAccountDetail->acc_id;
-                                    $invoice_table['machine_member_id'] = $getAccountDetail->machine_member_id;
-                                    $invoice_table['state'] = $state;
-                                    $invoice_table['subtotal'] = $subtotal;
-                                    $invoice_table['discount'] = 0;
-                                    $invoice_table['received_amount'] = $received_amount;
-                                    $invoice_table['remaining_amount'] = $total - $received_amount;
-                                    $invoice_table['amount'] = $total;
-                                    $invoice_table['description'] = 'Subscription duration expired';
-                                    $invoice_table['fees_datetime'] = date('Y-m-d H:i:s');
-                                    $invoice_table['fees_month'] = date('Y-m-d');
-                                    $invoice_table['type'] = implode(",",$type);
-                                    $invoice_table['amount_details'] = json_encode($account_details);
-                                    $invoice_table['status'] = 2;
-                                    $invoice_table['branch_id'] = $getAccountDetail->branch_id;
-                                    $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
+                                        $total_array = array();
+                                        $subtotal = $calculate_amount;
+                                        $total = $calculate_amount;
+                                        $state = 4;//1=paid 2=partial paid 4=unpaid
+                                        $received_amount = 0;
+                                        $total_array['subtotal'] = $subtotal;
+                                        $total_array['discount'] = 0;
+                                        $total_array['received_amount'] = $received_amount;
+                                        $total_array['total'] = $total;
+                                        $total_array['remaining_amount'] = $total - $received_amount;
+                                        $type = array();
+                                        $type[] = 3;
 
-                                    $redirect_id = save("invoices",$invoice_table);
+                                        $account_details = array('other_invoice' => $other_invoice_template_array, 'total' => $total_array);
+                                        $invoice_table = array();
+                                        $invoice_table['acc_id'] = $getAccountDetail->acc_id;
+                                        $invoice_table['machine_member_id'] = $getAccountDetail->machine_member_id;
+                                        $invoice_table['state'] = $state;
+                                        $invoice_table['subtotal'] = $subtotal;
+                                        $invoice_table['discount'] = 0;
+                                        $invoice_table['received_amount'] = $received_amount;
+                                        $invoice_table['remaining_amount'] = $total - $received_amount;
+                                        $invoice_table['amount'] = $total;
+                                        $invoice_table['description'] = 'Subscription duration expired';
+                                        $invoice_table['fees_datetime'] = date('Y-m-d H:i:s');
+                                        $invoice_table['fees_month'] = $lastAttendance;
+                                        $invoice_table['type'] = implode(",", $type);
+                                        $invoice_table['amount_details'] = json_encode($account_details);
+                                        $invoice_table['status'] = 2;
+                                        $invoice_table['branch_id'] = $getAccountDetail->branch_id;
+                                        $invoice_table['created_by'] = $this->session->userdata('user_info')->user_id;
+                                        $invoice_table['from_date'] = $lastAttendance;
+                                        $invoice_table['to_date'] = $lastAttendance;
+
+                                        $redirect_id = save("invoices", $invoice_table);
+                                    }
                                     ///////////////////////////////////////////////////////
 
 
@@ -335,13 +343,13 @@ class Dashboard extends CI_Controller
 
                         /***********************END*********************************/
                         /********************Check pending invoices***************************/
-                        $unpaidInvoiceCheck = $this->db->query("SELECT COUNT(id) AS unpaid_invoice FROM  invoices where acc_id = '" . $getAccountDetail->acc_id . "' AND `state`=2 LIMIT 1")->row();
+                        $unpaidInvoiceCheck = $this->db->query("SELECT COUNT(id) AS unpaid_invoice FROM  invoices where acc_id = '" . $getAccountDetail->acc_id . "' AND `state` IN(2,4) LIMIT 1")->row();
                         $json[$i]['unpaid_invoice'] = $unpaidInvoiceCheck->unpaid_invoice;
                         /***********************END*********************************/
 
 
                         $acc_id = getVal('accounts','acc_id',' WHERE machine_user_id = "'.$attendance->USERID.'" and serial_number="'.$attendance->sn.'"');
-                        $this->db->query("INSERT INTO `attendance` SET `account_id` = '" . $attendance->USERID . "', `status` = '1', `datetime` = '" . $attendance->CHECKTIME . "', `check_type` = '" . $attendance->CHECKTYPE . "', `machine_serial` = '" . $attendance->sn . "', `sensored_id` = '" . $attendance->SENSORID . "' ,`acc_id` = '".$acc_id."'");
+                        $this->db->query("INSERT INTO `attendance` SET `account_id` = '" . $attendance->USERID . "', `status` = '1', `datetime` = '" . $attendance->CHECKTIME . "', `check_type` = '" . $attendance->CHECKTYPE . "', `machine_serial` = '" . $attendance->sn . "', `sensored_id` = '" . $attendance->SENSORID . "' ,`acc_id` = '".$acc_id."',`is_machine`=1");
 
                         $json[$i]['account_id'] = $getAccountDetail->machine_member_id;
                         $json[$i]['datetime'] = $attendance->CHECKTIME;

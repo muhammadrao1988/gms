@@ -24,6 +24,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
         <div class="row page-table">
             <div class="clearfix"></div>
                 <?php
+
                 $search = getVar('search');
                 $subsction_status = '<select name="search[subscription_status]" class="form-control select-default">
                                     <option value="">-select-</option>
@@ -33,6 +34,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </select>';
                 $datetime = '<input type="text" class="form-control datepicker-format" name="search[acc:acc_date]" value="'.(($search['acc:acc_date']!="")?date('d-M-Y',strtotime($search['acc:acc_date'])):"").'"/>';
                 $membership_type = '<input type="text" class="form-control" name="search[act:Name]" value="'.$search['act:Name'].'"/>';
+                $subscription_name = '<input type="text" class="form-control" name="search[sub:name]" value="'.$search['sub:name'].'"/>';
                 $grid = new grid();
                 $grid->query = $query;
                 //$grid->title = $this->module_title .' - List';
@@ -42,9 +44,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 $grid->order_column = 'acc_id';
                 $grid->hide_fields = array('machine_serial','status','invoices_id','acc_id','day_invoice','branch_name','partial_paid','subscription_status');
                 //$grid->custom_func = array('subscription_status'=>'getSubscriptionStatus');
-                $grid->custom_func = array('fees_month'=>'getPaymemntStatus','subscription_status'=>'getSubscriptionStatusResult','acc_date'=>'grid_dateFormat');
-                $grid->custom_col_name_fields = array('machine_member_id'=>'Member ID','Name'=>'membership_type','monthly_status'=>'Membership Status','acc_name'=>'Name','acc_tel'=>'Mobile','name'=>'Subscription','acc_date'=>'Registration Date','acc_id'=>'account_id','fees_month'=>'fees_status');
-                $grid->search_fields_html = array('partial_paid'=>'','fees_month' => '','Name'=>$membership_type, 'subscription_status' => $subsction_status,'acc_date'=>$datetime);
+                $grid->custom_func = array('unpaid_invoice'=>'getPaymemntStatus','subscription_status'=>'getSubscriptionStatusResult','acc_date'=>'grid_dateFormat');
+                $grid->custom_col_name_fields = array('machine_member_id'=>'Member ID','Name'=>'membership_type','monthly_status'=>'Membership Status','acc_name'=>'Name','acc_tel'=>'Mobile','name'=>'Subscription','acc_date'=>'Registration Date','acc_id'=>'account_id','unpaid_invoice'=>'fees_status');
+                $grid->search_fields_html = array('partial_paid'=>'','unpaid_invoice' => '','Name'=>$membership_type, 'name' => $subscription_name,'acc_date'=>$datetime);
                 $grid->form_buttons = array('new');
                 $grid->url = '?' . $_SERVER['QUERY_STRING'];
                 //$grid->grid_buttons = array('edit', 'delete', 'status','send_new_password');

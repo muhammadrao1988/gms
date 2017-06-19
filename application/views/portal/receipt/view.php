@@ -50,7 +50,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 <!--breadcrumbs start -->
                 <ul class="breadcrumb">
                     <li><a href="<?php echo site_url(ADMIN_DIR . "invoices"); ?>">Fees Management</a></li>
-                    <li><a href="<?php echo site_url(ADMIN_DIR . "invoices/view/" . $row->id); ?>">View Invoice</a></li>
+                    <li><a href="<?php echo site_url(ADMIN_DIR . "receipt/view/" . $row->id); ?>">View Receipt</a></li>
                     <li class="active">View</li>
                 </ul>
                 <!--breadcrumbs end -->
@@ -66,7 +66,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                 class="fa fa-chevron-left"></i> Back
                     </button>
                     <span class="vert-sep"></span>
-                    <button class="btn btn-white active" type="button">View Invoice</button>
+                    <button class="btn btn-white active" type="button">View Receipt</button>
                     <span class="vert-sep"></span>
                 </div>
             </div>
@@ -117,63 +117,41 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                             <div class="col-md-5 col-sm-5 pull-right">
                                 <div class="row">
                                     <div class="col-md-4 col-sm-5 inv-label">Invoice #</div>
-                                    <div class="col-md-8 col-sm-7"><?php echo ((getUri(4)!='')?getUri(4):getVar('id')); ?></div>
+                                    <div class="col-md-8 col-sm-7"><?php echo $row->invoice_id; ?></div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-5 inv-label">Invoice Total</div>
+                                    <div class="col-md-8 col-sm-7"><?php echo number_format(getVal("invoices","amount","WHERE id='".$row->invoice_id."'")); ?></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-5 inv-label">Receipt #</div>
+                                    <div class="col-md-8 col-sm-7"><?php echo $row->receipt_id; ?></div>
+                                </div>
+
 
                                 <div class="row">
                                     <div class="col-md-4 col-sm-5 inv-label">Member Name :</div>
                                     <div class="col-md-8 col-sm-7"><?= $row2->acc_name; ?></div>
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-4 col-sm-5 inv-label">Invoice Type :</div>
-                                    <div class="col-md-8 col-sm-7"><?php
-                                        $invoice_types = '';
-                                        foreach ($rows as $row) {
-                                            $type[0] = $row->type;
-                                            $invoice_types .= invoice_for($type).',';
-                                        }
-                                        echo trim($invoice_types,',');
-                                        ?></div>
-                                </div>
 
                                 <div class="row">
-                                    <div class="col-md-4 col-sm-5 inv-label">Generated Date :</div>
-                                    <div class="col-md-8 col-sm-7"><?= grid_dateFormat($row->fees_datetime); ?></div>
+                                    <div class="col-md-4 col-sm-5 inv-label">Receipt Date :</div>
+                                    <div class="col-md-8 col-sm-7"><?= grid_dateFormat($row->receipt_date); ?></div>
                                 </div>
 
                                 <br>
-                                <!--<div class="row">
-                                    <div class="col-md-12 inv-label">
-                                        <h3>TOTAL DUE</h3>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <h1 class="amnt-value">$ 3120.00</h1>
-                                    </div>
-                                </div>-->
-
 
                             </div>
                         </div>
                         <div style="text-align: center; font-size: 20px">
-                            <strong>
-                                STATUS:
-                                <?php
-                                if($row->state==1){
-                                    echo "PAID";
-                                }else if($row->state==2){
-                                    echo "PARTIAL PAID";
-                                }else if($row->state==3){
-                                    echo "CANCELLED";
-                                }
-                                ?>
-                            </strong>
+
                         </div>
                                     <table class="table table-invoice">
                                     <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Fees Description</th>
+                                        <th>Receipt Description</th>
                                         <th class="text-center">Amount</th>
 
                                     </tr>
@@ -181,120 +159,60 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <tbody>
                                     <?php
 
-                                    $i = 1;
-                                    $amount_details = json_decode($row->amount_details);
-                                    $amount_details = object2array($amount_details);
-                                    $fee_invoice_array =  array();
-                                    $other_invoice =  array();
-                                    $total_array =  array();
-                                    if(is_array($amount_details['fee_invoice'])){
-                                        $fee_invoice_array = $amount_details['fee_invoice'];
-                                    }
-                                    if(is_array($amount_details['other_invoice'])){
-                                        $other_invoice = $amount_details['other_invoice'];
-                                    }
-                                    if(is_array($amount_details['total'])){
-                                        $total_array = $amount_details['total'];
-                                    }
-                                    $i = 1;
-                                    if(count($fee_invoice_array) > 0) {
-                                        foreach ($fee_invoice_array as $val) {
                                             ?>
                                             <tr>
-                                                <td><?php echo $i; ?></td>
+                                                <td>1</td>
                                                 <td>
-                                                    <h4>Monthly Fee Charges</h4>
+
                                                     <?php
 
-                                                        $duration = explode("|",$val['duration']);
-                                                        $from_date = "From ".grid_dateFormat($duration[0]);
-                                                        $to_date = " To ".grid_dateFormat($duration[1]);
-                                                        echo "Duration: ".$from_date.$to_date;
+                                                         echo $row->description;
                                                     ?>
 
                                                 </td>
-                                                <td class="text-center"><?php echo number_format($val['amount']); ?></td>
+                                                <td class="text-center"><?php echo number_format($row->subtotal); ?></td>
 
                                                 <!--<td class="text-center">Rs. 300</td>-->
                                             </tr>
-                                            <?php $i++;
 
-                                        }
-                                    }
-                                if(count($other_invoice) > 0) {
-                                    foreach ($other_invoice as $val) {
-                                        ?>
-                                        <tr>
-                                            <td><?php echo $i; ?></td>
-                                            <td>
-                                                <h4><?php echo invoice_name($val['type']); ?></h4>
 
+
+
+                                        <tr class="grand-total">
+
+                                            <td colspan="2" class="">
+                                                <h4 style="text-align: right">Subtotal: </h4>
 
                                             </td>
-                                            <td class="text-center"><?php echo number_format($val['amount']); ?></td>
-
-                                            <!--<td class="text-center">Rs. 300</td>-->
+                                            <td class="text-center total_div"><?php echo number_format($row->subtotal); ?></td>
                                         </tr>
-                                        <?php $i++;
+                                    <tr class="grand-total">
 
-                                    }
-                                }
+                                        <td colspan="2" class="">
+                                            <h4 style="text-align: right">Received Amount: </h4>
 
-
-
-
-
-                                    if(count($total_array) > 0) {
-
-                               ?>
+                                        </td>
+                                        <td class="text-center total_div"><?php echo number_format($row->received_amount); ?></td>
+                                    </tr>
 
                                     <tr class="grand-total">
 
                                         <td colspan="2" class="">
-                                            <h4 style="text-align: right">Subtotal: </h4>
+                                            <h4 style="text-align: right">Discount: </h4>
 
                                         </td>
-                                        <td class="text-center total_div"><?php echo number_format($total_array['subtotal']); ?></td>
+                                        <td class="text-center total_div"><?php echo number_format($row->discount); ?></td>
                                     </tr>
-                                        <tr class="grand-total">
 
-                                            <td colspan="2" class="">
-                                                <h4 style="text-align: right">Discount: </h4>
+                                    <tr class="grand-total">
 
-                                            </td>
-                                            <td class="text-center total_div"><?php echo number_format($total_array['discount']); ?></td>
-                                        </tr>
-                                    <?php if($row->state ==2){?>
-                                        <tr class="grand-total">
+                                        <td colspan="2" class="">
+                                            <h4 style="text-align: right">Total: </h4>
 
-                                            <td colspan="2" class="">
-                                                <h4 style="text-align: right">Received Amount: </h4>
+                                        </td>
+                                        <td class="text-center total_div"><?php echo number_format($row->total); ?></td>
+                                    </tr>
 
-                                            </td>
-                                            <td class="text-center total_div"><?php echo number_format($total_array['received_amount']); ?></td>
-                                        </tr>
-                                        <?php }?>
-                                    <?php if($row->state > 1){?>
-                                        <tr class="grand-total">
-
-                                            <td colspan="2" class="">
-                                                <h4 style="text-align: right">Remaining Amount: </h4>
-
-                                            </td>
-                                            <td class="text-center total_div"><?php echo number_format($total_array['remaining_amount']); ?></td>
-                                        </tr>
-                                        <?php }?>
-                                        <?php if($row->state==1){?>
-                                        <tr class="grand-total">
-
-                                            <td colspan="2" class="">
-                                                <h4 style="text-align: right">Total: </h4>
-
-                                            </td>
-                                            <td class="text-center total_div"><?php echo number_format($total_array['total']); ?></td>
-                                        </tr>
-                                            <?php }?>
-                                    <?php }?>
 
                                     </tbody>
                                     </table>

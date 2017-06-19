@@ -910,9 +910,12 @@ function  getPaymemntStatus($val){
 
     if($fees_date > 0){
 
-        $paybutton = '<span class="red"><b>'.$fees_date.' Month Unpaid</b></span> <button class="btn btn-primary btn-sm payment_pop" type="button" href="javascript:void(0);" data-invoice="'.$val[1]['id'].'" data-id="'.$val[1]['acc_id'].'" data-month="'.$fees_date.'" data-acc-date="'.$val[1]['day_invoice'].'"><i class="fa fa-money"></i> Pay</button>';
+        $paybutton = '<a href="'.base_url(ADMIN_DIR.'invoices?search[id]=&search[ic:state]=5&search[ic:machine_member_id]='.$val[1]['machine_member_id']).'"> <span class="red"><b> Unpaid</b></span></a> ';
         return $paybutton;
-    }else if($fees_date==="0"){
+    }
+    $checkInvoiceGenerat = getVal("invoices","id","WHERE FIND_IN_SET(1,type) AND acc_id='".$val[1]['acc_id']."' LIMIT 1");
+
+    if($checkInvoiceGenerat){
 
         return '<span class="green"><b>PAID</b></span>';
     }else{

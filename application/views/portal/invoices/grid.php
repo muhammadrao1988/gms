@@ -41,8 +41,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                         <option value="1" '.($search_ar['ic:state']==1 ? "selected":"").'> Paid </option>
                         <option value="2" '.($search_ar['ic:state']==2 ? "selected":"").'> Partially Paid </option>
                         <option value="3" '.($search_ar['ic:state']==3 ? "selected":"").'> Cancelled </option>
-                        <option value="4" '.($search_ar['ic:state']==3 ? "selected":"").'> UnPaid </option>
-                      
+                        <option value="4" '.($search_ar['ic:state']==4 ? "selected":"").'> UnPaid </option>
+                        <option value="5" '.($search_ar['ic:state']==5 ? "selected":"").'> UnPaid/Partially Paid </option>
+
                       </select>';
             $grid = new grid();
             $grid->query = $query;

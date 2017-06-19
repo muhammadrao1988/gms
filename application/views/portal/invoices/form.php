@@ -436,7 +436,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     <?php
 
 
-                                } else {
+                                }
+                                else {
                                     ?>
                                     <div class="form-group">
                                         <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Invoice Date: </label>
@@ -448,15 +449,15 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
+                                    <div class="form-group" <?php echo(($row->id > 0) ? "style='margin-bottom:0px'" : ""); ?>>
                                         <label for="Name" class="col-lg-3 col-sm-3 control-label">Member Name:</label>
 
-                                        <div class="col-lg-6" <?php echo(($row->id > 0) ? "style='margin-top:7px'" : ""); ?>>
+                                        <label class="col-lg-6" <?php echo(($row->id > 0) ? "style='margin-top:7px'" : ""); ?>>
                                             <?php
                                             if ($row->id > 0) {
                                                 $machine_id = getVal("accounts", "machine_member_id", " WHERE acc_id='" . $row->acc_id . "'");
                                                 $acc_name = getVal("accounts", "acc_name", " WHERE acc_id='" . $row->acc_id . "'");
-                                                echo $machine_id . ") " . $acc_name;
+                                                echo  $acc_row->acc_name;
                                                 echo "<input type='hidden' name='acc_id' value='" . $row->acc_id . "'>";
                                             } else {
 
@@ -476,44 +477,108 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                 </select>
                                             <?php } ?>
 
-                                        </div>
+                                        </label>
                                     </div>
                                     <?php if ($row->id != "") {
+                                        $type = explode(",", $row->type);
+                                        echo "<input type='hidden' name='types' value='".$row->type."'>";
+
+                                        ?>
+                                        <div class="form-group" style="margin-bottom: 0px">
+                                            <label for="Name" class="col-lg-3 col-sm-3 control-label">Member ID:</label>
+                                            <label class="col-lg-6"
+                                                   style="margin-top: 7px"><?php echo(($acc_row->machine_member_id!='')? $acc_row->machine_member_id :"" ); ?></label>
+
+                                        </div>
+                                        <?php
+                                        //Monthly Fee
+                                        if(in_array(1,$type)){ ?>
+                                            <div class="form-group" style="margin-bottom: 0px">
+                                                <label for="Name" class="col-lg-3 col-sm-3 control-label">Registration Date:</label>
+                                                <label class="col-lg-6"
+                                                       style="margin-top: 7px"><?php echo grid_dateFormat(array($acc_row->acc_date));; ?></label>
+
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 0px">
+                                                <label for="Name" class="col-lg-3 col-sm-3 control-label">Membership Type:</label>
+                                                <label class="col-lg-6"
+                                                       style="margin-top: 7px"><?php echo $acc_row->membership_name; ?></label>
+
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 0px">
+                                                <label for="Name" class="col-lg-3 col-sm-3 control-label">Membership Fee:</label>
+                                                <label class="col-lg-6"
+                                                       style="margin-top: 7px"><?php echo $acc_row->monthly_charges; ?></label>
+
+                                            </div>
+                                            <?php if($acc_row->discount > 0){
+                                                if($acc_row->discount==1){
+                                                    //discount in percent
+                                                    $fees_per_month = ceil(($acc_row->monthly_charges/100)*$acc_row->discount_value);
+                                                    $fees_per_month = $acc_row->monthly_charges - $fees_per_month;
+                                                    $membership_fee = "After ".$acc_row->discount_value."% discount Membership fee = ".$fees_per_month;
+
+                                                }else if($acc_row->discount==2){
+                                                    $fees_per_month = $acc_row->monthly_charges - $acc_row->discount_value;
+                                                    $membership_fee = "After ".$acc_row->discount_value."rs discount Membership fee =  ".$fees_per_month;
+                                                }else {
+                                                    $fees_per_month = $acc_row->monthly_charges;
+                                                    $membership_fee = $fees_per_month;
+                                                }
+
+
+                                                ?>
+                                                <div class="form-group" style="margin-bottom: 0">
+                                                    <label for="Name" class="col-lg-3 col-sm-3 control-label">Membership Fee After Discount:</label>
+                                                    <label class="col-lg-6"
+                                                           style="margin-top: 7px"><?php
+                                                        echo  $membership_fee;
+                                                        ?></label>
+
+                                                </div>
+                                            <?php } ?>
+                                            <div class="form-group" style="margin-bottom: 0">
+                                                <label for="Name" class="col-lg-3 col-sm-3 control-label">Membership Period:</label>
+                                                <label class="col-lg-6" style="margin-top: 7px">
+                                                    <?php echo grid_dateFormat($row->from_date); ?>
+
+                                                    to
+
+
+                                                    <?php echo grid_dateFormat($row->to_date); ?>
+                                                </label>
+
+                                            </div>
+
+
+                                       <?php } ?>
+                                        <?php
+                                        //subscription Fee
+                                        if(in_array(3,$type)){ ?>
+                                            <div class="form-group" style="margin-bottom: 0">
+                                                <label for="Name" class="col-lg-3 col-sm-3 control-label">Subscription Type:</label>
+                                                <label class="col-lg-6"
+                                                       style="margin-top: 7px"><?php echo $acc_row->subscription_name; ?></label>
+
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 0">
+                                                <label for="Name" class="col-lg-3 col-sm-3 control-label">Subscription Amount:</label>
+                                                <label class="col-lg-6"
+                                                       style="margin-top: 7px"><?php echo $acc_row->subscription_fee; ?></label>
+
+                                            </div>
+
+
+                                        <?php }?>
+                                        <?php
+
                                         $fees_invoice_array = array();
                                         $amount_details = json_decode($row->amount_details);
                                         $fees_invoice_array = $amount_details->fee_invoice;
-
-
-                                        if (count($fees_invoice_array) > 0) { ?>
-                                            <div class="form-group">
-                                                <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
-                                                    Monthly Fee Invoice:</label>
-                                                <div class="col-lg-6">
-                                                    <?php $amount = 0;
-                                                    foreach ($fees_invoice_array as $fee) {
-                                                        $duration = explode("|", $fee->duration);
-                                                        $from_date = "From " . date("d MY", strtotime($duration[0]));
-                                                        $to_date = " To " . date("d MY", strtotime($duration[1]));
-                                                        echo $from_date . $to_date;
-                                                        echo "<br>";
-                                                        $amount = $amount + $fee->amount;
-
-                                                    } ?>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
-                                                    Total Monthly Fee Amount:</label>
-                                                <div class="col-lg-6" style="margin-top: 7px">
-                                                    <?php echo number_format($amount); ?>
-                                                </div>
-                                            </div>
-
-                                        <?php }
-
-
+                                        ?>
+                                        <?php
                                     } ?>
-
+                                    <?php if(!in_array(3,$type) AND !in_array(1,$type)){ ?>
                                     <div class="form-group">
                                         <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">
                                             Invoice Entry:</label>
@@ -540,17 +605,15 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                                value="<?= $row->amount; ?>">
                                                     </div>
                                                 </div>
-                                            <?php } else {
-                                                $type = explode(",", $row->type);
-
-
+                                            <?php }
+                                            else {
                                                 $other_invoice_array = $amount_details->other_invoice;
-
-
                                                 $j = 0;
-
-
-                                                foreach ($other_invoice_array as $ad) { ?>
+                                                foreach ($other_invoice_array as $ad) {
+                                                    if($ad->type==3){
+                                                        continue;
+                                                    }
+                                                    ?>
 
 
                                                     <div class="<?php echo(($j > 0) ? 'append_row' : 'default-row'); ?>">
@@ -607,6 +670,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                             </div>
                                         </div>
                                     <?php } ?>
+                                        <?php }?>
                                     <input type="hidden" name="state" id="state" value="<?php echo ($row->state=="" ? 4 :$row->state) ; ?>">
 
 
