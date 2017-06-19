@@ -39,8 +39,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $invoice_state = '<select class="select" name="search[ic:state]" id="ic:state" style="width: 100%">
                         <option value="" > - Select State - </option>
                         <option value="1" '.($search_ar['ic:state']==1 ? "selected":"").'> Paid </option>
-                        <option value="2" '.($search_ar['ic:state']==2 ? "selected":"").'> Partial Paid </option>
+                        <option value="2" '.($search_ar['ic:state']==2 ? "selected":"").'> Partially Paid </option>
                         <option value="3" '.($search_ar['ic:state']==3 ? "selected":"").'> Cancelled </option>
+                        <option value="4" '.($search_ar['ic:state']==3 ? "selected":"").'> UnPaid </option>
                       
                       </select>';
             $grid = new grid();
@@ -49,12 +50,12 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
             $grid->limit = 25;
             $grid->search_box = true;
             $grid->selectAllCheckbox = false;
-            $grid->hide_fields = array('acc_id');
+            $grid->hide_fields = array('acc_id','fees_month');
             $grid->order_column = 'id';
-            $grid->custom_col_name_fields = array('acc_name'=>'Member Name','fees_datetime'=>'Paid Date','type'=>'Invoice For','fees_month'=>'last_paid_month','machine_member_id'=>'Member Id','id'=>'invoice_No.','acc_id'=>'Account ID');
-            $grid->search_fields_html = array('state'=>$invoice_state,'machine_member_id'=>$machine_member,'fees_datetime'=>$fees_datetime,'type'=>$invoice_type,'fees_month'=>$last_paid);
+            $grid->custom_col_name_fields = array('acc_name'=>'Member Name','from_date'=>'Period','type'=>'Invoice For','fees_month'=>'last_paid_month','machine_member_id'=>'Member Id','id'=>'invoice_No.','acc_id'=>'Account ID');
+            $grid->search_fields_html = array('state'=>$invoice_state,'machine_member_id'=>$machine_member,'from_date'=>$fees_datetime,'type'=>$invoice_type,'fees_month'=>$last_paid);
             //$grid->custom_func = array('amount'=>'getTotalfeesAmount');
-            $grid->custom_func = array('type'=>'invoice_for','fees_datetime'=>'grid_dateFormat');
+            $grid->custom_func = array('type'=>'invoice_for','state'=>'getInvoiceStatus');
             //$grid->search_fields_html = array('user_login_status' => '', 'company' => $s_company, 'reseller' => $s_reseller, 'user_id' => $s_user_id, 'username' => $s_username, 'email' => $s_email);
 
             $grid->form_buttons = array('new');
@@ -75,6 +76,8 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
 include dirname(__FILE__) . "/../includes/footer.php";
 include dirname(__FILE__) . "/../delete.php";
 include dirname(__FILE__) . "/../status.php";
+include dirname(__FILE__) . "/../includes/invoice_popup_js.php";
+include dirname(__FILE__) . "/../includes/cancel_invoice.php";
 ?>
 <script>
     $(function() {
@@ -87,6 +90,14 @@ include dirname(__FILE__) . "/../status.php";
                 $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
             }
         });
+    })
+    $('.cancel_invoice').click(function(){
+
+        var acc_id =$(this).attr("data-id");
+        var invoice_id =$(this).attr("data-invoice");
+
+        $('#cancel_invoice_modal #acc_id').attr('value', acc_id);
+        $('#cancel_invoice_modal #invoice_id').attr('value', invoice_id);
     });
 </script>
 <!-- Content -->

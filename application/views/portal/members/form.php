@@ -209,11 +209,39 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     </div>
                                 </div>
                                 <div class="form-group">
+<<<<<<< HEAD
                                     <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Member Picture: </label>
                                     <div class="col-lg-6">
                                         <label class="styled_select">
                                             <input type="file" name="member_image" id="member_image" class="form-control">
                                         </label>
+=======
+                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Membership Monthly Fee Discount: </label>
+                                    <div class="col-lg-6">
+                                        <label>
+                                            <input type="radio" name="discount"
+                                                   value="0" <?php echo(($row->discount == '0' OR $row->discount == '') ? 'checked' : ''); ?>>
+                                            No Discount
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="discount"
+                                                   value="1" <?php echo(($row->discount == '1') ? 'checked' : ''); ?>>
+                                            Discount in Percent
+                                        </label>
+                                        <label>
+                                            <input type="radio" name="discount"
+                                                   value="2" <?php echo(($row->discount == '2') ? 'checked' : ''); ?>>
+                                            Discount in Rupees
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group discount_value" style="<?= (($row->discount == '0' OR $row->discount == '')?'display:none':''); ?>">
+                                    <label for="inputPassword1" class="col-lg-3 col-sm-3 control-label">Discount Value: </label>
+                                    <div class="col-lg-6">
+                                        <input type="text" id="discount_value" name="discount_value"
+                                               value="<?= $row->discount_value; ?>" placeholder=""
+                                               class="form-control validate[required,custom[integer]]">
+>>>>>>> 86a8e690dc287cdc50fad26a80308e9754a97bf5
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -261,6 +289,20 @@ include dirname(__FILE__) . "/../includes/footer.php";
                 }
             });
             $('#subscriptin_id').trigger('change');
+
+            $('input[name="discount"]').click(function () {
+
+
+
+                if ($('input:radio[name=discount]:checked').val() == "1" || $('input:radio[name=discount]:checked').val() == "2") {
+
+
+                    $('.discount_value').show();
+                } else {
+
+                    $('.discount_value').hide();
+                }
+            });
         });
     })(jQuery)
 </script>

@@ -75,7 +75,24 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     $machine_member_id = $tempRow->machine_member_id;
                                     $acc_name = $tempRow->acc_name;
 
-                                    $fees_per_month = getVal("acc_types", "monthly_charges", " WHERE acc_type_ID='" . $subscription_id . "'");
+                                            if($tempRow->discount==1){
+                                                //discount in percent
+                                                $fees_per_month = ceil(($tempRow->monthly_charges/100)*$tempRow->discount_value);
+                                                $fees_per_month = $tempRow->monthly_charges - $fees_per_month;
+                                                $membership_fee = "After ".$tempRow->discount_value."% discount Membership fee = ".$fees_per_month;
+
+                                            }else if($tempRow->discount==2){
+                                                $fees_per_month = $tempRow->monthly_charges - $tempRow->discount_value;
+                                                $membership_fee = "After ".$tempRow->discount_value."rs discount Membership fee =  ".$fees_per_month;
+                                            }else {
+                                                 $fees_per_month = $tempRow->monthly_charges;
+                                                 $membership_fee = $fees_per_month;
+                                            }
+
+
+                                    $sql_monthly_detail = "SELECT monthly_charges,";
+
+                                    //$fees_per_month = $tempRow->monthly_charges;
 
                                     $month_due = ceil(dayDifference($invoice_generate_date)/30 );
 
@@ -85,32 +102,112 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                     ?>
                                     <input type='hidden' name='firstInvoice' value='1'>
                                     <input type='hidden' name='tempID' value='<?php echo $tempRow->acc_id; ?>'>
-                                    <input type='hidden' name='acc_id' value='<?php echo $tempRow->acc_id ?>'>
-                                    <input type='hidden' name='fees_per_month' value='<?php echo $fees_per_month ?>'>
-                                    <input type='hidden' name='invoice_generate_date'
+                                    <input type='hidden' name='acc_id' value='<?php echo $tempRow->acc_id; ?>'>
+                                    <input type='hidden' name='fees_per_month' value='<?php echo $fees_per_month; ?>'>
+                                    <input type='hidden' name='discount' value='<?php echo $tempRow->discount; ?>'>
+                                    <input type='hidden' name='discount_value' value='<?php echo $tempRow->discount_value; ?>'>
+                                    <input type='hidden' name='monthly_charges' value='<?php echo $tempRow->monthly_charges; ?>'>
+                                    <input type='hidden' name='subscription_fee' value='<?php echo $tempRow->subscription_fee; ?>'>
+                                    <input type='hidden' name='account_invoice_generate_date'
                                            value='<?php echo $invoice_generate_date ?>'>
                                     <div class="form-group">
+                                        <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Invoice Date: </label>
+                                        <div class="col-lg-6">
+                                            <input type="text" id="invoice_date" name="invoice_date"
+                                                   value=""
+                                                   placeholder="DD-MM-YYYY"
+                                                   class="form-control validate[required] datepicker-format">
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0">
                                         <label for="Name" class="col-lg-3 col-sm-3 control-label">Member Name:</label>
                                         <label class="col-lg-6"
-                                               style="margin-top: 7px"><?php echo(($machine_member_id!='')? $machine_member_id . ") ":"" ). $acc_name; ?></label>
+                                               style="margin-top: 7px"><?php echo $acc_name; ?></label>
 
                                     </div>
-                                    <div class="form-group" style="border-top:3px  dotted;padding-top: 10px">
-                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Per Month Fee:</label>
-                                        <div class="col-lg-6" style="margin-top: 7px">
-                                            <?php echo $fees_per_month; ?>
-                                        </div>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Member ID:</label>
+                                        <label class="col-lg-6"
+                                               style="margin-top: 7px"><?php echo(($machine_member_id!='')? $machine_member_id :"" ); ?></label>
+
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Registration Date:</label>
+                                        <label class="col-lg-6"
+                                               style="margin-top: 7px"><?php echo grid_dateFormat(array($tempRow->acc_date)); ?></label>
+
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Membership Type:</label>
+                                        <label class="col-lg-6"
+                                               style="margin-top: 7px"><?php echo $tempRow->membership_name; ?></label>
+
+                                    </div>
+                                <div class="form-group" style="margin-bottom: 0">
+                                    <label for="Name" class="col-lg-3 col-sm-3 control-label">Membership Fee:</label>
+                                    <label class="col-lg-6"
+                                           style="margin-top: 7px"><?php
+                                        echo  $tempRow->monthly_charges;
+                                        ?></label>
+
+                                </div>
+                                <?php if($tempRow->discount > 0){ ?>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Membership Fee After Discount:</label>
+                                        <label class="col-lg-6"
+                                               style="margin-top: 7px"><?php
+                                           echo  $membership_fee;
+                                            ?></label>
+
+                                    </div>
+                            <?php } ?>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Membership Period:</label>
+                                        <label class="col-lg-3">
+                                            <input type="text"  placeholder=""
+                                                   style="padding: 0 10px;"
+                                                   class="form-control  validate[required]"
+                                                   name="invoice_generate_date"
+                                                   id="date1"
+                                                   value="">
+
+                                        </label>
+                                        <label class="pull-left">
+                                            to
+                                        </label>
+                                            <label class="col-lg-3">
+
+                                            <input type="text" placeholder=""
+                                                   style="padding: 0 10px;"
+                                                   class="form-control  validate[required]"
+                                                   id="date2"
+
+                                                   value="<?php echo $row->received_amount; ?>">
+                                        </label>
+
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Subscription Type:</label>
+                                        <label class="col-lg-6"
+                                               style="margin-top: 7px"><?php echo $tempRow->subscription_name; ?></label>
+
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0">
+                                        <label for="Name" class="col-lg-3 col-sm-3 control-label">Subscription Amount:</label>
+                                        <label class="col-lg-6"
+                                               style="margin-top: 7px"><?php echo $tempRow->subscription_fee; ?></label>
+
                                     </div>
 
                                     <?php
 
-                                    if ($month_due > 0) { ?>
+                                   /* if ($month_due > 0) { */?><!--
                                         <div class="form-group">
                                             <label for="Name" class="col-lg-3 col-sm-3 control-label">Monthly Fee
                                                 Invoice</label>
                                             <div class="col-lg-6">
                                                 <?php
-                                                if ($register_day <= date('d')) {
+/*                                                if ($register_day <= date('d')) {
 
                                                     $datetime = new DateTime(date('Y-m-') . '01');
                                                     $datetime2 = new DateTime(date('Y-m-') . '01');
@@ -124,10 +221,10 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                 for ($i = 1; $i <= $month_due; $i++) {
 
 
-                                                    ?>
+                                                    */?>
 
                                                     <?php
-                                                    if ($i == 1) {
+/*                                                    if ($i == 1) {
                                                         $from_month = $datetime;
                                                     } else {
                                                         $from_month = $datetime->modify("-1 month");
@@ -179,7 +276,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                     //$datetime = new DateTime(date('Y-m-d'));
 
                                                 }
-                                                ?>
+                                                */?>
 
                                             </div>
                                         </div>
@@ -207,14 +304,15 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                             </div>
                                         </div>
                                         <input type='hidden' name='is_register_old' value='1'>
-                                    <?php } else {
-                                        ?>
+                                    <?php /*}
+                                    else {
+                                        */?>
                                         <input type='hidden' name='is_register_old' value='0'>
                                         <div class="form-group">
                                             <label for="Name" class="col-lg-3 col-sm-3 control-label">Monthly Fee
                                                 Invoice:</label>
                                             <div class="col-lg-6" style="margin-top: 7px">
-                                                <?php $datetime2 = new DateTime(date('Y-m', strtotime($invoice_generate_date)) . '-01');
+                                                <?php /*$datetime2 = new DateTime(date('Y-m', strtotime($invoice_generate_date)) . '-01');
                                                 $to_month = $datetime2->modify("+1 month");
                                                 $to_month = $datetime2->format("MY");
 
@@ -233,32 +331,30 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                 echo "<input  style='float:left;margin-top:3px;margin-right:5px' type='hidden' name='fees_month[]' class='due_fees' data-count='" . $i . "' id='fees_" . $i . "' value='" . date('Y-m-d', strtotime($invoice_generate_date)) . "|" . date('Y-m', strtotime($to_month)) . "-" . $register_day_to . "'>";
                                                 echo " From " . date('d MY', strtotime($invoice_generate_date));
                                                 echo " To " . $register_day_to . " " . $to_month;
-                                                ?>
+                                                */?>
                                             </div>
                                         </div>
 
 
-                                    <?php }
+                                    --><?php /*}*/
                                     ?>
-                                    <div class="form-group" style="border-top:3px  dotted;padding-top: 10px">
-                                        <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">Other
-                                            Invoice
-                                            Entry:</label>
+                                    <div class="form-group" style="padding-top: 10px">
+                                        <label for="invoice" class="col-lg-3 col-md-3 col-sm-3 control-label">Other Entry:</label>
                                         <div class="form-inline col-md-9" id="invoice_entries">
                                             <div class="default-row">
                                                 <div class="form-group" style="margin: 0;">
-                                                    <select name="type[]" id="type" class="select validate[required]"
+                                                    <select name="type[]" id="type" class="select"
                                                             tabindex="-1"
                                                             data-placeholder="Select invoice types">
                                                         <option value="">- select -</option>
                                                         <?php
-                                                        echo selectBox("select `id`,`name` from `invoice_types` WHERE id!=1", $val);
+                                                        echo selectBox("select `id`,`name` from `invoice_types` WHERE id NOT IN (1,3)", $val);
                                                         ?>
                                                     </select>
                                                 </div>
                                                 <div class="form-group" style="margin: 0;">
                                                     <input type="text"
-                                                           class="form-control validate[required,custom[integer]] col-md-12"
+                                                           class="form-control validate[custom[integer]] col-md-12"
                                                            id="amount" name="amount[]" placeholder="amount e.g 1500"
                                                            value="<?= $row->amount; ?>">
                                                 </div>
@@ -272,11 +368,11 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         <label for="addmorebtn" class="col-lg-3 col-sm-3 control-label">&nbsp;</label>
                                         <div class="col-lg-6">
                                             <button class="btn btn-green" type="button" id="add-more-btn">Add More
-                                                Invoice Entry
+                                                 Entry
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                   <!-- <div class="form-group">
                                         <label for="description" class="col-lg-3 col-sm-3 control-label">Invoice
                                             Status:</label>
                                         <div class="col-lg-6">
@@ -284,10 +380,10 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                     tabindex="-1"
                                                     data-placeholder="Select invoice types">
                                                 <option value="">Select Status:</option>
-                                                <option value="1" <?php echo $row - state == 1 ? "selected" : ""; ?>>
+                                                <option value="1" <?php /*echo $row - state == 1 ? "selected" : ""; */?>>
                                                     Paid
                                                 </option>
-                                                <option value="2" <?php echo $row - state == 2 ? "selected" : ""; ?>>
+                                                <option value="2" <?php /*echo $row - state == 2 ? "selected" : ""; */?>>
                                                     Partial
                                                     Paid
                                                 </option>
@@ -296,7 +392,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                         </div>
                                     </div>
                                     <div class="form-group partial_paid_div"
-                                         style="<?php echo(($row - state == 1 OR $row - state == "") ? "display: none;" : ""); ?>">
+                                         style="<?php /*echo(($row - state == 1 OR $row - state == "") ? "display: none;" : ""); */?>">
                                         <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Received
                                             Amount:</label>
                                         <div class="col-lg-6">
@@ -304,7 +400,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                    style="padding: 0 10px;"
                                                    class="form-control  validate[required,custom[integer]]"
                                                    name="received_amount"
-                                                   value="<?php echo $row->received_amount; ?>">
+                                                   value="<?php /*echo $row->received_amount; */?>">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -315,9 +411,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                    style="padding: 0 10px;"
                                                    class="form-control  validate[custom[integer]]"
                                                    name="discount"
-                                                   value="<?php echo $row->discount; ?>">
+                                                   value="<?php /*echo $row->discount; */?>">
                                         </div>
-                                    </div>
+                                    </div>-->
                                     <div class="form-group">
                                         <label for="description"
                                                class="col-lg-3 col-sm-3 control-label">Description:</label>
@@ -326,13 +422,31 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                   rows="5"><?= $row->description;; ?></textarea>
                                         </div>
                                     </div>
+                            <div class="form-group" style="margin-bottom: 0">
+                                <label for="Name" class="col-lg-3 col-sm-3 control-label">Invoice Total:</label>
+                                <label class="col-lg-6"
+                                       style="margin-top: 7px; margin-left: 5px">
+
+
+                                <span style="background: #FBFBFB;padding: 10px 30px;font-size: 18px;color: #ff0058;"><?php echo $fees_per_month + $tempRow->subscription_fee; ?></span></label>
+
+                            </div>
+                                    <div class="clearfix">&nbsp;</div>
 
                                     <?php
 
 
                                 } else {
                                     ?>
-
+                                    <div class="form-group">
+                                        <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Invoice Date: </label>
+                                        <div class="col-lg-6">
+                                            <input type="text" id="invoice_date" name="invoice_date"
+                                                   value="<?php echo ($row->id!=""? grid_dateFormat($row->fees_datetime) : "");?>"
+                                                   placeholder="DD-MM-YYYY"
+                                                   class="form-control validate[required] datepicker-format">
+                                        </div>
+                                    </div>
 
                                     <div class="form-group">
                                         <label for="Name" class="col-lg-3 col-sm-3 control-label">Member Name:</label>
@@ -415,7 +529,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                                 data-placeholder="Select invoice types">
                                                             <option value="">- select -</option>
                                                             <?php
-                                                            echo selectBox("select `id`,`name` from `invoice_types` WHERE id!=1", $val);
+                                                            echo selectBox("select `id`,`name` from `invoice_types` WHERE id NOT IN (1,3)", $val);
                                                             ?>
                                                         </select>
                                                     </div>
@@ -447,7 +561,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                                     data-placeholder="Select invoice types">
                                                                 <option value="">- select -</option>
                                                                 <?php
-                                                                echo selectBox("select `id`,`name` from `invoice_types` WHERE id!=1", $ad->type);
+                                                                echo selectBox("select `id`,`name` from `invoice_types` WHERE id NOT IN (1,3)", $ad->type);
                                                                 ?>
                                                             </select>
                                                         </div>
@@ -488,51 +602,15 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                    class="col-lg-3 col-sm-3 control-label">&nbsp;</label>
                                             <div class="col-lg-6">
                                                 <button class="btn btn-green" type="button" id="add-more-btn">Add More
-                                                    Invoice Entry
+                                                     Entry
                                                 </button>
                                             </div>
                                         </div>
                                     <?php } ?>
-                                    <div class="form-group">
-                                        <label for="description" class="col-lg-3 col-sm-3 control-label">Invoice
-                                            Status</label>
-                                        <div class="col-lg-6">
-                                            <select name="state" id="state" class="select validate[required]"
-                                                    tabindex="-1"
-                                                    data-placeholder="Select invoice types">
-                                                <option value="">Select Status</option>
-                                                <option value="1" <?php echo $row->state == 1 ? "selected" : ""; ?>>Paid
-                                                </option>
-                                                <option value="2" <?php echo $row->state == 2 ? "selected" : ""; ?>>
-                                                    Partially
-                                                    Paid
-                                                </option>
+                                    <input type="hidden" name="state" id="state" value="<?php echo ($row->state=="" ? 4 :$row->state) ; ?>">
 
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group partial_paid_div"
-                                         style="<?php echo(($row - state == 1 OR $row - state == "") ? "display: none;" : ""); ?>">
-                                        <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Received
-                                            Amount</label>
-                                        <div class="col-lg-6">
-                                            <input type="text" id="received_amount" placeholder=""
-                                                   style="padding: 0 10px;"
-                                                   class="form-control  validate[required,custom[integer]]"
-                                                   name="received_amount"
-                                                   value="<?php echo($row->state == 2 ? $row->received_amount : ""); ?>">
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="fees_month" class="col-lg-3 col-sm-3 control-label">Discount</label>
-                                        <div class="col-lg-6">
-                                            <input type="text" id="discount" placeholder=""
-                                                   style="padding: 0 10px;"
-                                                   class="form-control  validate[custom[integer]]"
-                                                   name="discount"
-                                                   value="<?php echo $row->discount; ?>">
-                                        </div>
-                                    </div>
+
+
                                     <div class="form-group">
                                         <label for="description"
                                                class="col-lg-3 col-sm-3 control-label">Description</label>
@@ -591,9 +669,9 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 <option value="">- select -</option>
                 <?php
                 if ($row->id != "") {
-                    echo selectBox("select `id`,`name` from `invoice_types` WHERE id!='1'");
+                    echo selectBox("select `id`,`name` from `invoice_types` WHERE id NOT IN (1,3)");
                 } else {
-                    echo selectBox("select `id`,`name` from `invoice_types` WHERE id!='1' ");
+                    echo selectBox("select `id`,`name` from `invoice_types` WHERE id NOT IN (1,3) ");
                 }
                 ?>
             </select>
