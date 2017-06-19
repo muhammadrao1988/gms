@@ -39,7 +39,7 @@ class Members extends CI_Controller
         $this->module = 'm_' . $this->module_name;
         $this->load->model(ADMIN_DIR . $this->module);
         $this->module = $this->{$this->module};
-
+        //$this->load->helper(array('form', 'url'));
         $this->table = $this->module->table;
         $this->id_field = $this->module->id_field;
         $this->branch_id = getVal("users", "branch_id", " WHERE user_id='" . $this->session->userdata('user_info')->user_id . "'");
@@ -77,8 +77,8 @@ class Members extends CI_Controller
         WHERE 1 ". $where;*/
 
         $search = getVar('search');
-        if($search['acc:acc_date']!=""){
-            $where = str_replace(" AND acc.acc_date LIKE '%".$search['acc:acc_date']."%'","AND acc.acc_date LIKE '%".date('Y-m-d',strtotime($search['acc:acc_date']))."%'",$where);
+        if ($search['acc:acc_date'] != "") {
+            $where = str_replace(" AND acc.acc_date LIKE '%" . $search['acc:acc_date'] . "%'", "AND acc.acc_date LIKE '%" . date('Y-m-d', strtotime($search['acc:acc_date'])) . "%'", $where);
         }
         $having_record = "";
         if ($search['subscription_status'] != '') {
@@ -192,6 +192,7 @@ class Members extends CI_Controller
     }
 
 
+
     public function add()
     {
         /*$email_exists = getVal('accounts', 'email', 'WHERE `email`="' . getVar('email') . '"');
@@ -230,14 +231,23 @@ class Members extends CI_Controller
             $DBdata['serial_number'] = $user_info->machine_serial;
             $DBdata['acc_manager'] = $user_info->user_id;
 
+            /*Image Upload Function*/
+            $DBdata['image'] = '';
+            if($_FILES['member_image']['name']!=''){
+                $check_image = $this->picture_upload('member_image');
+                if ($check_image['error'] == "") {
+                    $this->resize_picture($check_image['upload_data']['file_name']);
+                    $DBdata['image'] = $check_image['upload_data']['file_name'];
+                }
+            }
+
             $id = save($this->table, $DBdata);
             if ($this->is_machine == 1) {
                 $this->module->getMachineUserId(getVar('machine_member_id'), base_url(ADMIN_DIR . 'invoices/form/?tempID=' . $id . '&firstInvoice=1&msg=Member has been created. Please generate first invoice.'));
-            }else{
+            } else {
                 /*------------------------------------------------------------------------------------------*/
                 redirect(ADMIN_DIR . 'invoices/form/?tempID=' . $id . '&firstInvoice=1&msg=Member has been created. Please generate first invoice.');
             }
-
         }
     }
 
@@ -257,6 +267,16 @@ class Members extends CI_Controller
             //$DBdata['machine_user_id']  = $this->module->getMachineUserId($_REQUEST['machine_member_id']);;
             $DBdata['branch_id'] = getVal('users', 'branch_id', ' where user_id = "' . $this->session->userdata('user_info')->user_id . '"');
             $DBdata['serial_number'] = getVal('users', 'machine_serial', ' where user_id = "' . $this->session->userdata('user_info')->user_id . '"');
+
+            /*Image Upload Function*/
+            $DBdata['image'] = '';
+            if($_FILES['member_image']['name']!=''){
+                $check_image = $this->picture_upload('member_image');
+                if ($check_image['error'] == "") {
+                    $this->resize_picture($check_image['upload_data']['file_name']);
+                    $DBdata['image'] = $check_image['upload_data']['file_name'];
+                }
+            }
 
             $where = $DbArray['where'];
             save($this->table, $DBdata, $where);
@@ -345,9 +365,9 @@ class Members extends CI_Controller
                 }
             } else {
                 //if (getVal('accounts', 'machine_member_id', ' WHERE acc_id = "' . getVar('acc_id') . '" AND branch_id = "' . $this->branch_id . '" AND status =1') != $str) {
-                    if (getVal('accounts', 'acc_id', ' WHERE machine_member_id = "' . $str . '" AND branch_id = "' . $this->branch_id . '" AND status =1 AND acc_id != "'.getVar('acc_id').'"')=="") {
-                        return true;
-                    }
+                if (getVal('accounts', 'acc_id', ' WHERE machine_member_id = "' . $str . '" AND branch_id = "' . $this->branch_id . '" AND status =1 AND acc_id != "' . getVar('acc_id') . '"') == "") {
+                    return true;
+                }
                 //}
             }
             $this->form_validation->set_message('member_id_exist', 'This member id is already exist.');
@@ -356,6 +376,41 @@ class Members extends CI_Controller
             $this->form_validation->set_message('member_id_exist', 'Please insert member id');
             return FALSE;
         }
+    }
+    function picture_upload($input, $with = '', $height = '')
+    {
+        $config['upload_path'] = 'assets/images/members/';
+        $config['allowed_types'] = 'gif|jpg|png';
+        $config['max_size'] = 100000;
+        $config['max_width'] = $with;
+        $config['max_height'] = $height;
+
+        $this->load->library('upload');
+        $this->upload->initialize($config);
+        if (!$this->upload->do_upload($input)) {
+            $error = array('error' => $this->upload->display_errors());
+            return $error;
+            //$this->load->view('upload_form', $error);
+        } else {
+            $data = array('upload_data' => $this->upload->data());
+            return $data;
+            //$this->load->view('upload_success', $data);
+        }
+    }
+
+    function resize_picture($path,$width=100,$height=100){
+        $this->load->library('image_lib');
+
+        $config['image_library'] = 'gd2';
+        $config['source_image'] = 'assets/images/members/' . $path;
+        $config['create_thumb'] = TRUE;
+        $config['maintain_ratio'] = TRUE;
+        $config['width'] = $width;
+        $config['height'] = $height;
+
+        $this->image_lib->clear();
+        $this->image_lib->initialize($config);
+        $this->image_lib->resize();
     }
 }
 
