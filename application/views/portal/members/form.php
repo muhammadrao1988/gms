@@ -52,7 +52,7 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                 <div class="panel-body">
                     <form id="validate" class="form-horizontal theme-form-horizontal" role="form" method="post"
                           action="<?= site_url(ADMIN_DIR . $this->module_name . (!empty($row->acc_id) ? '/update' : '/add')); ?>"
-                          method="post" enctype="multipart/form-data">
+                          enctype="multipart/form-data">
                         <input type="hidden" name="acc_id" id="acc_id" value="<?= $row->acc_id; ?>"/>
                         <div class="row">
 
@@ -205,6 +205,14 @@ include dirname(__FILE__) . "/../includes/left_side_bar.php";
                                                 <?= selectBox("SELECT id,CONCAT(`name`,' - ',period,' Days') AS subsribe_name FROM `subscriptions` WHERE `status` = 1 AND branch_id='".$this->branch_id."'", $row->subscription_id); ?>
                                             </select>
                                             <span class="help-block"></span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail1" class="col-lg-3 col-sm-3 control-label">Member Picture: </label>
+                                    <div class="col-lg-6">
+                                        <label class="styled_select">
+                                            <input type="file" name="member_image" id="member_image" class="form-control">
                                         </label>
                                     </div>
                                 </div>

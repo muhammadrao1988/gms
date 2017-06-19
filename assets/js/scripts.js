@@ -70,6 +70,7 @@
     $(".validate").validationEngine({promptPosition : "topRight:-122,-5"});
 	 //===== Select box with search =====//
     $(".styled_select select").uniform();
+    $(".styled_select input[type='file']").uniform();
 	$(".select").select2();
     $('.select-default').select2({
         minimumResultsForSearch: -1
