@@ -1,4 +1,8 @@
 <?php
+
+
+date_default_timezone_set("Asia/Karachi");
+
 $system_path = 'system';
 if (realpath($system_path) !== FALSE)
 {
@@ -22,7 +26,9 @@ if ($mysqli->connect_errno) {
     printf("Connect failed: %s\n", $mysqli->connect_error);
     exit();
 }
- $sql = "SELECT
+
+
+  $sql = "SELECT
   acc.branch_id,
   acc.`machine_member_id`,
   inv.`acc_id`,
@@ -59,6 +65,7 @@ GROUP BY inv.acc_id
 HAVING last_paid < DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
 $sql_result = $mysqli->query($sql) or die($mysqli->error);
 
+
 if ($sql_result->num_rows) {
     while ($row = $sql_result->fetch_object()) {
         $total_month = $row->fees_month;
@@ -70,17 +77,21 @@ if ($sql_result->num_rows) {
 
 
         if($discount==1){ //percent
+
             $fees_per_month = ceil(($monthly_charges/100)*$discount_value);
             $fees_per_month = $monthly_charges - $fees_per_month;
             $membership_fee = "Membership fee = ".$monthly_charges.". By default membership discount = " . $discount_value . "%. After discount Membership fee =  " . $fees_per_month;
-        }else if($discount){//rupess
+        }else if($discount==2){//rupess
+
             $fees_per_month = $monthly_charges - $discount_value;
             $membership_fee = "After ".$discount_value."rs discount Membership fee =  ".$fees_per_month;
         }else {
-            $fees_per_month = $discount_value;
-            $membership_fee = $fees_per_month;
+
+            $fees_per_month = $monthly_charges;
+            $membership_fee = "Generated invoice for membership fee. Membership fee = ".$fees_per_month;
         }
         $fee_invoice_template_array[0]['description'] = $membership_fee;
+
 
 
 
@@ -94,6 +105,7 @@ if ($sql_result->num_rows) {
             $fee_invoice_template_array[0]['amount'] = $fees_per_month;
             $fee_invoice_template_array[0]['duration'] = $from . "|" . $to;
 
+
             $total_array = array();
             $total_array['subtotal'] = $fees_per_month;
             $total_array['discount'] = 0;
@@ -104,7 +116,7 @@ if ($sql_result->num_rows) {
             $account_details = array('fee_invoice' => $fee_invoice_template_array, 'total' => $total_array);
 
 
-            $insert = "INSERT INTO `gms`.`invoices`
+            $insert = "INSERT INTO `invoices`
             (
 
              `acc_id`,
@@ -143,9 +155,9 @@ VALUES ('".$row->acc_id."',
         '999',
         '$from',
         '$to')";
-            echo $insert;
-            echo "<br>";
-            $mysqli->query($insert);
+           // echo $insert;
+          //  echo "<br>";
+            $mysqli->query($insert) or  die($mysqli->error);
 
         }
 

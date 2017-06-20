@@ -1,0 +1,45 @@
+[19-Jun-2017 08:16:01 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
+[19-Jun-2017 08:17:15 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
+[19-Jun-2017 08:17:52 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
+[19-Jun-2017 08:19:23 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
+[19-Jun-2017 10:06:01 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
+[19-Jun-2017 11:09:29 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
+[19-Jun-2017 11:09:38 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
+[19-Jun-2017 11:12:35 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
+[19-Jun-2017 11:16:07 UTC] PHP Warning:  PHP Startup: imagick: Unable to initialize module
+Module compiled with module API=20121212
+PHP    compiled with module API=20151012
+These options need to match
+ in Unknown on line 0
