@@ -97,7 +97,7 @@ class M_attendance extends CI_Model
 
                     $account_details = array('other_invoice' => $fee_invoice_template_array, 'total' => $total_array);
 
-                        $insert = "INSERT INTO `gms`.`invoices`
+                        $insert = "INSERT INTO `invoices`
                                     (`acc_id`,
                                      `machine_member_id`,
                                      `state`,
